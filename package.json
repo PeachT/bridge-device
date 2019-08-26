@@ -89,7 +89,7 @@
       "target": [
         "nsis"
       ],
-      "icon": "build/icons/256x256.ico"
+      "icon": "build/icons/kvm/256x256.ico"
     },
     "nsis": {
       "oneClick": false,
@@ -100,7 +100,7 @@
       "target": [
         "deb"
       ],
-      "icon": "build/icons"
+      "icon": "build/icons/kvm"
     }
   },
   "keywords": [
