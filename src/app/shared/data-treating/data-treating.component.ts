@@ -19,7 +19,6 @@ import { lastDayOfWeek, lastDayOfMonth, startOfWeek, startOfMonth, getTime, comp
   selector: 'app-data-treating',
   templateUrl: './data-treating.component.html',
   styleUrls: ['./data-treating.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DataTreatingComponent implements OnInit {
   @ViewChild('tplTitle', null) tplTitle: TemplateRef<{}>;
@@ -157,7 +156,7 @@ export class DataTreatingComponent implements OnInit {
         this.upanState.msg = data;
         this.upanState.state = false;
         console.log('获取U盘返回', data);
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       });
     }
   }
@@ -170,10 +169,11 @@ export class DataTreatingComponent implements OnInit {
         this.template.files = data.stdout;
         this.savePath = data.stdout;
         this.template.fileMsg = data;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       });
     }
   }
+  /** 获取导入数据 */
   getDbFile() {
     if (this.e.isLinux) {
       this.e.ipcRenderer.send('get-dbfile', 'get-dbfile-back');
@@ -181,7 +181,8 @@ export class DataTreatingComponent implements OnInit {
         console.log(data);
         this.inData.files = data.stdout;
         this.inData.fileMsg = data;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+        this.cdr.detectChanges();
       });
     }
   }
@@ -239,7 +240,7 @@ export class DataTreatingComponent implements OnInit {
     } else {
       this.taskData.sp = null;
     }
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
   /** 选择任务项目 */
   selectTaskProject(e) {
@@ -257,7 +258,7 @@ export class DataTreatingComponent implements OnInit {
     } else {
       this.taskData.sc = null;
     }
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
   /** 选择构建 */
   selectTaskComponent(e) {
@@ -268,14 +269,14 @@ export class DataTreatingComponent implements OnInit {
   selectTaskJack(e) {
     this.selectIndatas = this.indatas.filter(t => t.jack.name === this.taskData.sj);
     console.log(this.taskData.sj, e, this.selectIndatas);
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
   /** 获取任务梁数据 */
   async getTaskBridge() {
     // this.taskData.bridge = await this.db.getTaskBridgeMenuData(
     //   (o1) => o1.project === this.taskData.sp && o1.component === this.taskData.sc);
     // console.log(this.taskData.bridge);
-    // this.cdr.markForCheck();
+    // this.cdr.detectChanges();
 
     const bridge = await this.db.getTaskBridgeMenuData(
       'task',
@@ -311,7 +312,7 @@ export class DataTreatingComponent implements OnInit {
     this.taskData.bridge = bridge.menus;
     this.filter.count = bridge.count;
     console.log(this.filter);
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
   /** 选择梁 */
   setBridge(b) {
@@ -329,7 +330,7 @@ export class DataTreatingComponent implements OnInit {
     }
     console.log(this.taskData.sb);
     this.progress.length = this.taskData.sb.length;
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
   /** 过滤 */
   onTaskFliter(e) {
@@ -445,7 +446,7 @@ export class DataTreatingComponent implements OnInit {
         this.progress.msg = '导出错误';
         this.progress.success = true;
       }
-      this.cdr.markForCheck();
+      this.cdr.detectChanges();
       console.log('导出', data);
     });
     // this.taskData.sb.map(async id => {
@@ -474,7 +475,7 @@ export class DataTreatingComponent implements OnInit {
         this.progress.success = true;
         console.log(data);
       }
-      this.cdr.markForCheck();
+      this.cdr.detectChanges();
       console.log('导出', data);
     });
   }
@@ -503,13 +504,13 @@ export class DataTreatingComponent implements OnInit {
         this.indatas = JSON.parse(b64_to_utf8(data.data));
         console.log('导入的文件', data, this.indatas);
         this.inData.state = false;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       } else {
         console.log(data);
         this.inData.msg = data.msg;
         this.message.error('获取数据错误');
         this.inData.state = false;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       }
     });
   }
@@ -542,7 +543,7 @@ export class DataTreatingComponent implements OnInit {
             }
             console.log('覆盖导入', task);
             this.inResult.merge.push(task.name);
-            this.cdr.markForCheck();
+            this.cdr.detectChanges();
             this.inDataRun();
           });
         } else {
@@ -601,7 +602,7 @@ export class DataTreatingComponent implements OnInit {
         this.progress.msg = '导出完成';
         this.progress.success = true;
       }
-      this.cdr.markForCheck();
+      this.cdr.detectChanges();
       this.inDataRun();
     });
   }
@@ -614,7 +615,7 @@ export class DataTreatingComponent implements OnInit {
     }
     console.log('跳过导入', task);
     this.inResult.jump.push(task.name);
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
 
   onFilter() {

@@ -217,6 +217,7 @@ export class DbService {
     const count = await this.db.task.filter(o1 => f(o1)).count();
     console.log(count);
     y = y || count;
+    // y = count;
     await this.db[dbName].filter(o1 => f(o1))
       .reverse() // 按id 反序获取
       .offset(p) // 第几条开始

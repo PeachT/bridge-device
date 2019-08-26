@@ -121,12 +121,18 @@
     </nz-alert>
   </nz-spin>
   <div *ngIf="indatas">
-    <nz-radio-group [(ngModel)]="taskData.sp" (ngModelChange)="selectTaskProject($event)">
-      <label nz-radio [nzValue]="p.key" *ngFor="let p of taskData.project">{{p.title}}</label>
-    </nz-radio-group>
-    <nz-radio-group [(ngModel)]="taskData.sj" (ngModelChange)="selectTaskJack($event)">
-      <label nz-radio [nzValue]="j.title" *ngFor="let j of taskData.jack">{{j.title}}</label>
-    </nz-radio-group>
+    <div>
+      选择项目：
+      <nz-radio-group [(ngModel)]="taskData.sp" (ngModelChange)="selectTaskProject($event)">
+        <label nz-radio [nzValue]="p.key" *ngFor="let p of taskData.project">{{p.title}}</label>
+      </nz-radio-group>
+    </div>
+    <div>
+      选择顶：
+      <nz-radio-group [(ngModel)]="taskData.sj" (ngModelChange)="selectTaskJack($event)">
+        <label nz-radio [nzValue]="j.title" *ngFor="let j of taskData.jack">{{j.title}}</label>
+      </nz-radio-group>
+    </div>
     <table class="gridtable">
       <thead>
         <tr>

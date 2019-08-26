@@ -39,7 +39,10 @@ export class TaskMenuComponent implements OnInit {
   bridge = {
     select: null,
     menu: null,
+    count: 0,
+    page: 0
   };
+  pageCount = 17;
   paddingTop = 0;
   pts = [];
   sg = 0;
@@ -153,14 +156,14 @@ export class TaskMenuComponent implements OnInit {
     this.scrollTop = 0;
     this.setScrollTop = 0;
     this.bridgeScrollDom.nativeElement.scrollTop = 0;
-    this.getBridgedb(id, 0, 45);
+    this.getBridgedb(id);
   }
 
   onProject() {
     this.project.select = this.project.menu.filter(f => f.name === this.project.sName)[0];
     console.log(this.project.select, this.project.menu);
     if (this.ifEdit()) { return; }
-    this.bridge = { menu: [], select: null };
+    this.bridge = { menu: [], select: null, count: 0, page: 0 };
     this.component = { menu: [], select: null };
     this.appS.leftMenu = null;
     console.log(this.project);
@@ -241,7 +244,7 @@ export class TaskMenuComponent implements OnInit {
       this.sgs = false;
       console.log('sg=', sg);
       this.sg++;
-      await this.getBridgedb(null, this.sg * 15, 45);
+      await this.getBridgedb(null);
       this.pts.push(this.pt20);
       this.paddingTop = this.pts.reduce((prev, cur) => prev + cur, 0);
       this.setPadding(data, 1);
@@ -251,7 +254,7 @@ export class TaskMenuComponent implements OnInit {
       this.sgsd = false;
       console.log('sgd=', sgd);
       this.sg--;
-      await this.getBridgedb(null, this.sg * 15, 45);
+      await this.getBridgedb(null);
       this.pts.pop();
       this.paddingTop = this.pts.reduce((prev, cur) => prev + cur, 0);
       this.setPadding(data, 2);
@@ -277,7 +280,8 @@ export class TaskMenuComponent implements OnInit {
     }
     console.log(this.pt20);
   }
-  async getBridgedb(id = null, p, y) {
+  /** 获取梁数据 */
+  async getBridgedb(id = null) {
     const menu = await this.db.getTaskBridgeMenuData(
       this.dbNmae,
       (o1: TaskBase) => {
@@ -308,17 +312,27 @@ export class TaskMenuComponent implements OnInit {
 
         return false;
       },
-      false, p, y);
+      false, this.bridge.page * this.pageCount, this.pageCount);
     this.bridge.menu = menu.menus;
+    this.bridge.count = Math.ceil(menu.count / this.pageCount);
+    console.log(this.bridge.page, this.pageCount, menu);
     if (id) {
       this.onBridge(id);
     }
     this.cdr.markForCheck();
     console.log(this.bridge, id);
   }
+  funcPage(state) {
+    if (state) {
+      this.bridge.page ++;
+    } else {
+      this.bridge.page --;
+    }
+    this.getBridgedb();
+  }
   onFilter() {
     console.log(this.filter);
-    this.getBridgedb(null, 0, 45);
+    this.getBridgedb(null);
     this.paddingTop = 0;
     this.getBridge();
   }

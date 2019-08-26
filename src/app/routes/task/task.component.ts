@@ -223,7 +223,7 @@ export class TaskComponent implements OnInit {
     } else if (s1 && s2) {
       this.tensionMsg.bridgeState = 3;
     }
-    if (jack.state) {
+    if (jack && jack.state) {
       if (this.jackData.modificationDate  !== jack.modificationDate) {
         this.tensionMsg.jaskState = 1;
         for (const key of deviceGroupMode[jack.jackMode]) {
