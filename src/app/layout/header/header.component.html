@@ -1,0 +1,45 @@
+<div class="layout">
+  <header>
+    <div class="left" (click)="power()" style="cursor: pointer">
+      <div class="logo">
+        <nz-avatar [nzSize]="56" nzShape="square" [nzSrc]="'./' + appS.info.unit.logo"></nz-avatar>
+      </div>
+      <div class="user">
+        <p>
+          {{appS.userInfo?.name || '非法登录'}}
+        </p>
+      </div>
+    </div>
+    <div class="main">
+      <!-- <div class="icon" (click)="goUrl('/task')"  [ngClass]="{'active': ifUrl('/task')}">
+        <i nz-icon nzType="swap" theme="outline"></i>
+        <div class="text">张拉</div>
+      </div>
+      <div class="icon" (click)="goUrl('/grouting')"  [ngClass]="{'active': ifUrl('/grouting')}">
+        <i nz-icon nzType="experiment" nzTheme="outline"></i>
+        <div class="text">压浆</div>
+      </div> -->
+      <div class="icon" *ngFor="let item of appS.menus" [ngClass]="{'active': ifUrl(item.url)}"
+        (click)="goUrl(item.url)">
+        <i nz-icon [nzType]="item.icon" nzTheme="outline"></i>
+        <div class="text">{{item.name}}</div>
+      </div>
+      <div class="icon" (click)="appS.dataTreatingShow = true">
+        <i nz-icon nzType="file-sync" theme="outline"></i>
+        <div class="text">数据</div>
+      </div>
+      <div class="icon" (click)="appS.debugShow = true" *ngIf="appS.userInfo.jurisdiction >= 8" >
+        <i nz-icon nzType="bug" theme="outline"></i>
+        <div class="text">调试</div>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div style="flex: 1; height: 100%;">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
+
+<app-data-treating *ngIf="appS.dataTreatingShow"></app-data-treating>
+<app-debug *ngIf="appS.debugShow"></app-debug>

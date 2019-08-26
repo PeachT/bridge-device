@@ -1,0 +1,66 @@
+.windows-select {
+  display: flex;
+  .item {
+    flex: 1;
+  }
+}
+.bridge-item {
+  padding: 5px;
+  margin-bottom: 10px;
+  width: 25%;
+  border-left: 3px solid silver;
+  display: flex;
+  align-items: center;
+  // text-align: center;
+}
+.checkbox {
+  // padding: 5px 10px;
+  // border-bottom: 2px solid;
+  // border-radius: 10px;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+  p {
+    margin: 0;
+    padding-left: 5px;
+  }
+  input {
+    position: absolute;
+    clip: rect(0, 0, 0, 0)
+  }
+  &::before {
+    content: '\a0';
+    display: inline-block;
+    border: 1px solid silver;
+    text-align: center;
+    width: 20px;
+    height: 20px;
+    font-weight: bold;
+    line-height: 18px;
+    flex: none;
+  }
+  &.check::before {
+    content: '\2713';
+    color: white;
+    background: #1890ff;
+    border: 1px solid #1890ff;
+  }
+}
+
+.record {
+  margin: 10px;
+  background-color: #555;
+  padding: 0px 10px;
+  color: white;
+  border-radius: 5px;
+}
+
+.ok {
+  background-color: #1890ff;
+}
+
+
+.border-top {
+  margin-top: 15px;  border-top: 1px solid #e8e8e8; padding-top: 15px;
+}

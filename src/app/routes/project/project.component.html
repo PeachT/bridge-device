@@ -1,0 +1,13 @@
+<app-left>
+  <div class="sider sider-menu">
+    <app-left-menu [dbName]="dbName" (menuChange)="onMneu($event)" [menuFilter]="menuFilter" #leftMenu></app-left-menu>
+  </div>
+  <div class="main scroll-y">
+    <app-operat [dbName]="dbName" [formData]="prjDom.validateForm" (outEdit)="edit($event)"
+    (outEditOk)="editOk($event)"
+    (outDelete)="delete()"></app-operat>
+    <app-project class="scroll-content" #prjDom></app-project>
+  </div>
+</app-left>
+
+<app-delete-modal *ngIf="deleteShow" (outDelete)="deleteOk($event)"></app-delete-modal>

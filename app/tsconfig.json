@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+      "module": "commonjs",
+      "target": "es6",
+      "noImplicitAny": false,
+      "sourceMap": false,
+      "rootDir":"./src",
+      "outDir":"./js",
+      "watch":true,
+      "lib": [
+        "es2018",
+        "dom"
+      ]
+  },
+  "include":[
+      "./src/**/*"
+  ],
+  "exclude":[
+      "views",
+      "static"
+  ],
+  "lib": [
+    "es2018",
+    "dom"
+  ]
+}

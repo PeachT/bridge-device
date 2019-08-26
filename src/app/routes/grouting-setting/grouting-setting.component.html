@@ -1,0 +1,38 @@
+<main class="setting">
+  <div >
+    <nz-divider style="min-width: auto;" nzText="链接参数" nzOrientation="left"></nz-divider>
+    <nz-col nz-col nzSpan="6">
+      <nz-input-group nzAddOnBefore="IP">
+        <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="PLCS.connectionStr.ip"/>
+      </nz-input-group>
+    </nz-col>
+    <nz-col nz-col nzSpan="6">
+      <nz-input-group nzAddOnBefore="端口号">
+        <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="PLCS.connectionStr.port"/>
+      </nz-input-group>
+    </nz-col>
+    <nz-col nz-col nzSpan="6">
+      <nz-input-group nzAddOnBefore="PLC地址">
+        <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="PLCS.connectionStr.address"/>
+      </nz-input-group>
+    </nz-col>
+    <nz-col nz-col nzSpan="6">
+      <nz-input-group nzAddOnBefore="设备uid">
+        <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="PLCS.connectionStr.uid"/>
+      </nz-input-group>
+    </nz-col>
+    <nz-col nz-col nzSpan="6">
+      <nz-input-group nzAddOnBefore="通信延时">
+        <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="PLCS.connectionStr.setTimeout"/>
+      </nz-input-group>
+    </nz-col>
+    <button nz-button nzType="primary" [nzLoading]="tastLinkMsg.state" (click)="tastLink()">保存测试链接</button>
+    <ng-container *ngIf="tastLinkMsg.msg && !tastLinkMsg.success; else elseTemplate">
+      <span style="color: red;">{{tastLinkMsg.msg}}</span>
+    </ng-container>
+    <ng-template #elseTemplate>
+      <span style="color: green;">{{tastLinkMsg.msg}}</span>
+    </ng-template>
+
+  </div>
+</main>

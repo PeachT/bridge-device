@@ -1,0 +1,23 @@
+{
+  "name": "bridge-device",
+  "version": "0.0.1",
+  "main": "./js/main.js",
+  "author": {
+    "name": "Peach",
+    "email": "peachlin@outlook.com",
+    "url": "https://github.com/PeachT/kairuimo"
+  },
+  "description": "智能设备",
+  "scripts": {
+    "tsc": "tsc"
+  },
+  "dependencies": {
+    "ejsexcel": "^3.5.3",
+    "electron-updater": "^4.1.2",
+    "modbus-serial": "^7.6.0",
+    "ping": "^0.2.2"
+  },
+  "devDependencies": {
+    "typescript": "~3.4.5"
+  }
+}

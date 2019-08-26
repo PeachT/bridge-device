@@ -1,0 +1,70 @@
+<main >
+  <header>
+    <div>
+      <span style="margin-left: 60px;">选择千斤顶：</span>
+      <nz-select nzSize="large" style="width: 200px;" [(ngModel)]="selectJackId" nzPlaceHolder="选择顶"
+      (ngModelChange)="onSelectedDevice($event)">
+      <nz-option [nzValue]="item.id" [nzLabel]="item.name" *ngFor="let item of jacks"></nz-option>
+      </nz-select>
+    </div>
+    <span hidden>{{ms.i}}</span>
+    <!-- <nz-radio-group [(ngModel)]="connection" nzName="radiogroup" (ngModelChange)="onConnention()">
+      <label nz-radio [nzValue]="true">联机</label>
+      <label nz-radio [nzValue]="false">单机</label>
+    </nz-radio-group> -->
+    <div>
+      <label nz-checkbox [(ngModel)]="zShow" (ngModelChange)="showDevices()">主 机</label>
+      <label nz-checkbox [(ngModel)]="cShow" (ngModelChange)="showDevices()">副 机</label>
+    </div>
+
+  </header>
+  <main class="manual manual-slider">
+    <div class="content z scroll-y" [ngClass]="{'form-edit': !PLCS.plcState.z}"  [hidden]="!zShow">
+      <div class="btn" [ngClass]="{'coerce': zMarginMode[1]}">
+        <nz-divider style="min-width: auto;" nzText="主 机" nzOrientation="left"></nz-divider>
+          <!-- <button nzSize="large" nz-button nzShape="round"
+          *ngFor="let item of devModeStr.z"
+          [nzType]="showDev[item] ? 'primary' : 'dashed'"  (click)="showDev[item] = !showDev[item]">{{item}}</button> -->
+          <nz-anchor [nzAffix]="false" [nzTarget]="dz" *ngIf="anchor.z.length > 0">
+            <nz-link *ngFor="let name of anchor.z; index as i" [nzHref]="'#' + name" [nzTitle]="name | nameConvert"></nz-link>
+          </nz-anchor>
+        <button nzSize="large" [disabled]="!(PLCS.manualMode.z[4] === '1')" nz-button nzType="default" [ngClass]="{'on': PLCS.manualMode.z[1] === '1'}" (click)="setF15('z', 101, PLCS.manualMode.z[1])">点动</button>
+        <button nzSize="large" [disabled]="!(PLCS.manualMode.z[4] === '1')" nz-button nzType="default" [ngClass]="{'on': PLCS.manualMode.z[2] === '1'}" (click)="setF15('z', 102, PLCS.manualMode.z[2])">强制运行</button>
+        <!-- <button nzSize="large" nz-button nzType="default" [ngClass]="{'on': zMarginMode[2]}" (click)="setF15(2)">自动补压</button> -->
+      </div>
+      <div class="manual-data scroll-content" #dz>
+        <div #domz>
+        </div>
+      </div>
+      <div class="alarm" *ngIf="!PLCS.jack || !PLCS.plcState.z">{{!PLCS.jack ? '没有选择顶' : (!PLCS.plcState.z ? '设备未连接' : zmsg)}}</div>
+    </div>
+    <br><br>
+    <div class="content c scroll-y" [ngClass]="{'form-edit': !PLCS.plcState.c}" [hidden]="!cShow">
+      <div class="btn" [ngClass]="{'coerce': cMarginMode[1]}">
+        <nz-divider style="min-width: auto;" nzText="从 机" nzOrientation="left"></nz-divider>
+
+        <nz-anchor [nzAffix]="false" [nzTarget]="dc" *ngIf="anchor.z.length > 0">
+          <nz-link *ngFor="let name of anchor.c; index as i" [nzHref]="'#' + name" [nzTitle]="name | nameConvert"></nz-link>
+        </nz-anchor>
+
+        <button nzSize="large" [disabled]="!(PLCS.manualMode.c[4] === '1')" nz-button nzType="default" [ngClass]="{'on': PLCS.manualMode.c[1] === '1'}" (click)="setF15('c', 101, PLCS.manualMode.c[1])">点动</button>
+        <button nzSize="large" [disabled]="!(PLCS.manualMode.c[4] === '1')" nz-button nzType="default" [ngClass]="{'on': PLCS.manualMode.c[2] === '1'}" (click)="setF15('c', 102, PLCS.manualMode.c[2])">强制运行</button>
+      </div>
+
+      <div class="manual-data scroll-content" #dc>
+        <div #domc hidden></div>
+      </div>
+      <div class="alarm" *ngIf="!PLCS.jack || !PLCS.plcState.c">{{!PLCS.jack ? '没有选择顶' : (!PLCS.plcState.c ? '设备未连接' : cmsg)}}</div>
+    </div>
+  </main>
+</main>
+
+<nz-modal [(nzVisible)]="alarm.state" [nzTitle]="alarm.name | nameConvert" (nzOnCancel)="alarm.state = false" [nzFooter]="null">
+    <nz-alert
+    nzType="error"
+    [nzMessage]="item"
+    nzDescription="还没有说明"
+    nzShowIcon
+    *ngFor="let item of alarm.datas">
+  </nz-alert>
+</nz-modal>

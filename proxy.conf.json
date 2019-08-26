@@ -1,0 +1,6 @@
+{
+  "/iotws": {
+    "target": "http://121.12.120.62:6543",
+    "secure": false
+  }
+}

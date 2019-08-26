@@ -1,0 +1,129 @@
+<app-left>
+  <div class="sider sider-menu">
+    <task-menu style="overflow: hidden;" dbNmae="grouting" (menuChange)="onBridge($event)" #taskmenu></task-menu>
+  </div>
+  <div class="main">
+    <!-- <button (click)="save100()">添加100</button> -->
+    <nz-tabset class="task-tabset" (nzSelectChange)="changeTabs($event)">
+      <nz-tab nzTitle="基础信息">
+        <div class="form-edit">
+          <form nz-form [ngClass]="{'form-edit': !appS.edit}" [formGroup]="formData">
+            <nz-form-item>
+              <nz-form-label [nzSm]="3" nzRequired>梁号</nz-form-label>
+              <nz-form-control [nzSm]="9" [ngClass]="{'in-error': formData.get('name').errors}"
+                [nzErrorTip]="formData.get('name').errors | ValidatorError">
+                <input type="text" nz-input placeholder="梁号" formControlName="name">
+              </nz-form-control>
+              <nz-form-label [nzSm]="3" nzRequired>构建</nz-form-label>
+              <nz-form-control [nzSm]="9" nzErrorTip="请入选择构建！">
+                <input type="text" nz-input formControlName="component" *ngIf="data?.createdDate" disabled>
+                <div style="display: flex;" *ngIf="!data?.createdDate">
+                  <nz-select style="width: 100%;" formControlName="component" nzPlaceHolder="选择构建"
+                    (ngModelChange)="componentChange($event)" [nzDisabled]="data?.createdDate">
+                    <nz-option [nzValue]="item.name" [nzLabel]="item.name" *ngFor="let item of componentOptions.menu">
+                    </nz-option>
+                  </nz-select>
+                  <!-- <button nz-button nzType="primary" nzSearch (click)="groupDom.onShow()"
+                        type="button" *ngIf="!data?.createdDate" style="z-index: 1">分组</button> -->
+                </div>
+              </nz-form-control>
+            </nz-form-item>
+
+            <app-add-other [validateForm]="formData" [keys]="otherKey" [iselect]="0" #otherInfo></app-add-other>
+
+            <nz-form-item>
+              <nz-form-label [nzSm]="3">气温</nz-form-label>
+              <nz-form-control [nzSm]="5">
+                <nz-input-group nzSuffix="℃">
+                  <input type="text" nz-input placeholder="气温" formControlName="airTemperature">
+                </nz-input-group>
+              </nz-form-control>
+
+              <nz-form-label [nzSm]="3">水温</nz-form-label>
+
+              <nz-form-control [nzSm]="5">
+                <nz-input-group nzSuffix="℃">
+                  <input type="text" nz-input placeholder="水温" formControlName="waterTemperature">
+                </nz-input-group>
+              </nz-form-control>
+
+              <nz-form-label [nzSm]="3">压浆温度</nz-form-label>
+              <nz-form-control [nzSm]="5">
+                <nz-input-group nzSuffix="℃">
+                  <input type="text" nz-input placeholder="压浆温度" formControlName="groutingTemperature">
+                </nz-input-group>
+              </nz-form-control>
+
+              <nz-form-label [nzSm]="3">泌水率</nz-form-label>
+              <nz-form-control [nzSm]="5">
+                <nz-input-group nzSuffix="%">
+                  <input type="text" nz-input placeholder="泌水率" formControlName="bleedingRate">
+                </nz-input-group>
+              </nz-form-control>
+
+              <nz-form-label [nzSm]="3">流动度</nz-form-label>
+              <nz-form-control [nzSm]="5">
+                <nz-input-group nzSuffix="s">
+                  <input type="text" nz-input placeholder="流动度" formControlName="mobility">
+                </nz-input-group>
+              </nz-form-control>
+
+              <nz-form-label [nzSm]="3">黏稠度</nz-form-label>
+              <nz-form-control [nzSm]="5">
+                <nz-input-group nzSuffix="s">
+                  <input type="text" nz-input placeholder="黏稠度" formControlName="viscosity">
+                </nz-input-group>
+              </nz-form-control>
+            </nz-form-item>
+
+            <!-- <nz-divider style="min-width: auto;" nzText="使用材料信息" nzOrientation="left"></nz-divider> -->
+            <nz-form-label [nzSm]="3">浆液水胶比</nz-form-label>
+            <nz-form-control [nzSm]="21">
+              <nz-input-group>
+                <input type="text" nz-input placeholder="浆液水胶比" formControlName="proportion">
+              </nz-input-group>
+            </nz-form-control>
+            <grouting-proportion [validateForm]="formData" [keys]="propertionKey" #proportions>
+            </grouting-proportion>
+            <br>
+            <nz-form-item *ngIf="data; else elseTemplate" style="z-index: 2;">
+              <nz-form-control nzErrorTip="至少需要一组张拉数据！">
+                <nz-radio-group [nzButtonStyle]="'solid'">
+                  <label nz-radio-button [nzValue]="item" *ngFor="let item of holeMneu.names; index as i"
+                    (click)="onHoleRadio(item.name, i)" [ngClass]="{'hole-active': holeMneu.index === i}"
+                    [class]="'hole' + item.cls" class="hole">{{item.name}}</label>
+                </nz-radio-group>
+              </nz-form-control>
+            </nz-form-item>
+            <ng-template #elseTemplate>
+              <h2 style="color: red;">没有孔道数据</h2>
+            </ng-template>
+
+          </form>
+
+          <grouting-record (updateHole)="updateGroupItem()" #groutingRecord [show]="holeMneu.name"></grouting-record>
+
+          <div class="edit" [ngClass]="{'edit-on': appS.edit}" *ngIf="!appS.edit"></div>
+        </div>
+
+        <div class="operation" *ngIf="taskmenu?.project?.select">
+          <app-operat [dbName]="dbName" [formData]="formData" (outEdit)="onEdit($event)" (outEditOk)="editOk($event)"
+            [addFilterFun]="addFilterFun" [updateFilterFun]="updateFilterFun"
+            [saveState]="groutingRecord?.formData?.valid" [coprState]="true" (outDelete)="delete()">
+            <button nz-button nzType="primary" (click)="link()">链接</button>
+          </app-operat>
+        </div>
+
+        <app-delete-modal *ngIf="deleteShow" (outDelete)="deleteOk($event)"></app-delete-modal>
+      </nz-tab>
+      <nz-tab nzTitle="其他">
+        <p>创建者：{{data?.user}}</p>
+        <p>创建日期：{{data?.createdDate | date: "yyyy.MM.dd HH:mm"}}</p>
+        <p>修改日期：{{data?.modificationDate | date: "yyyy.MM.dd HH:mm"}}</p>
+      </nz-tab>
+    </nz-tabset>
+
+  </div>
+</app-left>
+
+<app-delete-modal *ngIf="deleteShow" (outDelete)="deleteOk($event)"></app-delete-modal>

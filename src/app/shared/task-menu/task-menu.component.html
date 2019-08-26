@@ -1,0 +1,59 @@
+<div class="sider sider-menu">
+  <div class="filter">
+      <div class="checkbox">
+        <label nz-checkbox [(ngModel)]="filter.ok" (click)="onFilter()">已</label>
+        <label nz-checkbox [(ngModel)]="filter.no" (click)="onFilter()">未</label>
+        <button nz-button nz-popover nzTitle="高级筛选" nzType="link" [nzContent]="contentTemplate" nzTrigger="click">
+          <i nz-icon nzType="filter"></i>筛选
+        </button>
+        <ng-template #contentTemplate>
+          <div>
+            已张拉日期: <nz-range-picker readonly [nzDisabled]="!filter.ok" [nzRanges]="rangesDate" [ngModel]="filter.tension.date" (ngModelChange)="onFilterDate($event, 'tension')"></nz-range-picker>
+          </div>
+          <br>
+          <div>
+            浇筑日期: <nz-range-picker readonly [nzRanges]="rangesDate" [ngModel]="filter.pouring.date" (ngModelChange)="onFilterDate($event,'pouring')"></nz-range-picker>
+          </div>
+        </ng-template>
+      </div>
+      <span style="margin: 0;" [ngStyle]="{'textDecoration': filter.ok ? '' :'line-through'}"
+      >&nbsp;已: {{filter.tension.date[0] | date: 'yyyy-MM-dd'}}~{{filter.tension.date[1] | date: 'yyyy-MM-dd'}}</span>
+      <span style="margin: 0;">&nbsp;浇筑: {{filter.pouring.date[0] | date: 'yyyy-MM-dd'}}~{{filter.pouring.date[1] | date: 'yyyy-MM-dd'}}</span>
+  </div>
+  <div class="project">
+    <nz-select nzSize="large" nzPlaceHolder="请选择项目" [(ngModel)]="project.sName" (ngModelChange)="onProject()" [nzDisabled]="appS.edit">
+      <nz-option [nzValue]="item" [nzLabel]="item" *ngFor="let item of project.names"></nz-option>
+    </nz-select>
+  </div>
+  <ul>
+    <ng-container *ngFor="let item of component.menu; index as i">
+      <li class="item" (click)="onComponent(item)"
+        *ngIf="component.select === null || component.select === item"
+        [ngClass]="{'active': component.select === item}">
+        <p>
+          {{item}}
+        </p>
+        <i nz-icon nzType="up" nzTheme="outline"></i>
+      </li>
+    </ng-container>
+  </ul>
+  <ul class="menu-2" [hidden]="component.select === null" #bridgeScroll  (scroll)="bScroll($event)">
+    <li [style.height]="paddingTop + 'px'"></li>
+    <li *ngFor="let item of bridge.menu; index as i"
+      [ngClass]="{'active': bridge.select === item.id && (!appS.edit || appS.leftMenu === item.id)}"
+      (click)="onBridge(item.id)">
+      <div class="state-content">
+        <div class="state">
+          <div *ngIf="item.cls.e" style="background-color: #d9d9d9"></div>
+          <div *ngIf="item.cls.a" style="background-color: #45b787"></div>
+          <div *ngIf="item.cls.d" style="background-color: #51c4d3"></div>
+          <div *ngIf="item.cls.b" style="background-color: #fcd337"></div>
+          <div *ngIf="item.cls.c" style="background-color: #f34718"></div>
+        </div>
+      </div>
+      <p>
+        {{item.name}}
+      </p>
+    </li>
+  </ul>
+</div>

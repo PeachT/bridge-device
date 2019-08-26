@@ -1,0 +1,40 @@
+<form nz-form [formGroup]="validateForm">
+  <div formArrayName="proportions" class="other-info">
+    <table class="gridtable">
+        <thead>
+          <tr>
+            <th>名称</th>
+            <th>规格</th>
+            <th>配比量</th>
+            <th>总用量</th>
+            <th width="80px">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of proportionrFormArr.controls; index as i" [formGroupName]="i">
+            <td >
+              <!-- <nz-form-control [ngClass]="{'in-error': item.get('name').errors}" [nzErrorTip]="item.get('name').errors | ValidatorError">
+                <input placeholder="名称" nz-input formControlName="name" [nzAutocomplete]="auto" />
+                <nz-autocomplete [nzDataSource]="bridgeOtherKeySelect()" #auto> </nz-autocomplete>
+              </nz-form-control> -->
+              <input type="text" nz-input placeholder="名称" formControlName="name">
+            </td>
+            <td ><input type="text" nz-input placeholder="规格" formControlName="type"></td>
+            <td ><input type="number" nz-input placeholder="配比量" formControlName="value" (input)="proportionCalculate()"></td>
+            <td ><input type="number" nz-input placeholder="总用量" formControlName="total"></td>
+            <td>
+              <div style="display: flex; justify-content: center;" *ngIf="i > 1">
+                <button nz-button nzType="default" nzShape="circle" (click)="proportionSub(i)"><i nz-icon
+                    nzType="close"></i></button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td *ngIf="appS.edit" colspan="5">
+              <button style="width: 100%;" nz-button nzType="primary" nzSearch (click)="proportionAdd()" type="button">添 加</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  </div>
+</form>

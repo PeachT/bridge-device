@@ -1,0 +1,102 @@
+main {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  header {
+    height: 48px;
+    // border-bottom: 1px solid #ebedf0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .btn {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      button {
+        margin-right: 15px;
+        &.on {
+          background-color: #87d068;
+          color: white;
+        }
+      }
+    }
+  }
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    overflow-y: auto;
+    .content {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      .alarm {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        font-size: 56px;
+        color: white;
+        justify-content: center;
+        align-items: center;
+        animation:alarm 3s infinite linear;
+      }
+      .btn {
+        background-image: linear-gradient(135deg, #92FFC0 0%, #002661 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        button {
+          margin-right: 15px;
+          &.on {
+            background-color: #87d068;
+            color: white;
+          }
+        }
+      }
+      .data {
+        display: flex;
+        height: 100%;
+        flex-wrap: wrap;
+        .app-manual-item{
+          flex: 1;
+          min-width: 500px;
+          padding: 0 25px 25px 25px;
+          border: 1px solid rgba(0, 0, 0, 0.12);
+        }
+      }
+    }
+  }
+}
+.coerce {
+  animation:gogogo 3s infinite linear;
+
+}
+nz-divider {
+  min-width: auto;
+}
+
+@keyframes gogogo {
+  0%{
+    background-color: #ffa39e;
+  }
+  50%{
+    background-color: #fff1f0;
+  }
+  100%{
+    background-color: #ffa39e;
+  }
+}
+@keyframes alarm {
+  0%{
+    background-color: rgba(255, 163, 158, 0.82);
+  }
+  50%{
+    background-color: rgba(255, 163, 158, .3);
+  }
+  100%{
+    background-color: rgba(255, 163, 158, 0.82);
+  }
+}
+
+

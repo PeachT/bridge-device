@@ -1,0 +1,62 @@
+.plc-state {
+  position: fixed;
+  top: 0;
+  right: 1px;
+  display: flex;
+  flex-direction: column;
+  margin-left: 5px;
+  height: 64px;
+  justify-content: center;
+  .item {
+    min-width: 115px;
+    padding-right: 2px;
+    text-align: right;
+    color: red;
+    &.active {
+      color: white;
+    }
+  }
+}
+.time {
+  position: fixed;
+  top: 0;
+  left: 204px;
+  font-size: 20px;
+  // opacity: .3;
+}
+
+@keyframes plcState {
+  0%{
+    background-color: #30E3CA;
+  }
+  25%{
+    background-color: #11999E;
+  }
+  50%{
+    background-color: #6A1AEA;
+  }
+  75%{
+    background-color: #11999E;
+  }
+  100%{
+    background-color: #30E3CA;
+  }
+}
+
+
+
+@keyframes power-btn {
+  0%{
+    height: 90px;
+    width: 90px;
+  }
+  50%{
+    height: 96px;
+    width: 96px;
+  }
+
+  100%{
+    height: 90px;
+    width: 90px;
+  }
+}

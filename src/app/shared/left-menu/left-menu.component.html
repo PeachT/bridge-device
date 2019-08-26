@@ -1,0 +1,9 @@
+<div class="menu">
+  <ul>
+    <li *ngFor="let item of menus; index as i"
+      [ngClass]="{'active': selectId === item.id && (!appS.edit || appS.leftMenu === item.id)}"
+      (click)="onClick(item.id)">
+      <p>{{item.name}}</p>
+    </li>
+  </ul>
+</div>

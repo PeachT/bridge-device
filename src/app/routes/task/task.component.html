@@ -1,0 +1,110 @@
+<app-left>
+  <div class="sider sider-menu">
+    <task-menu style="overflow: hidden;" (menuChange)="onBridge($event)" #taskMneu></task-menu>
+  </div>
+  <div class="main">
+    <div class="upjack-alert">
+      <nz-alert nzType="error" style="height: 45px" *ngIf="tensionMsg.bridgeState === 3 && tensionMsg.jaskState >= 2" nzMessage="顶数据已更改，该梁已经不能张拉。"></nz-alert>
+      <nz-alert nzType="warning" style="height: 45px" *ngIf="tensionMsg.bridgeState === 1 && tensionMsg.jaskState >= 1" nzMessage="顶数据已更改，需要更新顶才能张拉。"></nz-alert>
+    </div>
+    <!-- <button (click)="save100()">添加100</button> -->
+    <nz-tabset class="task-tabset" (nzSelectChange)="changeTabst($event)">
+      <nz-tab nzTitle="基础信息">
+        <div class="form-edit">
+          <form nz-form [ngClass]="{'form-edit': !appS.edit}" [formGroup]="formData">
+            <nz-form-item>
+              <nz-form-label [nzSm]="3" nzRequired>梁号</nz-form-label>
+              <nz-form-control [nzSm]="21" [ngClass]="{'in-error': formData.get('name').errors}" [nzErrorTip]="formData.get('name').errors | ValidatorError">
+                <input type="text" nz-input placeholder="梁号" formControlName="name">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSm]="3" nzRequired>构建</nz-form-label>
+              <nz-form-control [nzSm]="6" nzErrorTip="请入选择构建！">
+                <input type="text" nz-input formControlName="component" *ngIf="data?.createdDate" disabled>
+                <div style="display: flex;" *ngIf="!data?.createdDate">
+                  <nz-select style="width: 100%;" formControlName="component" nzPlaceHolder="选择构建" (ngModelChange)="componentChange($event)" [nzDisabled]="data?.createdDate">
+                    <nz-option [nzValue]="item.name" [nzLabel]="item.name" *ngFor="let item of componentOptions.menu"></nz-option>
+                  </nz-select>
+                  <button nz-button nzType="primary" nzSearch (click)="groupDom.onShow()"
+                    type="button" *ngIf="!data?.createdDate" style="z-index: 1">分组</button>
+                </div>
+              </nz-form-control>
+
+              <nz-form-label [nzSm]="3" nzRequired>顶</nz-form-label>
+              <nz-form-control [nzSm]="5" nzErrorTip="请入选择顶！">
+                <input type="text" nz-input [value]="data.jack.name + '/' + modeName[data.device[1]]" *ngIf="data?.createdDate" disabled>
+                <nz-cascader *ngIf="!data?.createdDate" nzMenuClassName="task-cascader" nzPlaceHolder="选择顶" [nzOptions]="jacks" formControlName="device" [nzAllowClear]="false"
+                  (ngModelChange)="deviceOnChanges($event)" [nzDisabled]="data?.createdDate">
+                </nz-cascader>
+              </nz-form-control>
+            </nz-form-item>
+
+            <app-add-other [validateForm]="formData" [keys]="bridgeOtherKey" [iselect]="0" #otherInfo></app-add-other>
+
+            <nz-form-item *ngIf="data" style="z-index: 2;">
+              <nz-form-control nzErrorTip="至少需要一组张拉数据！">
+                <nz-radio-group [nzButtonStyle]="'solid'">
+                  <label nz-radio-button [nzValue]="item"
+                    *ngFor="let item of holeMneuData.names; index as i"
+                    (click)="onHoleRadio(item.name, i)"
+                    [ngClass]="{'hole-active': holeMneuData.index === i}"
+                    [class]="'hole' + item.cls"
+                    class="hole"
+                    >{{item.name}}</label>
+                </nz-radio-group>
+              </nz-form-control>
+            </nz-form-item>
+          </form>
+          <app-task-data #taskDataDom [jackData]="jackData" (updateHole)="updateGroupItem()" [show]="holeMneuData.name" [tensionState]="holeMneuData.names[holeMneuData.index]" ></app-task-data>
+          <div class="edit" [ngClass]="{'edit-on': appS.edit}" *ngIf="!appS.edit"></div>
+        </div>
+        <app-record *ngIf="showRecord" [GroupData]="holeMneuData.data"></app-record>
+      </nz-tab>
+      <nz-tab nzTitle="设备信息" [nzDisabled]="!jackData">
+        <task-jack [taskJack]="jackData" [mode]="data.device" *ngIf="tabsetShow === 1"></task-jack>
+      </nz-tab>
+      <nz-tab nzTitle="其他">
+        <p>创建者：{{data?.user}}</p>
+        <p>创建日期：{{data?.createdDate | date: "yyyy.MM.dd HH:mm"}}</p>
+        <p>修改日期：{{data?.modificationDate | date: "yyyy.MM.dd HH:mm"}}</p>
+      </nz-tab>
+    </nz-tabset>
+
+    <div class="operation" *ngIf="taskMneu.project.select">
+      <app-operat [dbName]="dbName" [formData]="formData" (outEdit)="onEdit($event)"
+        (outEditOk)="editOk($event)"
+        [addFilterFun] = "addFilterFun"
+        [updateFilterFun] = "updateFilterFun"
+        [saveState]="taskDataDom?.holeForm?.valid"
+        [coprState]="true"
+        (outDelete)="delete()">
+        <button nz-button nzType="primary" nzGhost nzSearch (click)="onTension()" type="button"
+          *ngIf="holeMneuData.index !== null
+            && (!holeMneuData.data?.record
+            || (holeMneuData.data?.record && holeMneuData.data?.record.state !== 2 && holeMneuData.data?.record.state !== 3)
+            && !appS.edit)
+            && !(tensionMsg.bridgeState === 3 && tensionMsg.jaskState >= 2)
+            && !(tensionMsg.bridgeState === 1 && tensionMsg.jaskState > 1)
+            && appS.platform === 'tension'">
+          张 拉
+        </button>
+        <button nz-button nzType="primary" nzGhost nzSearch (click)="gxJack()" type="button"
+          *ngIf="tensionMsg.bridgeState && !appS.edit">
+          更新顶
+        </button>
+      </app-operat>
+    </div>
+  </div>
+</app-left>
+
+<task-group (outGroup)="okGroup($event)" #groupDom></task-group>
+<task-tension-modal #tension></task-tension-modal>
+<app-delete-modal *ngIf="deleteShow" (outDelete)="deleteOk($event)"></app-delete-modal>
+
+<nz-modal [(nzVisible)]="tensionMsg.selectJackModal" nzTitle="选择更新顶" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()" nzClosable="false" nzMaskClosable="false">
+  <span>选择更新顶：</span>
+  <nz-select style="width: 100%;" nzPlaceHolder="选择更新顶" [(ngModel)]="tensionMsg.selectJack">
+    <nz-option [nzValue]="item.id" [nzLabel]="item.name" *ngFor="let item of tensionMsg.jackMenus"></nz-option>
+  </nz-select>
+</nz-modal>

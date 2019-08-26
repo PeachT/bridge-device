@@ -1,0 +1,109 @@
+{
+  "name": "bridge",
+  "version": "0.0.0",
+  "main": "./app/js/main.js",
+  "author": {
+    "name": "Peach",
+    "email": "peachlin@outlook.com",
+    "url": "https://github.com/PeachT/kairuimo"
+  },
+  "description": "智能设备",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve --proxy-config proxy.conf.json",
+    "build": "ng build",
+    "test": "ng test",
+    "lint": "ng lint",
+    "e2e": "ng e2e",
+    "hmr": "ng serve --proxy-config proxy.conf.json --hmr",
+    "dev": "concurrently \"ng serve\" \"electron . --dev\"",
+    "edev": "electron . --dev",
+    "edev-9222": "electron . --remote-debugging-port=9222",
+    "win-ng-pack": "ng build --prod && electron-builder -w",
+    "win-ng-prod-pack": "ng build --prod --build-optimizer && electron-builder -w",
+    "win-pack": "electron-builder -w",
+    "linux-ng-pack": "ng build && electron-builder --linux",
+    "linux-ng-prod-pack": "ng build --prod --build-optimizer && electron-builder --linux",
+    "linux-pack": "electron-builder --linux",
+    "all-pack": "electron-builder -mwl"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "~8.2.2",
+    "@angular/common": "~8.2.2",
+    "@angular/compiler": "~8.2.2",
+    "@angular/core": "~8.2.2",
+    "@angular/forms": "~8.2.2",
+    "@angular/platform-browser": "~8.2.2",
+    "@angular/platform-browser-dynamic": "~8.2.2",
+    "@angular/router": "~8.2.2",
+    "core-js": "^3.2.1",
+    "date-fns": "^1.30.1",
+    "dexie": "^2.0.4",
+    "echarts": "^4.2.1",
+    "ng-zorro-antd": "^8.0.0",
+    "ngx-electron": "^2.1.1",
+    "rxjs": "~6.5.2",
+    "ts-md5": "^1.2.4",
+    "tslib": "^1.9.0",
+    "zone.js": "~0.9.1"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "~0.800.6",
+    "@angular/cdk": "~8.1.3",
+    "@angular/cli": "~8.2.2",
+    "@angular/compiler-cli": "~8.2.2",
+    "@angular/language-service": "~8.2.2",
+    "@types/echarts": "^4.1.8",
+    "@types/jasmine": "~2.8.8",
+    "@types/jasminewd2": "~2.0.3",
+    "@types/node": "~8.9.4",
+    "codelyzer": "~5.1.0",
+    "electron": "^5.0.6",
+    "electron-builder": "^20.44.4",
+    "jasmine-core": "~2.99.1",
+    "jasmine-spec-reporter": "~4.2.1",
+    "karma": "~4.2.0",
+    "karma-chrome-launcher": "~2.2.0",
+    "karma-coverage-istanbul-reporter": "~2.1.0",
+    "karma-jasmine": "~1.1.2",
+    "karma-jasmine-html-reporter": "^0.2.2",
+    "protractor": "~5.4.0",
+    "ts-node": "~7.0.0",
+    "tslint": "~5.18.0",
+    "typescript": "~3.4.5"
+  },
+  "build": {
+    "appId": "con.bridge-Tesk.app",
+    "productName": "智能设备",
+    "directories": {
+      "output": "pack"
+    },
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "http://localhost:5500/up/"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icons/256x256.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "target": [
+        "deb"
+      ],
+      "icon": "build/icons"
+    }
+  },
+  "keywords": [
+    "dist"
+  ]
+}

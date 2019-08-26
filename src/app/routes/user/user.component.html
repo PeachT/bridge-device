@@ -1,0 +1,49 @@
+<app-left>
+    <!-- {{appS.sss('变更')}} -->
+  <div class="sider sider-menu">
+    <app-left-menu [dbName]="dbName" (menuChange)="onMneu($event)" [menuFilter]="menuFilter" #leftMenu></app-left-menu>
+  </div>
+  <div class="main">
+    <app-operat [dbName]="dbName" [formData]="formData" (outEdit)="edit($event)" (outEditOk)="editOk($event)"></app-operat>
+    <form nz-form [ngClass]="{'form-edit': !appS.edit}" [formGroup]="formData">
+      <nz-form-item>
+        <nz-form-label [nzSm]="3" nzRequired nzFor="name">用户姓名</nz-form-label>
+        <nz-form-control [nzSm]="21" [ngClass]="{'in-error': formData.get('name').errors}" [nzErrorTip]="formData.get('name').errors | ValidatorError">
+          <input type="text" nz-input placeholder="输入姓名" formControlName="name">
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSm]="3" nzRequired nzFor="name">密码</nz-form-label>
+        <nz-form-control [nzSm]="21" [ngClass]="{'in-error': formData.get('password').errors}" [nzErrorTip]="formData.get('password').errors | ValidatorError">
+          <input type="text" nz-input placeholder="输入密码" formControlName="password">
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSm]="3" nzRequired nzFor="name">权限</nz-form-label>
+        <nz-form-control [nzSm]="21">
+          <nz-radio-group formControlName="jurisdiction" #jackModeV>
+            <label nz-radio [nzValue]="8" *ngIf="appS.userInfo?.jurisdiction === 9">管理员</label>
+            <label nz-radio [nzValue]="1">技术员</label>
+            <label nz-radio [nzValue]="0">操作员</label>
+          </nz-radio-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item *ngIf="formData.value.jurisdiction === 0">
+        <nz-form-label [nzSm]="3" nzFor="name">操作</nz-form-label>
+        <nz-form-control [nzSm]="21">
+          <nz-checkbox-wrapper style="width: 100%;" (nzOnChange)="selectOperation($event)">
+            <label nz-checkbox nzValue="a">添加</label>
+            <label nz-checkbox nzValue="m">修改</label>
+            <label nz-checkbox nzValue="d">删除</label>
+          </nz-checkbox-wrapper>
+        </nz-form-control>
+      </nz-form-item>
+
+      <div class="edit" [ngClass]="{'edit-on': appS.edit}"></div>
+    </form>
+  </div>
+</app-left>
+<app-delete-modal *ngIf="deleteShow" (outDelete)="deleteOk($event)"></app-delete-modal>

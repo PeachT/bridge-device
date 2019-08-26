@@ -1,0 +1,31 @@
+<div class="main" *ngIf="taskJack">
+  <h2>回归方程：
+    <span *ngIf="taskJack.equation">P=aF+b F张拉控制应力KN</span>
+    <span *ngIf="!taskJack.equation">F=aP+b P张拉控制应力MPa</span>
+  </h2>
+  <table class="gridtable">
+
+    <thead>
+      <tr>
+        <th>顶</th>
+        <th>千斤顶编号</th>
+        <th>油泵编号</th>
+        <th>标定系数a</th>
+        <th>标定系数b</th>
+        <th>标定日期</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let name of devModeStr; index as i">
+        <tr>
+          <td>{{name}}</td>
+          <td>{{taskJack[name].jackNumber}}</td>
+          <td>{{taskJack[name].pumpNumber}}</td>
+          <td>{{taskJack[name].a}}</td>
+          <td>{{taskJack[name].b}}</td>
+          <td>{{taskJack[name].date | date: 'yyyy-MM-dd' }}</td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+</div>
