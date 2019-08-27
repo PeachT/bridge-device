@@ -7,6 +7,7 @@ import { PLCService } from 'src/app/services/PLC.service';
 import { PLC_D, PLC_M } from 'src/app/models/IPCChannel';
 import { mpaToPlc, mmToPlc } from 'src/app/Function/device.date.processing';
 import { DebugData } from 'src/app/models/debug';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-manual-item',
@@ -95,6 +96,8 @@ export class ManualItemComponent implements OnInit, OnDestroy {
     i: 0,
     t: null,
   };
+  /** 监听PLC */
+  plcsub: Subscription;
 
   constructor(
     public appS: AppService,
@@ -109,15 +112,20 @@ export class ManualItemComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     console.log(this.name);
+    // if (this.refreshState) {
+    //   this.ms.t = setInterval(() => {
+    //     this.ms.i ++;
+    //     // console.log(this.ms);
+    //     if (this.ms.i > 10000) {
+    //       this.ms.i = 0;
+    //     }
+    //     this.cdr.markForCheck();
+    //   }, this.appS.refresh);
+    // }
     if (this.refreshState) {
-      this.ms.t = setInterval(() => {
-        this.ms.i ++;
-        // console.log(this.ms);
-        if (this.ms.i > 10000) {
-          this.ms.i = 0;
-        }
-        this.cdr.markForCheck();
-      }, this.appS.refresh);
+      this.plcsub = this.PLCS.plcSubject.subscribe((data) => {
+        this.cdr.detectChanges();
+      });
     }
 
     this.PLCD = this.PLCS.PD[this.name];
@@ -172,6 +180,9 @@ export class ManualItemComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     console.log('退出');
     clearInterval(this.ms.t);
+    if (this.plcsub) {
+      this.plcsub.unsubscribe();
+    }
   }
 
   /** 设置数据 */

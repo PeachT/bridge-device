@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ElectronService } from 'ngx-electron';
 import { ConnectionStr } from '../models/socket';
+import { PLC_D } from '../models/IPCChannel';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,8 +11,16 @@ export class GroutingService {
   connectionStr: ConnectionStr;
   linkMsg = {
     state: false,
-    now: false
+    now: false,
+    link: false,
+    oldTime: 0,
+    delayTime: 0
   };
+
+  /** PLC sub */
+  private plcSub = new Subject();
+  // 获得一个Observable;
+  plcSubject = this.plcSub.asObservable();
 
   constructor(
     private e: ElectronService,
@@ -48,10 +58,18 @@ export class GroutingService {
       console.log(data);
       if (data.success) {
         this.linkMsg.state = false;
+      } else {
+        this.linkMsg.link = false;
+        this.plcSub.next({state: false, data});
       }
     });
     this.e.ipcRenderer.on(`groutingheartbeat`, async (event, data) => {
-      console.log(data);
+      this.linkMsg.link = true;
+      const time = new Date().getTime();
+      this.linkMsg.delayTime =  time - this.linkMsg.oldTime || time;
+      this.linkMsg.oldTime = time;
+      // console.log(data);
+      this.plcSub.next({state: true, data});
     });
   }
 }

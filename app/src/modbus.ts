@@ -179,6 +179,16 @@ export class ModbusTCP {
       });
     }
   }
+  public F03ASCII(address: number, length: number, channel: string): void {
+    if (this.ifClient()) {
+      this.client.readHoldingRegisters(address, length).then((data) => {
+        const str = data.buffer.toString();
+        this.IPCSend(channel, { uint16: data.data, str });
+      }).catch((err) => {
+        this.IPCSend(channel, err);
+      });
+    }
+  }
   /**
    * 读取多个寄存器值
    *

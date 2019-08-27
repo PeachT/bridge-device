@@ -27,7 +27,7 @@ export class AppService {
     unit: {
       name: '企业名称',
       tel: '888-8888888',
-      logo: 'assets/img/kvm/logo.png'
+      logo: 'assets/img/all/logo.png'
     }
   };
   /** 运行环境是否是Electron */

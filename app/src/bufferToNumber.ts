@@ -28,6 +28,9 @@ function floatToBuffer(floats) {
  * @param {Buffer} buffers buffer数据
  */
 function bufferToFloat(buffers: Buffer) {
+  if (buffers.length % 4 !== 0 ) {
+    return null;
+  }
   const fs = [];
   for (let index = 0; index < buffers.length; index += 4) {
     const b4 = buffers.slice(index, index + 4);

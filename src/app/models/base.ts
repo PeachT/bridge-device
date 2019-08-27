@@ -190,7 +190,7 @@ const base = {
     viscosity: null,
     /** 压浆量 */
     groutingDosage: null,
-    /** 浆液水胶比 */
+    /** 浆液水浆比 */
     proportion: null,
     proportions: [
       {name: '水', type: '水', value: 28, total: null},

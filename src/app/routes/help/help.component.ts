@@ -56,7 +56,7 @@ export class HelpComponent implements OnInit {
       console.log(data);
       this.update.files = data.stdout;
       this.update.fileMsg = data;
-      this.cdr.markForCheck();
+      this.cdr.detectChanges();
     });
 
   }
@@ -73,7 +73,7 @@ export class HelpComponent implements OnInit {
         this.update.sucess = 2;
         return;
       }
-      this.cdr.markForCheck();
+      this.cdr.detectChanges();
     }, 1000);
     this.e.ipcRenderer.once('onUpdate', (event, data) => {
       clearTimeout(it);
@@ -92,7 +92,7 @@ export class HelpComponent implements OnInit {
         this.update.msg = data.stderr;
         this.update.sucess = 2;
       }
-      this.cdr.markForCheck();
+      this.cdr.detectChanges();
       return;
     });
   }
@@ -129,7 +129,7 @@ export class HelpComponent implements OnInit {
 
     this.e.ipcRenderer.once('test', (event, data) => {
       this.testMsg = data;
-      this.cdr.markForCheck();
+      this.cdr.detectChanges();
     });
   }
   /** 打开天使面板 */

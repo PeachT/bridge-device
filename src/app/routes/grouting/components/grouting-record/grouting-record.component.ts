@@ -68,8 +68,14 @@ export class GroutingRecordComponent implements OnInit {
       state: [],
       /** 上传状态 */
       upState: [],
+      /** 压浆料量 */
       materialsTotal: [],
-      waterTotal: []
+      /** 水量 */
+      waterTotal: [],
+      /** 搅拌时间 */
+      stirTime: [],
+      /** 水浆比 */
+      proportion: [],
     });
     this.chsub = this.formData.valueChanges.subscribe((e) => {
       // console.log(e, this.holeForm.value);

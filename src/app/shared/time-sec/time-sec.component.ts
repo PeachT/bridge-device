@@ -5,7 +5,7 @@ import { DateFormat } from 'src/app/Function/DateFormat';
   selector: 'app-time-sec',
   templateUrl: './time-sec.component.html',
   styleUrls: ['./time-sec.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TimeSecComponent implements OnInit {
   time = (DateFormat(new Date(), 'MM-dd hh:mm:ss'));

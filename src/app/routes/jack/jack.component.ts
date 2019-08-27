@@ -23,7 +23,7 @@ import { copyAny } from 'src/app/models/base';
   selector: 'app-jack',
   templateUrl: './jack.component.html',
   styleUrls: ['./jack.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class JackComponent implements OnInit, DoCheck, OnChanges, AfterViewChecked, AfterContentInit, AfterContentChecked, AfterViewInit {
   dbName = 'jack';

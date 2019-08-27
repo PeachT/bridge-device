@@ -66,7 +66,7 @@ export class ProportionComponent implements OnInit {
     const arr = this.proportionrFormArr.value.map(v => v.key);
     return this.keys.filter(v =>  arr.indexOf(v) === -1 );
   }
-  /** 计算水胶比 */
+  /** 计算水浆比 */
   proportionCalculate() {
     const ps = this.validateForm.value.proportions as Array<Proportion>;
     let count = 0;

@@ -201,23 +201,22 @@ export class TaskMenuComponent implements OnInit {
   markForCheck() {
     this.cdr.markForCheck();
   }
-  /** 保存寻找的菜单 */
+  /** 保存菜单选项 */
   saveSelectMneu() {
-    try {
-      const data = JSON.parse(localStorage.getItem(this.appS.userInfo.nameId));
-      localStorage.setItem(this.appS.userInfo.nameId, JSON.stringify(
-        Object.assign(data,
-          {
-            url: this.appS.nowUrl,
-            [this.appS.nowUrl.slice(1)]: {
-              project: this.project.select.id,
-              component: this.component.select,
-              selectBridge: this.bridge.select,
-            }
+    let data = JSON.parse(localStorage.getItem(this.appS.userInfo.nameId)) || {};
+    data = JSON.stringify(
+      Object.assign(data,
+        {
+          url: this.appS.nowUrl,
+          [this.appS.nowUrl.slice(1)]: {
+            project: this.project.select.id,
+            component: this.component.select,
+            selectBridge: this.bridge.select,
           }
-        )));
-    } catch (error) {
-    }
+        }
+      ));
+    console.log('保存菜单选项', data, this.appS.userInfo.nameId);
+    localStorage.setItem(this.appS.userInfo.nameId, data);
   }
   ifEdit() {
     if (this.appS.edit) {

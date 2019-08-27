@@ -53,6 +53,15 @@
         </nz-input-group>
       </nz-form-control>
 
+      <nz-form-label [nzSm]="3">搅拌时间</nz-form-label>
+      <nz-form-control [nzSm]="5">
+        <nz-input-group nzSuffix="s">
+          <input type="number" nz-input placeholder="搅拌时间" formControlName="stirTime">
+        </nz-input-group>
+      </nz-form-control>
+
+
+
       <nz-form-label [nzSm]="3">压浆料量</nz-form-label>
       <nz-form-control [nzSm]="5">
         <nz-input-group nzSuffix="kg">
@@ -64,6 +73,13 @@
       <nz-form-control [nzSm]="5">
         <nz-input-group nzSuffix="kg">
           <input type="number" nz-input placeholder="水量" formControlName="waterTotal">
+        </nz-input-group>
+      </nz-form-control>
+
+      <nz-form-label [nzSm]="3">水浆比</nz-form-label>
+      <nz-form-control [nzSm]="5">
+        <nz-input-group nzSuffix="kg">
+          <input type="number" nz-input placeholder="水浆比" formControlName="proportion">
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>

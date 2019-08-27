@@ -265,19 +265,20 @@ export class AutoComponent implements OnInit, OnDestroy, AfterViewInit {
 
   async ngOnInit() {
     /** 刷新率 */
-    this.ms.t = setInterval(() => {
-      if (this.outstate) {
-        return;
-      }
-      this.ms.i ++;
-      // console.log(this.ms);
-      if (this.ms.i > 10000) {
-        this.ms.i = 0;
-      }
-      this.cdr.markForCheck();
-    }, this.appS.refresh);
+    // this.ms.t = setInterval(() => {
+    //   if (this.outstate) {
+    //     return;
+    //   }
+    //   this.ms.i ++;
+    //   // console.log(this.ms);
+    //   if (this.ms.i > 10000) {
+    //     this.ms.i = 0;
+    //   }
+    //   this.cdr.markForCheck();
+    // }, this.appS.refresh);
     this.plcsub = this.PLCS.plcSubject.subscribe((data) => {
       this.alarmMonitoring();
+      this.cdr.detectChanges();
     });
     this.stageStr = getStageString(this.task);
     this.stepStageStr = this.stageStr;

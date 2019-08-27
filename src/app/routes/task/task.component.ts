@@ -24,7 +24,7 @@ import { TaskMenuComponent } from 'src/app/shared/task-menu/task-menu.component'
   selector: 'app-task',
   templateUrl: './task.component.html',
   styleUrls: ['./task.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TaskComponent implements OnInit {
   dbName = 'task';

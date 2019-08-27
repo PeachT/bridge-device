@@ -18,12 +18,13 @@ export interface GroutingTask extends TaskBase {
   viscosity: number;
   /** 压浆量 */
   groutingDosage: number;
-  /** 浆液水胶比 */
+  /** 浆液水浆比 */
   proportion: number;
   /** 材料信息 */
   proportions: Array<Proportion>;
   /** 压浆组信息 */
   groups?: Array<GroutingItem>;
+  any?: any;
 }
 export interface GroutingItem {
   /** 孔号 */
@@ -46,18 +47,23 @@ export interface GroutingItem {
   stayTime: number;
   /** 稳压时间 */
   steadyTime: number;
+  /** 搅拌时间 */
+  stirTime: number;
   /** 稳压压力 */
   steadyMpa: number;
+  /** 材料 */
+  materialsTotal: number;
+  /** 水量 */
+  waterTotal: number;
+  /** 浆液水浆比 */
+  proportion: number;
   /** 二次压浆 */
   tow?: GroutingItem2;
   /** 压浆状态 */
   state: number;
   /** 上传状态 */
   upState: number;
-  /** 材料 */
-  materialsTotal: number;
-  /** 水量 */
-  waterTotal: number;
+  any?: any;
 
 }
 export interface GroutingItem2 extends GroutingItem {

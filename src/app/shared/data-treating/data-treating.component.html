@@ -1,10 +1,23 @@
 <nz-modal [nzVisible]="true" nzTitle="数据处理" (nzOnCancel)="dataHandleCancel()" (nzOnOk)="dataHandleOk()" nzWidth="85%"
   [nzMaskClosable]="false" [nzFooter]="null">
-  <nz-radio-group [(ngModel)]="exportMode" (ngModelChange)="selectEM()">
-    <label nz-radio [nzValue]="1">导出表格</label>
-    <label nz-radio [nzValue]="2">导出数据</label>
-    <label nz-radio [nzValue]="3">导入</label>
-  </nz-radio-group>
+  <div style="display: flex; justify-content: space-between;">
+    <div>
+      任务：
+      <nz-radio-group [(ngModel)]="dbName" *ngIf="apps.platform === 'windows' || apps.platform === 'debug'">
+        <label nz-radio nzValue="task">张拉</label>
+        <label nz-radio nzValue="grouting">压浆</label>
+      </nz-radio-group>
+    </div>
+    <div>
+      操作：
+      <nz-radio-group [(ngModel)]="exportMode" (ngModelChange)="selectEM()" [nzDisabled]="!dbName">
+        <label nz-radio [nzValue]="1" *ngIf="dbName === 'task'">导出表格</label>
+        <label nz-radio [nzValue]="2">导出数据</label>
+        <label nz-radio [nzValue]="3" *ngIf="dbName === 'task'">导入</label>
+      </nz-radio-group>
+    </div>
+  </div>
+
 
   <div *ngIf="exportMode === 1">
     <nz-divider nzText="导出位置"></nz-divider>
@@ -74,13 +87,13 @@
   <div style="display: flex; flex-direction: column;" class="border-top"
     *ngIf="exportMode === 1 || exportMode === 2">
     <nz-checkbox-wrapper (nzOnChange)="onTaskFliter($event)" style="margin-bottom: 5px;">
-      张拉状态：
-      <label nz-checkbox [(ngModel)]="filter.ok" (click)="onFilter()">已张拉</label>
-      <label nz-checkbox [(ngModel)]="filter.no" (click)="onFilter()">未张拉</label>
+      状态：
+      <label nz-checkbox [(ngModel)]="filter.ok" (click)="onFilter()">已</label>
+      <label nz-checkbox [(ngModel)]="filter.no" (click)="onFilter()">未</label>
     </nz-checkbox-wrapper>
     <div style="display: flex; align-items: center; justify-content: space-between;">
       <div>
-        已张拉日期: <nz-range-picker readonly [nzDisabled]="!filter.ok" [nzRanges]="rangesDate"
+        已完成日期: <nz-range-picker readonly [nzDisabled]="!filter.ok" [nzRanges]="rangesDate"
           [ngModel]="filter.tension.date" (ngModelChange)="onFilterDate($event, 'tension')"></nz-range-picker>
       </div>
       <div>
@@ -89,7 +102,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="savePath && ((tempPath && exportMode === 1) || exportMode === 2)">
+  <div *ngIf="((tempPath && exportMode === 1) || exportMode === 2)">
     <div style="display: flex; flex-direction: column;" class="border-top">
       <nz-radio-group [(ngModel)]="taskData.sp" (ngModelChange)="selectTaskProject($event)">
         <label nz-radio [nzValue]="p.key" *ngFor="let p of taskData.project">{{p.title}}</label>
@@ -100,7 +113,7 @@
         <label nz-radio [nzValue]="c" *ngFor="let c of taskData.component">{{c}}</label>
       </nz-radio-group>
     </div>
-    <div style="display: flex;flex-wrap: wrap;" class="border-top">
+    <div  style="display: flex;flex-wrap: wrap;" class="border-top">
       <div *ngFor="let b of taskData.bridge; index as i" class="bridge-item">
         <label class="checkbox" [ngClass]="{'check': taskData.sb.indexOf(b.id) > -1}">
           <input type="checkbox" name="brigeBox" [checked]="taskData.sb.indexOf(b.id) > -1" (click)="setBridge(b.id)"
@@ -171,9 +184,12 @@
   </div>
 
 
-  <div *ngIf="taskData.sb.length > 0" style="display: flex; align-items: center;" class="border-top" >
-    <button nz-button nzType="primary" (click)="exportOk()" *ngIf="progress.btnTitle && !progress.success"
-      [disabled]="!(taskData.sb.length > 0)" [nzLoading]="progress.state">{{progress.btnTitle}}</button>
+  <div style="display: flex; align-items: center;" class="border-top" >
+    <button
+      style="margin-right: 15px;"
+      nz-button nzType="primary" (click)="exportOk()"
+      [disabled]="!(taskData.sb.length > 0) || !savePath || !(progress.btnTitle && !progress.success)"
+      [nzLoading]="progress.state">{{progress.btnTitle || '操作'}}</button>
     <div *ngIf="exportMode !== 2" style="flex: 1; display: flex;">
       <h2 *ngIf="progress.success">{{progress.msg}}{{progress.now}}条</h2>
       <nz-progress [nzPercent]="progress.now / progress.length * 100" style="flex: 1; margin-left: 15px;"></nz-progress>

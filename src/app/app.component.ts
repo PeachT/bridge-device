@@ -16,7 +16,6 @@ import { GroutingService } from './services/grouting.service';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
   title = 'bridge';
@@ -43,6 +42,9 @@ export class AppComponent implements OnInit {
         success: false,
         code: null,
       };
+      if (this.appS.platform === 'grouting' && this.GPLCS.connectionStr.ip && this.GPLCS.connectionStr.port) {
+        this.GPLCS.linkSocket();
+      }
     } else if (this.e.isLinux) {
       if (this.appS.platform === 'tension') {
         this.runPLC();

@@ -23,7 +23,7 @@ const os = ['see'];
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UserComponent implements OnInit {
   dbName = 'users';

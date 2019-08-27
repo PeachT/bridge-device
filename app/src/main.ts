@@ -71,8 +71,8 @@ function createWindow() {
   // IPCOn('z', ztcp);
   // IPCOn('c', ctcp);
   if (dev) {
+    win.webContents.openDevTools();
   }
-  win.webContents.openDevTools();
 
   win.on('closed', () => {
     win = null;
@@ -171,6 +171,9 @@ function IPCOn(d: string = 'z', tcp: ModbusTCP | PLCTcpModbus) {
   });
   ipcMain.on(`${d}F016_float`, (e, arg) => {
     tcp.F016_float(arg.address, arg.value, arg.channel);
+  });
+  ipcMain.on(`${d}F03ASCII`, (e, arg) => {
+    tcp.F03ASCII(arg.address, arg.value, arg.channel);
   });
 }
 

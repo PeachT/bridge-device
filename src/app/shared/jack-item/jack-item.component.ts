@@ -18,7 +18,7 @@ import { ReviseItemComponent } from 'src/app/shared/revise-item/revise-item.comp
   selector: 'app-jack-item',
   templateUrl: './jack-item.component.html',
   styleUrls: ['./jack-item.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class JackItemComponent implements OnInit {
   @ViewChild('reviseDom', null) reviseDom: ReviseItemComponent;

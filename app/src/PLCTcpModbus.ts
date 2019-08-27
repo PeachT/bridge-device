@@ -81,9 +81,9 @@ export class PLCTcpModbus {
       if (this.ifClient()) {
         const d = new Date().getSeconds();
         // this.F06(4195, d)
-        this.client.writeRegister(8, d).then((data) => {
-        });
-        this.client.readHoldingRegisters(0, 5).then((data) => {
+        // this.client.readHoldingRegisters(0, 1).then((data) => {
+        this.client.readHoldingRegisters(4548, 1).then((data) => {
+          // const float = bf.bufferToFloat(data.buffer);
           // const dint16 = bf.bufferTo16int(data.buffer);
           this.IPCSend(`${this.connectionStr.uid}heartbeat`, { uint16: data.data });
           this.heartbeat();
@@ -92,7 +92,7 @@ export class PLCTcpModbus {
         });
       }
     // tslint:disable-next-line:no-string-literal
-    }, 1000);
+    }, 10);
   }
 
   /**
@@ -132,7 +132,19 @@ export class PLCTcpModbus {
       this.client.readHoldingRegisters(address, length).then((data) => {
         const float = bf.bufferToFloat(data.buffer);
         const dint16 = bf.bufferTo16int(data.buffer);
-        this.IPCSend(channel, { int16: dint16, uint16: data.data, float });
+        this.IPCSend(channel, { uint16: data.data, float, dint16 });
+      }).catch((err) => {
+        this.IPCSend(channel, err);
+      });
+    }
+  }
+  public F03ASCII(address: number, length: number, channel: string): void {
+    if (this.ifClient()) {
+      this.client.readHoldingRegisters(address, length).then((data) => {
+        const str = data.buffer.toString();
+        console.log('buffer', data.buffer);
+        // const dint16 = bf.bufferTo16int(data.buffer);
+        this.IPCSend(channel, { uint16: data.data, str, buffer: data.buffer });
       }).catch((err) => {
         this.IPCSend(channel, err);
       });

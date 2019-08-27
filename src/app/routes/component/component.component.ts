@@ -22,7 +22,7 @@ import { arrayValidator } from 'src/app/Validator/repetition.validator';
   selector: 'app-component',
   templateUrl: './component.component.html',
   styleUrls: ['./component.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ComponentComponent implements OnInit {
   dbName = 'comp';

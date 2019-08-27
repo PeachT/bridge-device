@@ -23,6 +23,7 @@ import { lastDayOfWeek, lastDayOfMonth, startOfWeek, startOfMonth, getTime, comp
 export class DataTreatingComponent implements OnInit {
   @ViewChild('tplTitle', null) tplTitle: TemplateRef<{}>;
   @ViewChild('taskTerr', null) taskTerr: NzTreeComponent;
+  dbName = null;
   exportMode = null;
   savePath = null;
   tempPath = null;
@@ -111,6 +112,11 @@ export class DataTreatingComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    if (this.apps.platform === 'tension') {
+      this.dbName = 'task';
+    } else if (this.apps.platform === 'grouting') {
+      this.dbName = 'grouting';
+    }
   }
 
   onDataProcessing() {
@@ -250,7 +256,8 @@ export class DataTreatingComponent implements OnInit {
   /** 获取任务构建数据 */
   async getTaskComponent() {
     const project = this.taskData.sp;
-    this.taskData.component = await this.db.getTaskComponentMenuData('task', o1 => o1.project === Number(project));
+    // this.taskData.component = await this.db.getTaskComponentMenuData('task', o1 => o1.project === Number(project));
+    this.taskData.component = await this.db.getTaskComponentMenuData(this.dbName, o1 => o1.project === Number(project));
     console.log(this.taskData.component);
     if (this.taskData.component.length === 1) {
       this.taskData.sc = this.taskData.component[0];
@@ -278,8 +285,10 @@ export class DataTreatingComponent implements OnInit {
     // console.log(this.taskData.bridge);
     // this.cdr.detectChanges();
 
+    // const bridge = await this.db.getTaskBridgeMenuData(
+    //   'task',
     const bridge = await this.db.getTaskBridgeMenuData(
-      'task',
+      this.dbName,
       (o1) => {
         if (o1.project !== this.taskData.sp || o1.component !== this.taskData.sc) {
           return false;
@@ -455,7 +464,8 @@ export class DataTreatingComponent implements OnInit {
   }
   /** 导出数据 */
   async dataEX() {
-    const datas = await this.db.db.task.filter(t => this.taskData.sb.indexOf(t.id) > -1).toArray();
+    // const datas = await this.db.db.task.filter(t => this.taskData.sb.indexOf(t.id) > -1).toArray();
+    const datas = await this.db.db[this.dbName].filter(t => this.taskData.sb.indexOf(t.id) > -1).toArray();
     const strb64 = utf8_to_b64(JSON.stringify(datas));
     console.log('导出数据', datas, strb64);
 

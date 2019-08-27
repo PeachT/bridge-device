@@ -28,19 +28,33 @@ export class DbService {
     console.log(this.db);
   }
 
-  /** 判断数据是否重复 */
+
+  public async getOneAsync<T>(tName: string, filterFunction: (o1: T) => boolean): Promise<T> {
+    return await this.db[tName].filter(filterFunction).first();
+  }
+  /** 判断数据是否存在 */
   // tslint:disable-next-line:max-line-length
   public async repetitionAsync<T>(tName: string, filterFunction: (o1: T) => boolean): Promise<number> {
     const count = await this.db[tName].filter(filterFunction).count();
     console.log('重复查询', count);
     return count;
   }
-
+  /**
+   * 添加一条新数据
+   *
+   * @template T 添加数据类型
+   * @param {string} tName 库名称
+   * @param {IBase} data 数据
+   * @param {(o1: T) => boolean} filterFunction 存在判断
+   * @returns
+   * @memberof DbService
+   */
   public async addAsync<T>(tName: string, data: IBase, filterFunction: (o1: T) => boolean) {
     if (await this.repetitionAsync(tName, filterFunction) > 0) {
       return { success: false, msg: '已存在' };
     }
     try {
+      delete data.id;
       data.createdDate = new Date().getTime();
       data.modificationDate = new Date().getTime();
       data.user = this.appS.userInfo.name || 'sys';
@@ -115,7 +129,7 @@ export class DbService {
     }
   }
 
-  /** 判断数据是否重复 */
+  /** 判断数据是否存在 */
   // tslint:disable-next-line:max-line-length
   public repetition(tName: string, filterFunction: (obj: Project | TensionTask | Comp | User) => boolean): Observable<boolean> {
     return from(this.db[tName].filter(filterFunction).count()).pipe(
@@ -284,7 +298,7 @@ export class DbService {
     return r;
   }
   /**
-   * *通过ID获取一点一个数据
+   * *通过ID获取一个数据
    *
    * @template T 类型
    * @param {string} name 数据库名称

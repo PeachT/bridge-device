@@ -125,14 +125,17 @@ export class ManualComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async ngOnInit() {
     /** 刷新率 */
-    this.ms.t = setInterval(() => {
-      this.ms.i ++;
-      // console.log(this.ms);
-      if (this.ms.i > 10000) {
-        this.ms.i = 0;
-      }
-      this.cdr.markForCheck();
-    }, this.appS.refresh);
+    // this.ms.t = setInterval(() => {
+    //   this.ms.i ++;
+    //   // console.log(this.ms);
+    //   if (this.ms.i > 10000) {
+    //     this.ms.i = 0;
+    //   }
+    //   this.cdr.markForCheck();
+    // }, this.appS.refresh);
+    this.plcsub = this.PLCS.plcSubject.subscribe((data) => {
+      this.cdr.detectChanges();
+    });
     // 获取顶
     await this.db.jack.filter(j => j.state).toArray().then((d) => {
       this.jacks = d.map(item => {
