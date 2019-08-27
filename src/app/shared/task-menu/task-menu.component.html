@@ -8,7 +8,7 @@
       </button>
       <ng-template #contentTemplate>
         <div>
-          已张拉日期: <nz-range-picker readonly [nzDisabled]="!filter.ok" [nzRanges]="rangesDate"
+          已完成日期: <nz-range-picker readonly [nzDisabled]="!filter.ok" [nzRanges]="rangesDate"
             [ngModel]="filter.tension.date" (ngModelChange)="onFilterDate($event, 'tension')"></nz-range-picker>
         </div>
         <br>
@@ -69,6 +69,6 @@
   align-items: center;">
     <button nz-button nzType="primary" [disabled]="bridge.page === 0" (click)="funcPage(false)">上一页</button>
     <span>{{bridge.page + 1}} / {{bridge.count}}</span>
-    <button nz-button nzType="primary" [disabled]="bridge.page + 1  === bridge.count" (click)="funcPage(true)">下一页</button>
+    <button nz-button nzType="primary" [disabled]="bridge.page + 1  === bridge.count || bridge.count === 0" (click)="funcPage(true)">下一页</button>
   </div>
 </div>

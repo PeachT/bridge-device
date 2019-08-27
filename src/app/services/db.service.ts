@@ -228,7 +228,7 @@ export class DbService {
   public async getTaskBridgeMenuData(dbName: string, f: (o1: TaskBase) => boolean, state: boolean = false, p: number = 0, y: number = 0)
     : Promise<{menus: Array<Menu>, count: number}> {
     const r = [];
-    const count = await this.db.task.filter(o1 => f(o1)).count();
+    const count = await this.db[dbName].filter(o1 => f(o1)).count();
     console.log(count);
     y = y || count;
     // y = count;

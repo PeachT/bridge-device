@@ -17,13 +17,13 @@ export class AppService {
   // tension
   // grouting
   // debug
-  initSetPlatform = 'windows';
+  initSetPlatform = 'grouting';
   platformName = localStorage.getItem('platformName');
   /** 上传信息 */
   uploadingData = JSON.parse(localStorage.getItem('uploadingData'));
   /** 软件信息 */
   public info = {
-    version: '0.0.1',
+    version: '0.0.2',
     unit: {
       name: '企业名称',
       tel: '888-8888888',

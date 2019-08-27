@@ -39,7 +39,7 @@ export class TaskMenuComponent implements OnInit {
   bridge = {
     select: null,
     menu: null,
-    count: 0,
+    count: 1,
     page: 0
   };
   pageCount = 17;
@@ -99,11 +99,6 @@ export class TaskMenuComponent implements OnInit {
       }
       this.res(data);
     });
-    fromEvent(this.bridgeScrollDom.nativeElement, 'scroll').pipe(
-      debounceTime(200),
-      map(y => console.log(y))
-    );
-
   }
 
   res(data) {
@@ -136,9 +131,11 @@ export class TaskMenuComponent implements OnInit {
   async getComponent() {
     this.component.menu = await this.db.getTaskComponentMenuData(this.dbNmae, (o1) => o1.project === this.project.select.id);
     console.log(this.component);
-    if (this.component.select) {
+    if (this.component.select && this.component.menu.indexOf(this.component.select) > -1) {
       this.getBridge(this.bridge.select);
     } else {
+      this.component.select = null;
+      this.bridge.select = null;
       this.cdr.markForCheck();
     }
   }
