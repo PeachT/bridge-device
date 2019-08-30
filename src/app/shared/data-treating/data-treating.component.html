@@ -1,9 +1,9 @@
 <nz-modal [nzVisible]="true" nzTitle="数据处理" (nzOnCancel)="dataHandleCancel()" (nzOnOk)="dataHandleOk()" nzWidth="85%"
   [nzMaskClosable]="false" [nzFooter]="null">
   <div style="display: flex; justify-content: space-between;">
-    <div>
+    <div *ngIf="apps.platform === 'windows' || apps.platform === 'debug'">
       任务：
-      <nz-radio-group [(ngModel)]="dbName" *ngIf="apps.platform === 'windows' || apps.platform === 'debug'">
+      <nz-radio-group [(ngModel)]="dbName" >
         <label nz-radio nzValue="task">张拉</label>
         <label nz-radio nzValue="grouting">压浆</label>
       </nz-radio-group>

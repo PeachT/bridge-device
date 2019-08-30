@@ -71,6 +71,8 @@
     "protractor": "~5.4.0",
     "ts-node": "~7.0.0",
     "tslint": "~5.18.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
     "typescript": "~3.4.5"
   },
   "build": {
@@ -86,13 +88,13 @@
       }
     ],
     "win": {
-
       "icon": "build/icons/all/256x256.ico",
       "target": [
         {
           "target": "nsis",
           "arch": [
-            "x64", "ia32"
+            "x64",
+            "ia32"
           ]
         }
       ]
