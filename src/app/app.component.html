@@ -1,5 +1,5 @@
 <div class="plc-state">
-  <app-time-sec class="item" [hidden]="!(appS.platform === 'tension' || appS.platform === 'grouting') || e.isWindows"></app-time-sec>
+  <div class="item" style="color: white;" [hidden]="!(appS.platform === 'tension' || appS.platform === 'grouting') || e.isWindows">{{time$ | async}}</div>
   <div class="item" *ngIf="appS.platform === 'tesnsion'" [ngClass]="{'active': PLCS.plcState.z}">主:{{PLCS.plcState.zLT}}</div>
   <div class="item" *ngIf="appS.platform === 'tesnsion'" [ngClass]="{'active': PLCS.plcState.c}">副:{{PLCS.plcState.cLT}}</div>
   <button nz-button nzType="dashed" *ngIf="!PLCS.socketState && (appS.platform === 'tesnsion' || appS.platform === 'debug')" (click)="PLCS.runSocket()">张拉链接</button>

@@ -11,15 +11,8 @@
       </div>
     </div>
     <div class="main">
-      <!-- <div class="icon" (click)="goUrl('/task')"  [ngClass]="{'active': ifUrl('/task')}">
-        <i nz-icon nzType="swap" theme="outline"></i>
-        <div class="text">张拉</div>
-      </div>
-      <div class="icon" (click)="goUrl('/grouting')"  [ngClass]="{'active': ifUrl('/grouting')}">
-        <i nz-icon nzType="experiment" nzTheme="outline"></i>
-        <div class="text">压浆</div>
-      </div> -->
-      <div class="icon" *ngFor="let item of appS.menus" [ngClass]="{'active': ifUrl(item.url)}"
+      <!-- <div class="icon" *ngFor="let item of appS.menus" [ngClass]="{'active': ifUrl(item.url)}" -->
+      <div class="icon" *ngFor="let item of appS.menus" [ngClass]="{'active': item.url === (routerInfo$ | async).url}"
         (click)="goUrl(item.url)">
         <i nz-icon [nzType]="item.icon" nzTheme="outline"></i>
         <div class="text">{{item.name}}</div>
@@ -28,7 +21,8 @@
         <i nz-icon nzType="file-sync" theme="outline"></i>
         <div class="text">数据</div>
       </div>
-      <div class="icon" (click)="appS.debugShow = true" *ngIf="appS.userInfo?.jurisdiction >= 8 && (appS.platform === 'tension' || appS.platform === 'debug')" >
+      <div class="icon" (click)="appS.debugShow = true"
+        *ngIf="appS.userInfo?.jurisdiction >= 8 && (appS.platform === 'tension' || appS.platform === 'debug')">
         <i nz-icon nzType="bug" theme="outline"></i>
         <div class="text">调试</div>
       </div>

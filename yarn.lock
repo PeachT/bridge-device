@@ -341,6 +341,21 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@ngrx/effects@^8.3.0":
+  version "8.3.0"
+  resolved "https://registry.npm.taobao.org/@ngrx/effects/download/@ngrx/effects-8.3.0.tgz#d99a777ab352d4efdf456a7dec307514187ba496"
+  integrity sha1-2Zp3erNS1O/fRWp97DB1FBh7pJY=
+
+"@ngrx/store-devtools@^8.3.0":
+  version "8.3.0"
+  resolved "https://registry.npm.taobao.org/@ngrx/store-devtools/download/@ngrx/store-devtools-8.3.0.tgz#c9e9f5bd9fe7e32c605d3a85888d4da91a582b02"
+  integrity sha1-yen1vZ/n4yxgXTqFiI1NqRpYKwI=
+
+"@ngrx/store@^8.3.0":
+  version "8.3.0"
+  resolved "https://registry.npm.taobao.org/@ngrx/store/download/@ngrx/store-8.3.0.tgz#f2eaf428ec9e8379801cc37e3f6bffe88c2af472"
+  integrity sha1-8ur0KOyeg3mAHMN+P2v/6Iwq9HI=
+
 "@ngtools/webpack@8.0.6":
   version "8.0.6"
   resolved "https://registry.npm.taobao.org/@ngtools/webpack/download/@ngtools/webpack-8.0.6.tgz#c6b5416710913b24b741a17c8f255e54f42c9abf"
