@@ -19,8 +19,8 @@ import { log } from 'util';
   // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ManualComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('domz', { read: ViewContainerRef, static: false }) domz: ViewContainerRef;
-  @ViewChild('domc', { read: ViewContainerRef, static: false }) domc: ViewContainerRef;
+  @ViewChild('domz', { read: ViewContainerRef, static: true }) domz: ViewContainerRef;
+  @ViewChild('domc', { read: ViewContainerRef, static: true }) domc: ViewContainerRef;
   db: DB;
   selectedJack: any;
   selectedI: any = null;

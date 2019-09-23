@@ -3,6 +3,14 @@ import { Routes, RouterModule } from "@angular/router";
 import { DefaultComponent } from "./layout/default/default.component";
 import { HeaderComponent } from "./layout/header/header.component";
 import { GlobalEditGuard } from "./models/edit-guard";
+import { TaskComponent } from './routes/task/task.component';
+import { GroutingComponent } from './routes/grouting/grouting.component';
+import { JackComponent } from './routes/task/components/jack/jack.component';
+import { ProjectComponent } from './routes/task/components/project/project.component';
+import { ComponentComponent } from './routes/component/component.component';
+import { UserComponent } from './routes/user/user.component';
+import { HelpComponent } from './routes/help/help.component';
+import { LoginComponent } from './routes/login/login.component';
 
 const routes: Routes = [
   {
@@ -12,9 +20,10 @@ const routes: Routes = [
       { path: "", redirectTo: "login", pathMatch: "full" },
       {
         path: "login",
-        loadChildren: () =>
-          import("./routes/login/login.module").then(m => m.LoginModule),
-        data: { title: "登录" }
+        component: LoginComponent
+        // loadChildren: () =>
+        //   import("./routes/login/login.module").then(m => m.LoginModule),
+        // data: { title: "登录" }
       },
       {
         path: "auto",
@@ -30,6 +39,7 @@ const routes: Routes = [
     children: [
       {
         path: "task",
+        // component: TaskComponent,
         loadChildren: () =>
           import("./routes/task/task.module").then(m => m.TaskModule),
         data: { title: "张拉" },
@@ -37,6 +47,7 @@ const routes: Routes = [
       },
       {
         path: "grouting",
+        // component: GroutingComponent,
         loadChildren: () =>
           import("./routes/grouting/grouting.module").then(
             m => m.GroutingModule
@@ -66,6 +77,7 @@ const routes: Routes = [
       },
       {
         path: "jack",
+        // component: JackComponent,
         loadChildren: () =>
           import("./routes/jack/jack.module").then(m => m.JackModule),
         data: { title: "千斤顶" },
@@ -73,6 +85,7 @@ const routes: Routes = [
       },
       {
         path: "project",
+        // component: ProjectComponent,
         loadChildren: () =>
           import("./routes/project/project.module").then(m => m.ProjectModule),
         data: { title: "项目" },
@@ -80,15 +93,17 @@ const routes: Routes = [
       },
       {
         path: "component",
+        // component: ComponentComponent,
         loadChildren: () =>
           import("./routes/component/component.module").then(
             m => m.ComponentModule
           ),
-        data: { title: "构建" },
+        // data: { title: "构建" },
         canDeactivate: [GlobalEditGuard]
       },
       {
         path: "user",
+        // component: UserComponent,
         loadChildren: () =>
           import("./routes/user/user.module").then(m => m.UserModule),
         data: { title: "用户" },
@@ -96,9 +111,10 @@ const routes: Routes = [
       },
       {
         path: "help",
-        loadChildren: () =>
-          import("./routes/help/help.module").then(m => m.HelpModule),
-        data: { title: "帮助" },
+        component: HelpComponent,
+        // loadChildren: () =>
+        //   import("./routes/help/help.module").then(m => m.HelpModule),
+        // data: { title: "帮助" },
         canDeactivate: [GlobalEditGuard]
       }
     ]

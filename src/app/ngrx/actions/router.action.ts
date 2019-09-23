@@ -1,6 +1,3 @@
-// Section 1
-import { Action } from '@ngrx/store'
-import { type } from '../util';
 import { RouterInfo } from 'src/app/models/app';
 
 import { createAction, props } from '@ngrx/store';

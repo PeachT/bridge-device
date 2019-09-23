@@ -1,18 +1,15 @@
 import {
-  ActionReducer,
   ActionReducerMap,
-  createFeatureSelector,
-  createSelector,
   MetaReducer,
   Action
 } from '@ngrx/store';
 import { environment } from '../../../environments/environment';
 import { routerReducer } from './router.reducers';
-import { RouterInfo } from 'src/app/models/app';
 import { InjectionToken } from '@angular/core';
+import { RouterInfo } from 'src/app/models/app';
 
 export interface NgrxState {
-  routerInfo
+  routerInfo: RouterInfo
 }
 
 export const ROOT_REDUCERS = new InjectionToken<

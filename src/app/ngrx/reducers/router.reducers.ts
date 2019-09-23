@@ -2,7 +2,6 @@ import { Action, createReducer, on } from '@ngrx/store'
 import { RouterInfo } from 'src/app/models/app';
 import { goRouter, editRouter } from '../actions/router.action';
 
-// Section 1
 const initialState: RouterInfo = {
     url: null,
     state: false
