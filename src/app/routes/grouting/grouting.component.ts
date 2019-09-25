@@ -73,6 +73,10 @@ export class GroutingComponent implements OnInit, OnDestroy {
     data: null,
     group: null,
   };
+  /** 模板压浆方向 */
+  tpmDirection = null;
+  /** 选择监控模板 */
+  groutingTemplateShow = false;
 
   addFilterFun = (o1: any, o2: any) => o1.name === o2.name
     && o1.component === o2.component && o1.project === o2.project
@@ -126,6 +130,8 @@ export class GroutingComponent implements OnInit, OnDestroy {
       startDate: [],
       /** 最后一个孔完成时间 */
       entDate: [],
+      /** 模板 */
+      template: []
     });
     /** 获取构建菜单数据 */
     this.odb.db.comp.toArray().then((d) => {
@@ -348,63 +354,103 @@ export class GroutingComponent implements OnInit, OnDestroy {
     this.data.groups[this.holeMneu.index] = g;
     this.formData.controls.groups.setValue(this.data.groups);
   }
-
+  /** 监控压浆 */
   monitoring() {
-    const t = `<h2>将使用 ${this.data.name} - ${this.data.component} 作为压浆模板。</h2>`;
-    const modal: NzModalRef = this.modalService.create({
-      nzTitle: '压浆模板确认',
-      // nzContent: '千斤顶名称模式不一致不能导入',
-      nzContent: t,
-      nzClosable: false,
-      nzMaskClosable: false,
-      // nzWidth: '60%',
-      nzFooter: [
-        {
-          label: '取消',
-          shape: 'default',
-          type: 'danger',
-          onClick: () => {
-            modal.destroy();
-            return;
+    this.groutingTemplateShow = true;
+    // const t = `<h2>将使用 ${this.data.name} - ${this.data.component} 作为压浆模板。</h2>`;
+    // const modal: NzModalRef = this.modalService.create({
+    //   nzTitle: '压浆模板确认',
+    //   // nzContent: '千斤顶名称模式不一致不能导入',
+    //   nzContent: t,
+    //   nzClosable: false,
+    //   nzMaskClosable: false,
+    //   // nzWidth: '60%',
+    //   nzFooter: [
+    //     {
+    //       label: '取消',
+    //       shape: 'default',
+    //       type: 'danger',
+    //       onClick: () => {
+    //         modal.destroy();
+    //         return;
+    //       }
+    //     },
+    //     {
+    //       label: '确定模板',
+    //       shape: 'default',
+    //       type: 'primary',
+    //       onClick: () => {
+    //         if (!this.plcsub) {
+    //           const gdata: GroutingTask = copyAny(this.data);
+    //           this.tpmDirection = gdata.groups[0].direction;
+    //           gdata.id = null;
+    //           gdata.otherInfo[0].value = null;
+    //           gdata.groups = [];
+    //           this.saveTpl.data = gdata;
+    //           // data.groups.map(item => {
+    //           //   return this.creationGroutingItem(item.name);
+    //           // });
+    //           this.plcsub = this.GPLCS.plcSubject.subscribe((data: any) => {
+    //             console.warn(data.data[0]);
+    //             if (data.data[0]) {
+    //               console.error(data);
+    //             }
+    //             if (data.state) {
+    //               this.monitoringMsg.color = '#20a162';
+    //               if (data.data[0] && !this.monitoringMsg.save) {
+    //                 this.groutingSave();
+    //                 this.monitoringMsg.save = true;
+    //               } else if (!data.data[0] && this.monitoringMsg.save) {
+    //                 this.monitoringMsg.save = false;
+    //               }
+    //             } else {
+    //               this.monitoringMsg.color = '#d42517';
+    //             }
+    //             this.cdr.detectChanges();
+    //             this.cdr.markForCheck();
+    //           });
+    //         }
+    //         modal.destroy();
+    //         return;
+    //       }
+    //     },
+    //   ]
+    // });
+  }
+  /** 确认模板监控 */
+  async selectGroutingTemp(id) {
+    console.log(id);
+    const gdata = await this.odb.getOneAsync('grouting', (g: GroutingTask) => g.id === id);
+    if (!this.plcsub) {
+      this.tpmDirection = gdata.groups[0].direction;
+      gdata.id = null;
+      gdata.otherInfo[0].value = null;
+      gdata.groups = [];
+      this.saveTpl.data = gdata;
+      // data.groups.map(item => {
+      //   return this.creationGroutingItem(item.name);
+      // });
+      this.plcsub = this.GPLCS.plcSubject.subscribe((data: any) => {
+        console.warn(data.data[0]);
+        if (data.data[0]) {
+          console.error(data);
+        }
+        if (data.state) {
+          this.monitoringMsg.color = '#20a162';
+          if (data.data[0] && !this.monitoringMsg.save) {
+            this.groutingSave();
+            this.monitoringMsg.save = true;
+          } else if (!data.data[0] && this.monitoringMsg.save) {
+            this.monitoringMsg.save = false;
           }
-        },
-        {
-          label: '确定模板',
-          shape: 'default',
-          type: 'primary',
-          onClick: () => {
-            if (!this.plcsub) {
-              const gdata: GroutingTask = copyAny(this.data);
-              gdata.id = null;
-              gdata.otherInfo[0].value = null;
-              gdata.groups = [];
-              this.saveTpl.data = gdata;
-              // data.groups.map(item => {
-              //   return this.creationGroutingItem(item.name);
-              // });
-              this.plcsub = this.GPLCS.plcSubject.subscribe((data: any) => {
-                // console.log(data);
-                if (data.state) {
-                  this.monitoringMsg.color = '#20a162';
-                  if (data.data.uint16[0] === 1 && !this.monitoringMsg.save) {
-                    this.groutingSave();
-                    this.monitoringMsg.save = true;
-                  } else if (data.data.uint16[0] === 0) {
-                    this.monitoringMsg.save = false;
-                  }
-                } else {
-                  this.monitoringMsg.color = '#d42517';
-                }
-                this.cdr.detectChanges();
-                this.cdr.markForCheck();
-              });
-            }
-            modal.destroy();
-            return;
-          }
-        },
-      ]
-    });
+        } else {
+          this.monitoringMsg.color = '#d42517';
+        }
+        this.cdr.detectChanges();
+        this.cdr.markForCheck();
+      });
+    }
+    this.groutingTemplateShow = false;
   }
   stopMonitoring() {
     this.plcsub.unsubscribe();
@@ -447,7 +493,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
       });
     }
     const bridgeName = backData[1].str;
-    const date = format(new Date(), 'yyyy-MM-dd');
+    const date = `${backData[2].uint16[7]}-${backData[2].uint16[8]}-${backData[2].uint16[9]}`;
     // const groud: GroutingItem =  {
     //   /** 孔号 */
     //   name: backData[0].str,
@@ -487,19 +533,19 @@ export class GroutingComponent implements OnInit, OnDestroy {
     //   proportion: backData[5].uint16[0],
     //   any: backData
     // };
-    const groud: GroutingItem =  {
+    const groud: GroutingItem = {
       /** 孔号 */
       name: backData[0].str,
       /** 试验日期 */
       testDate: null,
       /** 压浆方向 */
-      direction: null,
+      direction: this.tpmDirection,
       /** 张拉开始时间 */
       startDate: new Date(`${date} ${backData[2].uint16[10]}:${backData[2].uint16[11]}:${backData[2].uint16[12]}`),
       /** 张拉结束时间 */
       endDate: new Date(`${date} ${backData[2].uint16[13]}:${backData[2].uint16[14]}:${backData[2].uint16[15]}`),
       /** 压浆压力 */
-      setMpa: backData[2].float[0],
+      setMpa: backData[2].float[2].toFixed(2),
       /** 通过 */
       pass: null,
       /** 冒浆情况 */
@@ -507,9 +553,9 @@ export class GroutingComponent implements OnInit, OnDestroy {
       /** 停留时间 */
       stayTime: null,
       /** 稳压时间 */
-      steadyTime: backData[2].uint16[7],
+      steadyTime: backData[2].uint16[6],
       /** 稳压压力 */
-      steadyMpa: backData[2].float[2],
+      steadyMpa: backData[2].float[0].toFixed(2),
       /** 压浆状态 */
       state: 2,
       /** 上传状态 */
@@ -517,13 +563,13 @@ export class GroutingComponent implements OnInit, OnDestroy {
       /** 二次压浆 */
       tow: null,
       /** 压浆料量 */
-      materialsTotal: backData[3].float[0],
+      materialsTotal: backData[3].float[0].toFixed(2),
       /** 水量 */
-      waterTotal: backData[4].float[0],
+      waterTotal: backData[4].float[0].toFixed(2),
       /** 搅拌时间 */
       stirTime: backData[5].uint16[0] / 10,
       /** 水浆比 */
-      proportion: backData[2].float[1],
+      proportion: backData[2].float[1].toFixed(2),
     };
     const getData = await this.odb.getOneAsync('grouting', (g: GroutingTask) =>
     g.name === bridgeName
@@ -533,6 +579,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
     if (!getData) {
       const gdata: GroutingTask = copyAny(this.saveTpl.data);
       gdata.name = bridgeName;
+      gdata.template = false;
       gdata.groups = [groud];
       console.log('save2', gdata);
       const saveback = await this.odb.addAsync('grouting', gdata, (g: GroutingTask) =>

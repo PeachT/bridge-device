@@ -116,7 +116,7 @@ ipcMain.on('runSocket', (event, data) => {
   if (!ztcp) {
     // tslint:disable-next-line:no-string-literal
     global['heartbeatRate'] = Number(data.delay) || 10;
-    event.sender.send(data.channel, global['heartbeatRate']);
+    event.sender.send(data.channel, global.heartbeatRate);
     console.log('3333333333333333333333333333333', data);
     // 启动Modbus
     createModbus();
@@ -124,7 +124,7 @@ ipcMain.on('runSocket', (event, data) => {
     IPCOn('z', ztcp);
     IPCOn('c', ctcp);
   } else {
-    event.sender.send(data.channel, global['heartbeatRate']);
+    event.sender.send(data.channel, global.heartbeatRate);
     ztcp.devicesLock();
     ctcp.devicesLock();
   }
@@ -137,7 +137,7 @@ ipcMain.on('heartbeatRate', (event, data) => {
   global['heartbeatRate'] = Number(data.delay) || 10;
   // tslint:disable-next-line:no-string-literal
   event.sender.send(data.channel, global['heartbeatRate']);
-  console.log('global.heartbeatRate', global['heartbeatRate']);
+  console.log('global.heartbeatRate', global.heartbeatRate);
 });
 
 
@@ -273,7 +273,7 @@ ipcMain.on('derivedExcel', async (event, data) => {
   }
 
   const filePath = data.templatePath;
-  const savePath = `${outPath}/${data.data.data.name}张拉记录.xlsx`;
+  const savePath = `${outPath}/${data.data.data.name}${data.fileName}记录.xlsx`;
   try {
     console.log(filePath, savePath, outPath, data.outPath);
     const exlBuf = await readFileAsync(filePath);
@@ -323,6 +323,58 @@ ipcMain.on('indb', async (event, data) => {
         }
       }
     });
+  } catch (error) {
+    event.sender.send(data.channel, { success: false, mgs: '读取文件错误' });
+    // event.sender.send(data.channel, { success: false, filePath, savePath, error });
+  }
+});
+// 导入HMIcsv数据
+ipcMain.on('inHMIcsv', async (event, data) => {
+  console.log(data);
+  try {
+    fs.readFile(data.inPath, 'utf-16le', (err, buffer) => {
+      const arr = buffer.toString().replace(/\r\n/g, '').replace(/\x20|\0/g, '').split('\t');
+      if (err) {
+        event.sender.send(data.channel, { success: false, mgs: '读取文件错误', error: err });
+      } else {
+        const arrData = [];
+        if (arr.length > 0) {
+          // tslint:disable-next-line:prefer-for-of
+          for (let index = 16; index < arr.length; index+= 16 ) {
+            const a: any = {};
+            const name = `${arr[index]}${arr[index + 1]}`;
+            if (!name || name === 'undefined') {
+              break;
+            } else {
+              a.name = arr[index+2];
+              a.steadyMpa = arr[index+3];
+              a.proportion = arr[index+4];
+              a.setMpa = arr[index+5];
+              a.steadyTime = arr[index+6];
+              const date = `${arr[index+7]}-${arr[index+8]}-${arr[index+9]}`;
+
+              a.startDate = new Date(`${date} ${arr[index+10]}:${arr[index+11]}:${arr[index+12]}`);
+              a.endDate = new Date(`${date} ${arr[index+13]}:${arr[index+14]}:${arr[index+15]}`);
+            }
+            if (arrData.length > 0) {
+              // tslint:disable-next-line:prefer-for-of
+              for (let i = 0; i < arrData.length; i++) {
+                if (arrData[i].name === name) {
+                  arrData[i].groups.push(a);
+                } else {
+                  arrData.push({name, id: index, groups: [a]});
+                }
+              }
+            } else {
+              arrData.push({name, id: index, groups: [a]});
+            }
+          }
+          event.sender.send(data.channel, { success: true, data: arrData });
+        } else {
+          event.sender.send(data.channel, { success: false, mgs: '没有数据' });
+        }
+      }
+    })
   } catch (error) {
     event.sender.send(data.channel, { success: false, mgs: '读取文件错误' });
     // event.sender.send(data.channel, { success: false, filePath, savePath, error });

@@ -3,11 +3,20 @@
     <task-menu style="overflow: hidden;" dbNmae="grouting" (menuChange)="onBridge($event)" #taskmenu></task-menu>
   </div>
   <div class="main">
+    <div *ngIf="data?.template" class="template">
+      <div class="text">模板</div>
+    </div>
     <!-- <button (click)="save100()">添加100</button> -->
     <nz-tabset class="task-tabset" (nzSelectChange)="changeTabs($event)">
       <nz-tab nzTitle="基础信息">
         <div class="form-edit">
           <form nz-form [ngClass]="{'form-edit': !appS.edit}" [formGroup]="formData">
+            <nz-form-item *ngIf="appS.edit">
+              <nz-form-label [nzSm]="3">模板</nz-form-label>
+              <nz-form-control [nzSm]="21">
+                <nz-switch formControlName="template" nzCheckedChildren="是" nzUnCheckedChildren="否"></nz-switch>
+              </nz-form-control>
+            </nz-form-item>
             <nz-form-item>
               <nz-form-label [nzSm]="3" nzRequired>梁号</nz-form-label>
               <nz-form-control [nzSm]="9" [ngClass]="{'in-error': formData.get('name').errors}"
@@ -110,7 +119,7 @@
           <app-operat [dbName]="dbName" [formData]="formData" (outEdit)="onEdit($event)" (outEditOk)="editOk($event)"
             [addFilterFun]="addFilterFun" [updateFilterFun]="updateFilterFun"
             [saveState]="groutingRecord?.formData?.valid" [coprState]="true" (outDelete)="delete()">
-            <button nz-button nzType="primary" (click)="monitoring()" *ngIf="!plcsub" [disabled]="!GPLCS.linkMsg.link || !data?.name">监控压浆</button>
+            <button nz-button nzType="primary" (click)="monitoring()" *ngIf="!plcsub" [disabled]="!GPLCS.linkMsg.link">监控压浆</button>
             <button nz-button *ngIf="plcsub" (click)="stopMonitoring()" ><i [ngStyle]="{'color': monitoringMsg.color}" nz-icon nzType="loading" nzTheme="outline"></i>压浆监控中</button>
           </app-operat>
         </div>
@@ -128,3 +137,4 @@
 </app-left>
 
 <app-delete-modal *ngIf="deleteShow" (outDelete)="deleteOk($event)"></app-delete-modal>
+<app-grouting-template *ngIf="groutingTemplateShow" [projectId]="taskMenuDom.project.select.id" (selectOut)="selectGroutingTemp($event)" (cancel)="groutingTemplateShow=false"></app-grouting-template>

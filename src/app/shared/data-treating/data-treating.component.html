@@ -11,9 +11,10 @@
     <div>
       操作：
       <nz-radio-group [(ngModel)]="exportMode" (ngModelChange)="selectEM()" [nzDisabled]="!dbName">
-        <label nz-radio [nzValue]="1" *ngIf="dbName === 'task'">导出表格</label>
+        <label nz-radio [nzValue]="1">导出表格</label>
         <label nz-radio [nzValue]="2">导出数据</label>
         <label nz-radio [nzValue]="3" *ngIf="dbName === 'task'">导入</label>
+        <label nz-radio [nzValue]="4" *ngIf="dbName === 'grouting'">导入HMI数据</label>
       </nz-radio-group>
     </div>
   </div>
@@ -64,7 +65,7 @@
     </div>
   </div>
   <div *ngIf="exportMode === 3">
-    <nz-divider nzText="导出位置"></nz-divider>
+    <nz-divider nzText="导入文件"></nz-divider>
     <div>
       <div *ngIf="e.isLinux">
         <h2 *ngIf="inData.files?.length === 0">没有找到数据文件
@@ -77,6 +78,25 @@
       </div>
       <div style="display: flex;flex-wrap: wrap;" *ngIf="e.isWindows || apps.userInfo?.jurisdiction > 8">
         <button nz-button nzType="primary" (click)="selectDb()">选择数据文件</button>&nbsp;&nbsp;&nbsp;
+        <h2>{{inData.selsectPath | GetPathName}}</h2>
+        <h2>{{inData.msg}}</h2>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="exportMode === 4">
+    <nz-divider nzText="导入文件"></nz-divider>
+    <div>
+      <!-- <div *ngIf="e.isLinux">
+        <h2 *ngIf="inData.files?.length === 0">没有找到数据文件
+          <p>{{inData.fileMsg | json}}</p>
+        </h2>
+        <nz-radio-group [(ngModel)]="inData.selsectPath" [nzDisabled]="inData.start" (ngModelChange)="radioSelectDb()">
+          <label nzSize="large" class="radio-item" nz-radio [nzValue]="item"
+            *ngFor="let item of inData.files">{{item | GetPathName}}</label>
+        </nz-radio-group>
+      </div> -->
+      <div style="display: flex;flex-wrap: wrap;" *ngIf="e.isWindows || apps.userInfo?.jurisdiction > 8">
+        <button nz-button nzType="primary" (click)="selectHMIFile()">选择数据文件</button>&nbsp;&nbsp;&nbsp;
         <h2>{{inData.selsectPath | GetPathName}}</h2>
         <h2>{{inData.msg}}</h2>
       </div>
@@ -103,17 +123,19 @@
     </div>
   </div>
   <div *ngIf="((tempPath && exportMode === 1) || exportMode === 2)">
-    <div style="display: flex; flex-direction: column;" class="border-top">
+    <div class="border-top">
+      <span>项目选择：</span>
       <nz-radio-group [(ngModel)]="taskData.sp" (ngModelChange)="selectTaskProject($event)">
         <label nz-radio [nzValue]="p.key" *ngFor="let p of taskData.project">{{p.title}}</label>
       </nz-radio-group>
     </div>
-    <div style="display: flex; flex-direction: column;" class="border-top">
+    <div class="border-top" *ngIf="taskData.sp">
+      <span>构建选择：</span>
       <nz-radio-group [(ngModel)]="taskData.sc" (ngModelChange)="selectTaskComponent($event)">
         <label nz-radio [nzValue]="c" *ngFor="let c of taskData.component">{{c}}</label>
       </nz-radio-group>
     </div>
-    <div  style="display: flex;flex-wrap: wrap;" class="border-top">
+    <div  style="display: flex;flex-wrap: wrap;" class="border-top" *ngIf="taskData.sc">
       <div *ngFor="let b of taskData.bridge; index as i" class="bridge-item">
         <label class="checkbox" [ngClass]="{'check': taskData.sb.indexOf(b.id) > -1}">
           <input type="checkbox" name="brigeBox" [checked]="taskData.sb.indexOf(b.id) > -1" (click)="setBridge(b.id)"
@@ -124,29 +146,34 @@
         </label>
       </div>
     </div>
+    <!-- 分页 -->
+    <!-- <p>{{taskData.bridge | json}}</p> -->
+    <div *ngIf="taskData.sc">
+      <nz-pagination [(nzPageIndex)]="filter.pageIndex" [(nzPageSize)]="filter.pageSize" [nzTotal]="filter.count"
+      (nzPageIndexChange)="paginationChange()" (nzPageSizeChange)="paginationChange()" nzShowSizeChanger></nz-pagination>
+    </div>
   </div>
 
-  <nz-pagination [(nzPageIndex)]="filter.pageIndex" [(nzPageSize)]="filter.pageSize" [nzTotal]="filter.count"
-    (nzPageIndexChange)="paginationChange()" (nzPageSizeChange)="paginationChange()" nzShowSizeChanger></nz-pagination>
 
   <nz-spin nzTip="正在处理数据..." *ngIf="inData.state">
     <nz-alert nzType="info">
     </nz-alert>
   </nz-spin>
-  <div *ngIf="indatas">
-    <div>
-      选择项目：
+  <div *ngIf="indatas || inHMIcsvData">
+    <div class="border-top">
+      <span>项目选择：</span>
       <nz-radio-group [(ngModel)]="taskData.sp" (ngModelChange)="selectTaskProject($event)">
         <label nz-radio [nzValue]="p.key" *ngFor="let p of taskData.project">{{p.title}}</label>
       </nz-radio-group>
+      <span style="color: red;" *ngIf="!taskData.sp">请选择项目！！</span>
     </div>
-    <div>
+    <div *ngIf="exportMode === 3">
       选择顶：
       <nz-radio-group [(ngModel)]="taskData.sj" (ngModelChange)="selectTaskJack($event)">
         <label nz-radio [nzValue]="j.title" *ngFor="let j of taskData.jack">{{j.title}}</label>
       </nz-radio-group>
     </div>
-    <table class="gridtable">
+    <table class="gridtable border-top" *ngIf="exportMode === 3">
       <thead>
         <tr>
           <th>选择</th>
@@ -181,15 +208,47 @@
         </ng-container>
       </tbody>
     </table>
+    <table class="gridtable border-top" *ngIf="exportMode === 4">
+      <thead>
+        <tr>
+          <th>选择</th>
+          <th>梁号</th>
+          <th>压浆孔道</th>
+          <!-- <th>油泵编号</th>
+            <th>标定系数a</th>
+            <th>标定系数b</th>
+            <th>标定日期</th> -->
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let task of inHMIcsvData; index as i">
+          <tr>
+            <td>
+              <label class="checkbox" [ngClass]="{'check': taskData.sb.indexOf(task.id) > -1}">
+                <input type="checkbox" [checked]="taskData.sb.indexOf(task.id) > -1" (click)="setBridge(task.id)"
+                  [value]="task.id" />
+              </label>
+            </td>
+            <td>{{task.name}}</td>
+            <td>
+              <span class="record" [ngClass]="{'ok': item.record}"
+                *ngFor="let item of task.groups">{{item.name}}</span>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
   </div>
 
 
   <div style="display: flex; align-items: center;" class="border-top" >
     <button
       style="margin-right: 15px;"
-      nz-button nzType="primary" (click)="exportOk()"
-      [disabled]="!(taskData.sb.length > 0) || !savePath || !(progress.btnTitle && !progress.success)"
+      nz-button nzType="primary"
+      (click)="exportOk()"
+      [disabled]="!(taskData.sb.length > 0) || (!savePath && exportMode < 3) || !(progress.btnTitle && !progress.success) || !taskData.sp"
       [nzLoading]="progress.state">{{progress.btnTitle || '操作'}}</button>
+      <!-- <p>{{!(taskData.sb.length > 0)}} {{!savePath && exportMode < 3}} {{!(progress.btnTitle && !progress.success)}}</p> -->
     <div *ngIf="exportMode !== 2" style="flex: 1; display: flex;">
       <h2 *ngIf="progress.success">{{progress.msg}}{{progress.now}}条</h2>
       <nz-progress [nzPercent]="progress.now / progress.length * 100" style="flex: 1; margin-left: 15px;"></nz-progress>
@@ -197,7 +256,7 @@
     </div>
     <h2 *ngIf="exportMode === 2 && progress.success">{{progress.msg}}</h2>
   </div>
-  <div *ngIf="exportMode === 3">
+  <div *ngIf="exportMode >= 3">
     <div>
       添加：{{inResult.add?.length}}条
       <span *ngFor="let item of inResult.add">{{item}} </span>
@@ -219,3 +278,5 @@
     <h1>梁号重复，请修改梁号</h1>
   </div>
 </ng-template>
+
+<app-grouting-template *ngIf="groutingTemplateShow" [projectId]="taskData.sp" (selectOut)="inHMIcsvOK($event)" (cancel)="groutingTemplateShow=false"></app-grouting-template>

@@ -25,6 +25,8 @@ export interface GroutingTask extends TaskBase {
   /** 压浆组信息 */
   groups?: Array<GroutingItem>;
   any?: any;
+  /** 设置为模板 */
+  template: boolean;
 }
 export interface GroutingItem {
   /** 孔号 */
@@ -37,7 +39,7 @@ export interface GroutingItem {
   startDate: Date;
   /** 张拉结束时间 */
   endDate: Date;
-  /** 压浆压力 */
+  /** 设置压浆压力 */
   setMpa: number;
   /** 通过 */
   pass: string;
@@ -49,7 +51,7 @@ export interface GroutingItem {
   steadyTime: number;
   /** 搅拌时间 */
   stirTime: number;
-  /** 稳压压力 */
+  /** 稳压压浆压力 */
   steadyMpa: number;
   /** 材料 */
   materialsTotal: number;
@@ -64,7 +66,6 @@ export interface GroutingItem {
   /** 上传状态 */
   upState: number;
   any?: any;
-
 }
 export interface GroutingItem2 extends GroutingItem {
   directionDispose: string;

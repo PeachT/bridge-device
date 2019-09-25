@@ -13,7 +13,9 @@ import { NzMessageService, NzModalRef, NzModalService } from 'ng-zorro-antd';
 import { DateFormat } from 'src/app/Function/DateFormat';
 import { utf8_to_b64, b64_to_utf8 } from 'src/app/Function/stringToBase64';
 import { TensionTask } from 'src/app/models/task.models';
-import { lastDayOfWeek, lastDayOfMonth, startOfWeek, startOfMonth, getTime, compareAsc, compareDesc} from 'date-fns';
+import { lastDayOfWeek, lastDayOfMonth, startOfWeek, startOfMonth, getTime, compareAsc, compareDesc, format } from 'date-fns';
+import { GroutingTask } from 'src/app/models/grouting';
+import { copyAny } from 'src/app/models/base';
 
 @Component({
   selector: 'app-data-treating',
@@ -67,6 +69,7 @@ export class DataTreatingComponent implements OnInit {
     msg: null
   };
   indatas: Array<TensionTask>;
+  inHMIcsvData: Array<any>;
   selectIndatas: Array<TensionTask>;
   upanState = {
     path: null,
@@ -99,7 +102,11 @@ export class DataTreatingComponent implements OnInit {
     },
     count: 0
   };
-  rangesDate = {本周: [startOfWeek(new Date()), lastDayOfWeek(new Date())], 本月: [startOfMonth(new Date()), lastDayOfMonth(new Date())] };
+  /** HMI导入模板选择 */
+  groutingTemplateShow = false;
+  /** HMI模板id */
+  groutingTemplateId = null;
+  rangesDate = { 本周: [startOfWeek(new Date()), lastDayOfWeek(new Date())], 本月: [startOfMonth(new Date()), lastDayOfMonth(new Date())] };
 
   constructor(
     private message: NzMessageService,
@@ -146,6 +153,10 @@ export class DataTreatingComponent implements OnInit {
       case 3:
         this.progress.btnTitle = '导入';
         this.getDbFile();
+        break;
+      case 4:
+        this.progress.btnTitle = '导入HMI';
+        this.selectHMIFile();
         break;
       default:
         break;
@@ -199,9 +210,10 @@ export class DataTreatingComponent implements OnInit {
   }
   /** 获取模板路径 */
   selectTemp() {
+    const tempName = this.dbName === 'task' ? 'zltmp' : 'yjtmp';
     this.tempPath = this.e.remote.dialog.showOpenDialog({
       properties: ['openFile'],
-      filters: [{ name: '模板', extensions: ['zltmp'] }]
+      filters: [{ name: '模板', extensions: [tempName] }]
     })[0];
     this.savePath = this.createSavePath(this.tempPath);
   }
@@ -255,6 +267,8 @@ export class DataTreatingComponent implements OnInit {
   }
   /** 获取任务构建数据 */
   async getTaskComponent() {
+    this.taskData.sc = null;
+    this.taskData.bridge = [];
     const project = this.taskData.sp;
     // this.taskData.component = await this.db.getTaskComponentMenuData('task', o1 => o1.project === Number(project));
     this.taskData.component = await this.db.getTaskComponentMenuData(this.dbName, o1 => o1.project === Number(project));
@@ -287,6 +301,7 @@ export class DataTreatingComponent implements OnInit {
 
     // const bridge = await this.db.getTaskBridgeMenuData(
     //   'task',
+    this.taskData.bridge = [];
     const bridge = await this.db.getTaskBridgeMenuData(
       this.dbName,
       (o1) => {
@@ -296,7 +311,7 @@ export class DataTreatingComponent implements OnInit {
         if (this.filter.ok) {
           if (!this.filter.tension.startDate) {
             return true;
-          } else if ( o1.startDate >= this.filter.tension.startDate && o1.startDate <= this.filter.tension.entDate) {
+          } else if (o1.startDate >= this.filter.tension.startDate && o1.startDate <= this.filter.tension.entDate) {
             return true;
           }
         }
@@ -304,8 +319,8 @@ export class DataTreatingComponent implements OnInit {
         if (this.filter.pouring.startDate
           && (
             (getTime(o1.otherInfo[0].value) < this.filter.pouring.startDate + 86400000
-            || getTime(o1.otherInfo[0].value) > this.filter.pouring.entDate + 86400000)
-            )) {
+              || getTime(o1.otherInfo[0].value) > this.filter.pouring.entDate + 86400000)
+          )) {
           return false;
         }
         if (!this.filter.no && !this.filter.ok) {
@@ -355,8 +370,11 @@ export class DataTreatingComponent implements OnInit {
         this.dataEX();
         break;
       case 3:
-        this.message.warning('功能没有实现');
         this.inDataRun();
+        break;
+      case 4:
+        this.message.warning('功能没有实现');
+        this.groutingTemplateShow = true;
         break;
       default:
         break;
@@ -369,6 +387,50 @@ export class DataTreatingComponent implements OnInit {
     if (this.progress.now === 0) {
       this.savePath = `${this.savePath}/${DateFormat(new Date(), 'yyyy年MM月dd日Thh时mm分ss秒')}导出`;
     }
+    let outdata = null;
+    let fileName = null;
+    if (this.dbName === 'task') {
+      outdata = await this.taskExecl(id);
+      fileName = '张拉';
+    } else {
+      outdata = await this.groutingExecl(id);
+      fileName = '压浆';
+    }
+    // outdata.data = JSON.stringify(outdata.record);
+    // const exData = {data: outdata.data, exData: JSON.stringify(outdata.record)};
+    console.log('导出的数据', outdata);
+    const channel = `ecxel${this.PLCS.constareChannel()}`;
+    this.e.ipcRenderer.send('derivedExcel', {
+      channel,
+      templatePath: this.tempPath,
+      outPath: this.savePath,
+      data: outdata,
+      fileName
+    });
+    this.e.ipcRenderer.once(channel, (event, data) => {
+      if (data.success) {
+        this.progress.now++;
+        if (this.progress.now === this.taskData.sb.length) {
+          // this.message.success(`导出${count}条完成`);
+          this.progress.msg = '导出完成';
+          this.progress.success = true;
+        } else {
+          this.derivedExcel();
+        }
+      } else {
+        this.progress.msg = '导出错误';
+        this.progress.success = true;
+      }
+      this.cdr.detectChanges();
+      console.log('导出', data);
+    });
+    // this.taskData.sb.map(async id => {
+
+    // });
+  }
+
+  /** 张拉导出表格数据处理 */
+  async taskExecl(id) {
     // this.savePath = this.savePath.replace(new RegExp(/(\\)/g), '/');
     const outdata = {
       record: [],
@@ -431,36 +493,38 @@ export class DataTreatingComponent implements OnInit {
     const min = Math.min.apply(null, tensionDate);
     outdata.data.tensionDate = `${DateFormat(new Date(min), 'yyyy-MM-dd hh:mm')} ~ ${DateFormat(new Date(max), 'yyyy-MM-dd hh:mm')}`;
     console.log('处理后的数据', id, outdata);
-    // outdata.data = JSON.stringify(outdata.record);
-    // const exData = {data: outdata.data, exData: JSON.stringify(outdata.record)};
-    console.log('导出的数据', outdata);
-    const channel = `ecxel${this.PLCS.constareChannel()}`;
-    this.e.ipcRenderer.send('derivedExcel', {
-      channel,
-      templatePath: this.tempPath,
-      outPath: this.savePath,
-      data: outdata,
-    });
-    this.e.ipcRenderer.once(channel, (event, data) => {
-      if (data.success) {
-        this.progress.now++;
-        if (this.progress.now === this.taskData.sb.length) {
-          // this.message.success(`导出${count}条完成`);
-          this.progress.msg = '导出完成';
-          this.progress.success = true;
-        } else {
-          this.derivedExcel();
-        }
-      } else {
-        this.progress.msg = '导出错误';
-        this.progress.success = true;
+    return outdata;
+  }
+  /** 压浆导出表格数据处理 */
+  async groutingExecl(id) {
+    // this.savePath = this.savePath.replace(new RegExp(/(\\)/g), '/');
+    const outdata = {
+      record: [],
+      data: {
+        name: null,
+        component: null,
+        tensionDate: null,
+        project: null,
+        bridgeOtherInfo: null,
+        bridgeInfo: null,
       }
-      this.cdr.detectChanges();
-      console.log('导出', data);
+    };
+    this.progress.state = true;
+    // {mm: 12.25, sumMm: 24.01, percent: -3.96, remm: 17.27}
+    console.log(id);
+    const data = await this.db.db.grouting.filter(t => t.id === id).first();
+    const project = await this.db.db.project.filter(p => p.id === this.taskData.sp).first();
+    outdata.data.name = data.name;
+    outdata.data.component = data.component;
+    outdata.data.bridgeOtherInfo = data.otherInfo;
+    outdata.data.project = project;
+    outdata.data.bridgeInfo = {...data, groups: null};
+    console.log(data, id);
+    outdata.record = data.groups.map(g => {
+      return {...g,  startDate: format(new Date(g.startDate), 'HH:mm:ss'), endDate: format(new Date(g.endDate), 'HH:mm:ss') };
     });
-    // this.taskData.sb.map(async id => {
-
-    // });
+    console.log('处理后的数据', id, outdata);
+    return outdata;
   }
   /** 导出数据 */
   async dataEX() {
@@ -599,7 +663,7 @@ export class DataTreatingComponent implements OnInit {
     }
     console.log('159753122222222222222222222222222222222222');
   }
-  async inadd(task: TensionTask) {
+  async inadd(task) {
     delete task.id;
     task.project = this.taskData.sp;
     console.log(task);
@@ -616,7 +680,7 @@ export class DataTreatingComponent implements OnInit {
       this.inDataRun();
     });
   }
-  injump(task: TensionTask) {
+  injump(task) {
     this.progress.now++;
     if (this.progress.now === this.taskData.sb.length) {
       // this.message.success(`导出${count}条完成`);
@@ -627,7 +691,18 @@ export class DataTreatingComponent implements OnInit {
     this.inResult.jump.push(task.name);
     this.cdr.detectChanges();
   }
-
+  /** 进度条状态 */
+  progressState(name: string, state: 'jump' | 'add') {
+    this.progress.now++;
+    if (this.progress.now === this.taskData.sb.length) {
+      // this.message.success(`导出${count}条完成`);
+      this.progress.msg = '导出完成';
+      this.progress.success = true;
+    }
+    console.log(state, name);
+    this.inResult[state].push(name);
+    this.cdr.detectChanges();
+  }
   onFilter() {
     console.log(this.filter);
     this.getTaskBridge();
@@ -642,5 +717,74 @@ export class DataTreatingComponent implements OnInit {
   paginationChange() {
     console.log(this.filter);
     this.getTaskBridge();
+  }
+  /** 导入HMI文件 */
+  selectHMIFile() {
+    this.inData.selectFile = this.e.remote.dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [{ name: 'HMI|csv文件', extensions: ['csv'] }]
+    })[0];
+    this.inData.selsectPath = this.inData.selectFile;
+    if (this.e.isWindows) {
+      this.inData.selsectPath = this.inData.selectFile.replace(/\\/g, '/');
+    }
+    this.inHMIcsv();
+  }
+  /** 导入HMIcsv数据 */
+  async inHMIcsv() {
+    this.inData.state = true;
+    console.log(this.inData.selsectPath);
+    const channel = `ecxel${this.PLCS.constareChannel()}`;
+    this.e.ipcRenderer.send('inHMIcsv', {
+      channel,
+      inPath: this.inData.selsectPath,
+    });
+    this.e.ipcRenderer.once(channel, async (event, data) => {
+      console.log('HMIcsv数据', data);
+      if (data.success) {
+        this.taskData.project = await this.db.getTaskDataTreatingProject();
+        console.log(this.taskData.project);
+        if (this.taskData.project.length === 1) {
+          this.taskData.sp = this.taskData.project[0].key;
+        }
+        this.inHMIcsvData = data.data;
+        this.inData.state = false;
+        this.cdr.detectChanges();
+      } else {
+        console.log(data);
+        this.inData.msg = data.msg;
+        this.message.error('获取数据错误');
+        this.inData.state = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+  /** 确定导入HMI数据 */
+  async inHMIcsvOK(id) {
+    console.log(id);
+    this.groutingTemplateShow = false;
+    const tempdata = await this.db.db.grouting.filter(g => g.id === id).first();
+    this.inHMIcsvData.map(async g => {
+      const count = await this.db.repetitionAsync('grouting',
+        (o: GroutingTask) => o.name === g.name && o.project === tempdata.project && o.component === tempdata.component);
+      if (count) {
+        this.progressState(g.name, 'jump');
+      } else {
+        g.groups.map(item => {
+          item.direction = tempdata.groups[0].direction;
+        })
+        const data: GroutingTask = copyAny(tempdata);
+        data.name = g.name;
+        data.template = false;
+        data.groups = g.groups;
+        const success = await this.db.addAsync('grouting', data,
+          (o: GroutingTask) => o.name === g.name && o.project === tempdata.project && o.component === tempdata.component);
+        if (success.success) {
+          this.progressState(g.name, 'add');
+        } else {
+          this.progressState(g.name, 'jump');
+        }
+      }
+    })
   }
 }

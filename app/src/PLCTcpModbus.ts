@@ -2,6 +2,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 const ModbusRTU = require('modbus-serial');
 import { bf } from './bufferToNumber';
+import { buffer } from 'rxjs/operators';
 
 interface ConnectionStr {
   /** ip */
@@ -42,7 +43,8 @@ export class PLCTcpModbus {
    */
   public async connection(): Promise<boolean> {
     if (!this.cs && this.connectionState()) {
-      this.IPCSendSys(`${this.connectionStr.uid}connection`, '设备链接正常');
+      this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: true, msg: '设备链接正常', connectionStr: this.connectionStr});
+      this.heartbeat();
       return;
     }
     this.cs = true;
@@ -54,12 +56,13 @@ export class PLCTcpModbus {
     let state = false;
     // 链接
     await this.client.connectTCP(this.connectionStr.ip, { port: Number(this.connectionStr.port) })
+    // await this.client.connectTCP('192.168.12.12', { port: Number(this.connectionStr.port) })
     /** 链接成功 */
     .then(() => {
       this.cs = false;
       state = true;
       this.client.setID(Number(this.connectionStr.address));
-      this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: true, msg: '正在成功', connectionStr: this.connectionStr});
+      this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: true, msg: '链接成功', connectionStr: this.connectionStr});
       console.log('success = true');
 
       this.heartbeat();
@@ -77,22 +80,35 @@ export class PLCTcpModbus {
 
   /** 心跳包 */
   private heartbeat() {
+    // console.log('hhhhhh', this.ifClient());
+
     setTimeout(() => {
       if (this.ifClient()) {
-        const d = new Date().getSeconds();
-        // this.F06(4195, d)
-        // this.client.readHoldingRegisters(0, 1).then((data) => {
-        this.client.readHoldingRegisters(4548, 1).then((data) => {
-          // const float = bf.bufferToFloat(data.buffer);
-          // const dint16 = bf.bufferTo16int(data.buffer);
-          this.IPCSend(`${this.connectionStr.uid}heartbeat`, { uint16: data.data });
+        // const d = new Date().getSeconds();
+        // // this.F06(4195, d)
+        // // this.client.readHoldingRegisters(0, 1).then((data) => {
+        // this.client.readHoldingRegisters(4548, 1).then((data) => {
+        //   // const float = bf.bufferToFloat(data.buffer);
+        //   // const dint16 = bf.bufferTo16int(data.buffer);
+        //   this.IPCSend(`${this.connectionStr.uid}heartbeat`, { uint16: data.data });
+        //   // console.log('heart', data);
+
+        //   this.heartbeat();
+        // }).catch((err) => {
+        //   this.connection();
+        // });
+        this.client.readCoils(2094, 1).then((data) => {
+          // console.log(data);
+
+          this.IPCSend(`${this.connectionStr.uid}heartbeat`, { data: data.data });
           this.heartbeat();
         }).catch((err) => {
           this.connection();
+          this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: false, msg: '设备链接错误', connectionStr: this.connectionStr});
         });
       }
     // tslint:disable-next-line:no-string-literal
-    }, 10);
+    }, 20);
   }
 
   /**
@@ -141,9 +157,10 @@ export class PLCTcpModbus {
   public F03ASCII(address: number, length: number, channel: string): void {
     if (this.ifClient()) {
       this.client.readHoldingRegisters(address, length).then((data) => {
-        const str = data.buffer.toString();
+        const str = bf.bufferToAscii(data.buffer);
         console.log('buffer', data.buffer);
         // const dint16 = bf.bufferTo16int(data.buffer);
+        // const str = (Buffer.from(dint16)).toString();
         this.IPCSend(channel, { uint16: data.data, str, buffer: data.buffer });
       }).catch((err) => {
         this.IPCSend(channel, err);

@@ -1,0 +1,8 @@
+<nz-modal [nzVisible]="true" nzTitle="选择模板" (nzOnCancel)="cancel.emit()" (nzOnOk)="ok()" nzWidth="85%">
+  <div>
+    <span>模板选择：</span>
+    <nz-radio-group [(ngModel)]="select">
+      <label nz-radio [nzValue]="c.id" *ngFor="let c of data">{{c.name}}</label>
+    </nz-radio-group>
+  </div>
+</nz-modal>

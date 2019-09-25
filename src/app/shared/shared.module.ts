@@ -23,6 +23,7 @@ import { DeleteModalComponent } from './delete-modal/delete-modal.component';
 import { DebugComponent } from './debug/debug.component';
 import { NameConvertPipe } from '../pipes/name-convert.pipe';
 import { TaskMenuComponent } from './task-menu/task-menu.component';
+import { GroutingTemplateComponent } from './grouting-template/grouting-template.component';
 
 
 // pipe
@@ -49,7 +50,8 @@ const COMPONENTS = [
   DataTreatingComponent,
   DeleteModalComponent,
   DebugComponent,
-  TaskMenuComponent
+  TaskMenuComponent,
+  GroutingTemplateComponent,
 ];
 const PIPE = [
   ToFixedrPipe,

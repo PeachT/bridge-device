@@ -58,6 +58,7 @@ export class GroutingService {
       console.log(data);
       if (data.success) {
         this.linkMsg.state = false;
+        // this.linkMsg.link = true;
       } else {
         this.linkMsg.link = false;
         this.plcSub.next({state: false, data});
@@ -69,7 +70,10 @@ export class GroutingService {
       this.linkMsg.delayTime =  time - this.linkMsg.oldTime || time;
       this.linkMsg.oldTime = time;
       // console.log(data);
-      this.plcSub.next({state: true, data});
+      if (data.data[0]) {
+        console.error(data);
+      }
+      this.plcSub.next({state: true, data: data.data});
     });
   }
 }

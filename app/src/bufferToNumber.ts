@@ -58,8 +58,21 @@ function bufferTo16int(buffers: Buffer) {
 function unTon(n: number): number {
   return parseInt((~(n)).toString(2).padStart(16, 'x').replace(/0/g, 'x').replace(/1/g, '0').replace(/x/g, '1'), 2);
 }
+/**
+ * 转换ASCII
+ *
+ */
+function bufferToAscii(buffers: Buffer): string {
+  /** 高低位交换 */
+  const b = buffers.swap16();
+  // 去0
+  const ab = Array.from(b).filter(f => f > 0);
+  // 装ASCII
+  return Buffer.from(ab).toString('ascii');
+}
 export const bf = {
   floatToBuffer,
   bufferToFloat,
-  bufferTo16int
+  bufferTo16int,
+  bufferToAscii
 };

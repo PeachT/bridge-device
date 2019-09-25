@@ -17,6 +17,11 @@
         <input type="text" nz-input placeholder="压浆方向" formControlName="direction">
       </nz-form-control>
 
+      <nz-form-label [nzSm]="3">设置压浆压力</nz-form-label>
+      <nz-form-control [nzSm]="5">
+        <input type="number" nz-input placeholder="设置压浆压力" formControlName="setMpa">
+      </nz-form-control>
+
       <nz-form-label [nzSm]="3" >开始时间</nz-form-label>
       <nz-form-control [nzSm]="5">
         <nz-time-picker readonly  class="revise-date" formControlName="startDate" ></nz-time-picker>
@@ -27,24 +32,11 @@
         <nz-time-picker readonly  class="revise-date" formControlName="endDate" ></nz-time-picker>
       </nz-form-control>
 
-      <nz-form-label [nzSm]="3">压浆压力</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <input type="number" nz-input placeholder="压浆压力" formControlName="setMpa">
-      </nz-form-control>
-
       <nz-form-label [nzSm]="3">稳压压力</nz-form-label>
       <nz-form-control [nzSm]="5">
-        <input type="number" nz-input placeholder="稳压压力" formControlName="steadyMpa">
+        <input type="number" nz-input placeholder="稳压压浆压力" formControlName="steadyMpa">
       </nz-form-control>
 
-
-
-      <nz-form-label [nzSm]="3">停留时间</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <nz-input-group nzSuffix="s">
-          <input type="number" nz-input placeholder="停留时间" formControlName="stayTime">
-        </nz-input-group>
-      </nz-form-control>
 
       <nz-form-label [nzSm]="3">稳压时间</nz-form-label>
       <nz-form-control [nzSm]="5">
@@ -60,6 +52,12 @@
         </nz-input-group>
       </nz-form-control>
 
+      <nz-form-label [nzSm]="3">停留时间</nz-form-label>
+      <nz-form-control [nzSm]="5">
+        <nz-input-group nzSuffix="s">
+          <input type="number" nz-input placeholder="停留时间" formControlName="stayTime">
+        </nz-input-group>
+      </nz-form-control>
 
 
       <nz-form-label [nzSm]="3">压浆料量</nz-form-label>

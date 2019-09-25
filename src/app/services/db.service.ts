@@ -28,7 +28,7 @@ export class DbService {
     console.log(this.db);
   }
 
-
+  /** 获取一条数据 */
   public async getOneAsync<T>(tName: string, filterFunction: (o1: T) => boolean): Promise<T> {
     return await this.db[tName].filter(filterFunction).first();
   }
