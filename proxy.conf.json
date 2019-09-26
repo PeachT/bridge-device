@@ -2,5 +2,9 @@
   "/iotws": {
     "target": "http://121.12.120.62:6543",
     "secure": false
+  },
+  "/DataService": {
+    "target": "http://117.34.70.71:8092",
+    "secure": false
   }
 }

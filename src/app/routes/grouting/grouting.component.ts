@@ -17,7 +17,12 @@ import { Subscription } from 'rxjs';
 import { GroutingService } from 'src/app/services/grouting.service';
 import { PLC_D } from 'src/app/models/IPCChannel';
 import { format } from 'date-fns';
+import { Project } from 'src/app/models/project';
+import { HttpService } from 'src/app/services/http.service';
+import { uploadingData } from 'src/app/Function/uploading';
 
+// tslint:disable-next-line:max-line-length
+const ddd = { Data: { beamBoardType: "高山寨 2号桥", holeNum: "0", stepsTimes: "1", dutyPersonnel: "0", beamNO: "Y1-2", holeNO: "N1", groutingModel: "小循环", groutingDate: "2018-10-09", mixingProportion: "197.0:0.0:55.1", waterGlueProportion: "0", mixingTime: "60", startTime: "2018-10-09 17:43:45", endTime: "2018-10-09 17:47:53", intoPulpPressure: "0.6", outPulpPressure: "0.0", pressureHoldingTime: "120", intoPulpvolume: "310.3", Datas: [{ outPulpPressure: "0.0", timeSeconds: "0", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "1", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "2", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "3", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "4", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "5", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "6", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "7", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "8", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "9", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "10", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "11", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "12", state: "压浆", intoPulpPressure: "0.16" }, { outPulpPressure: "0.0", timeSeconds: "13", state: "压浆", intoPulpPressure: "0.34" }, { outPulpPressure: "0.0", timeSeconds: "14", state: "压浆", intoPulpPressure: "0.34" }, { outPulpPressure: "0.0", timeSeconds: "15", state: "压浆", intoPulpPressure: "0.34" }, { outPulpPressure: "0.0", timeSeconds: "16", state: "压浆", intoPulpPressure: "0.36" }, { outPulpPressure: "0.0", timeSeconds: "17", state: "压浆", intoPulpPressure: "0.42" }, { outPulpPressure: "0.0", timeSeconds: "18", state: "压浆", intoPulpPressure: "0.33" }, { outPulpPressure: "0.0", timeSeconds: "19", state: "压浆", intoPulpPressure: "0.9" }, { outPulpPressure: "0.0", timeSeconds: "20", state: "压浆", intoPulpPressure: "0.61" }, { outPulpPressure: "0.0", timeSeconds: "21", state: "压浆", intoPulpPressure: "0.6" }, { outPulpPressure: "0.0", timeSeconds: "22", state: "压浆", intoPulpPressure: "0.6" }, { outPulpPressure: "0.0", timeSeconds: "23", state: "压浆", intoPulpPressure: "0.63" }, { outPulpPressure: "0.0", timeSeconds: "24", state: "压浆", intoPulpPressure: "0.63" }, { outPulpPressure: "0.0", timeSeconds: "25", state: "压浆", intoPulpPressure: "0.18" }, { outPulpPressure: "0.0", timeSeconds: "26", state: "压浆", intoPulpPressure: "0.43" }, { outPulpPressure: "0.0", timeSeconds: "27", state: "压浆", intoPulpPressure: "0.42" }, { outPulpPressure: "0.0", timeSeconds: "28", state: "压浆", intoPulpPressure: "0.43" }, { outPulpPressure: "0.0", timeSeconds: "29", state: "压浆", intoPulpPressure: "0.44" }, { outPulpPressure: "0.0", timeSeconds: "30", state: "压浆", intoPulpPressure: "0.46" }, { outPulpPressure: "0.0", timeSeconds: "31", state: "压浆", intoPulpPressure: "1.05" }, { outPulpPressure: "0.0", timeSeconds: "32", state: "压浆", intoPulpPressure: "0.44" }, { outPulpPressure: "0.0", timeSeconds: "33", state: "压浆", intoPulpPressure: "0.49" }, { outPulpPressure: "0.0", timeSeconds: "34", state: "压浆", intoPulpPressure: "0.61" }, { outPulpPressure: "0.0", timeSeconds: "35", state: "压浆", intoPulpPressure: "0.53" }, { outPulpPressure: "0.0", timeSeconds: "36", state: "压浆", intoPulpPressure: "0.61" }, { outPulpPressure: "0.0", timeSeconds: "37", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "38", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "39", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "40", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "41", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "42", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "43", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "44", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "45", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "46", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "47", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "48", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "49", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "50", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "51", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "52", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "53", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "54", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "55", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "56", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "57", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "58", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "59", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "60", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "61", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "62", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "63", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "64", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "65", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "66", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "67", state: "压浆", intoPulpPressure: "0.01" }, { outPulpPressure: "0.0", timeSeconds: "68", state: "压浆", intoPulpPressure: "0.0" }, { outPulpPressure: "0.0", timeSeconds: "69", state: "压浆", intoPulpPressure: "0.27" }, { outPulpPressure: "0.0", timeSeconds: "70", state: "压浆", intoPulpPressure: "0.28" }, { outPulpPressure: "0.0", timeSeconds: "71", state: "压浆", intoPulpPressure: "0.29" }, { outPulpPressure: "0.0", timeSeconds: "72", state: "压浆", intoPulpPressure: "0.31" }, { outPulpPressure: "0.0", timeSeconds: "73", state: "压浆", intoPulpPressure: "0.35" }, { outPulpPressure: "0.0", timeSeconds: "74", state: "压浆", intoPulpPressure: "0.11" }, { outPulpPressure: "0.0", timeSeconds: "75", state: "压浆", intoPulpPressure: "0.6" }, { outPulpPressure: "0.0", timeSeconds: "76", state: "压浆", intoPulpPressure: "0.74" }, { outPulpPressure: "0.0", timeSeconds: "77", state: "压浆", intoPulpPressure: "0.7" }, { outPulpPressure: "0.0", timeSeconds: "78", state: "压浆", intoPulpPressure: "0.68" }, { outPulpPressure: "0.0", timeSeconds: "79", state: "压浆", intoPulpPressure: "0.66" }, { outPulpPressure: "0.0", timeSeconds: "80", state: "压浆", intoPulpPressure: "0.65" }, { outPulpPressure: "0.0", timeSeconds: "81", state: "压浆", intoPulpPressure: "0.64" }, { outPulpPressure: "0.0", timeSeconds: "82", state: "压浆", intoPulpPressure: "0.63" }, { outPulpPressure: "0.0", timeSeconds: "83", state: "压浆", intoPulpPressure: "0.62" }, { outPulpPressure: "0.0", timeSeconds: "84", state: "压浆", intoPulpPressure: "0.61" }, { outPulpPressure: "0.0", timeSeconds: "85", state: "压浆", intoPulpPressure: "0.1" }, { outPulpPressure: "0.0", timeSeconds: "86", state: "压浆", intoPulpPressure: "0.28" }, { outPulpPressure: "0.0", timeSeconds: "87", state: "压浆", intoPulpPressure: "0.29" }, { outPulpPressure: "0.0", timeSeconds: "88", state: "压浆", intoPulpPressure: "0.3" }, { outPulpPressure: "0.0", timeSeconds: "89", state: "压浆", intoPulpPressure: "0.32" }, { outPulpPressure: "0.0", timeSeconds: "90", state: "压浆", intoPulpPressure: "0.04" }, { outPulpPressure: "0.0", timeSeconds: "91", state: "压浆", intoPulpPressure: "0.64" }, { outPulpPressure: "0.0", timeSeconds: "92", state: "压浆", intoPulpPressure: "0.76" }, { outPulpPressure: "0.0", timeSeconds: "93", state: "压浆", intoPulpPressure: "0.73" }, { outPulpPressure: "0.0", timeSeconds: "94", state: "压浆", intoPulpPressure: "0.71" }, { outPulpPressure: "0.0", timeSeconds: "95", state: "压浆", intoPulpPressure: "0.7" }, { outPulpPressure: "0.0", timeSeconds: "96", state: "压浆", intoPulpPressure: "0.68" }, { outPulpPressure: "0.0", timeSeconds: "97", state: "压浆", intoPulpPressure: "0.67" }, { outPulpPressure: "0.0", timeSeconds: "98", state: "压浆", intoPulpPressure: "0.66" }, { outPulpPressure: "0.0", timeSeconds: "99", state: "压浆", intoPulpPressure: "0.66" }, { outPulpPressure: "0.0", timeSeconds: "100", state: "压浆", intoPulpPressure: "0.65" }] } }
 @Component({
   selector: 'app-grouting',
   templateUrl: './grouting.component.html',
@@ -69,7 +74,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
   plcsub: Subscription;
   plcLink = false;
   /** 模板 */
-  saveTpl: {data: GroutingTask, group: GroutingItem} = {
+  saveTpl: { data: GroutingTask, group: GroutingItem } = {
     data: null,
     group: null,
   };
@@ -91,7 +96,8 @@ export class GroutingComponent implements OnInit, OnDestroy {
     public GPLCS: GroutingService,
     private e: ElectronService,
     private cdr: ChangeDetectorRef,
-    private modalService: NzModalService
+    private modalService: NzModalService,
+    private http: HttpService
   ) {
 
   }
@@ -572,9 +578,9 @@ export class GroutingComponent implements OnInit, OnDestroy {
       proportion: backData[2].float[1].toFixed(2),
     };
     const getData = await this.odb.getOneAsync('grouting', (g: GroutingTask) =>
-    g.name === bridgeName
-    && g.project === this.saveTpl.data.project
-    && g.component === this.saveTpl.data.component);
+      g.name === bridgeName
+      && g.project === this.saveTpl.data.project
+      && g.component === this.saveTpl.data.component);
     console.log('save', getData);
     if (!getData) {
       const gdata: GroutingTask = copyAny(this.saveTpl.data);
@@ -583,9 +589,9 @@ export class GroutingComponent implements OnInit, OnDestroy {
       gdata.groups = [groud];
       console.log('save2', gdata);
       const saveback = await this.odb.addAsync('grouting', gdata, (g: GroutingTask) =>
-      g.name === gdata.name
-      && g.project === gdata.project
-      && g.component === gdata.component);
+        g.name === gdata.name
+        && g.project === gdata.project
+        && g.component === gdata.component);
       if (saveback.success) {
         this.taskMenuDom.res({ component: this.data.component, selectBridge: saveback.id });
       }
@@ -602,10 +608,56 @@ export class GroutingComponent implements OnInit, OnDestroy {
         getData.groups.push(groud);
       }
       console.log('save3', getData);
-      const saveback = await this.odb.updateAsync('grouting', getData, (o1) =>  this.updateFilterFun(o1, getData));
+      const saveback = await this.odb.updateAsync('grouting', getData, (o1) => this.updateFilterFun(o1, getData));
       if (saveback.success) {
         this.taskMenuDom.res({ component: this.data.component, selectBridge: saveback.id });
       }
     }
+  }
+  /** 上传 */
+  async upload() {
+    const proj = await this.odb.getOneAsync('project', (p: Project) => p.id === this.taskMenuDom.project.select.id);
+    console.log(this.data, proj);
+    let url = null;
+    let data = null;
+    switch (proj.uploadingName) {
+      case 'weepal':
+
+        break;
+      case 'xalj':
+        url = uploadingData.xalj(proj.uploadingLinkData);
+        data = uploadingData.xaljData(this.data);
+        break;
+      default:
+        break;
+    }
+    console.log(data);
+    // tslint:disable-next-line:max-line-length
+    const d = {
+      Data: {
+        beamNO: "测试梁号1",
+        holeNO: "HN1",
+        stretchDrawDate: "2016-06-30",
+        endTime: "2016-06-30 10:20:21",
+        startTime: "2016-06-30 09:20:21",
+        intoPulpPressure: "551.2",
+        outPulpPressure: "124.2",
+        Datas: [
+          {
+            timeSeconds:"16",
+            intoPulpPressure:"157.2",
+            outPulpvolume:"1578.01",
+            state1:"保压"
+          }
+        ]
+      }
+    }
+    data.map(g => {
+      this.http.post(url, {Data: g}).subscribe(r => {
+        console.log(r);
+      }, err => {
+        console.log(decodeURI(err.error.text))
+      });
+    });
   }
 }

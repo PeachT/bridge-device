@@ -14,7 +14,9 @@
       <nz-form-label [nzSm]="3">上传服务器</nz-form-label>
       <nz-form-control [nzSm]="21">
         <nz-radio-group formControlName="uploadingName">
-          <label nz-radio nzValue="weepal" (click)="selectUp('weepal')">广州市微柏软件股份有限公司</label>
+          <label nz-radio nzValue="weepal">广州市微柏</label>
+          <!-- url: iotws/login/userlogin user: 1003499 password: 1234-->
+          <label nz-radio nzValue="xalj">西安璐江</label>
         </nz-radio-group>
       </nz-form-control>
     </nz-form-item>
@@ -110,11 +112,11 @@
       </div>
     </div>
   </form>
+  <!-- 广州市微柏 -->
   <div class="supervisions" *ngIf="validateForm?.value?.uploadingName === 'weepal'">
     <nz-form-item class="revise-btn">
-      <nz-divider style="min-width: auto;" nzText="上传信息" nzOrientation="left"></nz-divider>
+      <nz-divider style="min-width: auto;" nzText="上传服务器信息" nzOrientation="left"></nz-divider>
     </nz-form-item>
-
     <nz-form-item>
       <nz-form-label [nzSm]="6" nzRequired>服务器地址</nz-form-label>
       <nz-form-control [nzSm]="18">
@@ -143,6 +145,46 @@
       <p style="color: black; margin: 10px 15px;">分支机构/部门名称：{{validateForm.value?.uploadingBackData?.data?.deptName}}
       </p>
     </div>
+    <button nz-button nzType="primary" [nzLoading]="uploadingState" (click)="funcUploadingTask()"><i nz-icon
+        nzType="login" nzTheme="outline"></i>登录测试</button>
+  </div>
+  <!-- 西安璐江 -->
+  <div class="supervisions" *ngIf="validateForm?.value?.uploadingName === 'xalj'">
+    <nz-form-item class="revise-btn">
+      <nz-divider style="min-width: auto;" nzText="上传服务器信息" nzOrientation="left"></nz-divider>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-label [nzSm]="6" nzRequired>服务器地址</nz-form-label>
+      <nz-form-control [nzSm]="18">
+        <input type="text" nz-input placeholder="服务器地址" [(ngModel)]="uploadingData.url">
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-label [nzSm]="6" nzRequired>登录用户</nz-form-label>
+      <nz-form-control [nzSm]="18">
+        <input type="text" nz-input placeholder="登录用户" [(ngModel)]="uploadingData.user">
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-label [nzSm]="6">登录密码</nz-form-label>
+      <nz-form-control [nzSm]="18">
+        <input type="password" nz-input placeholder="登录密码" [(ngModel)]="uploadingData.password">
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-label [nzSm]="6">设备编码</nz-form-label>
+      <nz-form-control [nzSm]="18">
+        <input type="text" nz-input placeholder="设备编码" [(ngModel)]="uploadingData.deviceNo">
+      </nz-form-control>
+    </nz-form-item>
+
+    <div *ngIf="validateForm.value.uploadingBackData">
+      <p style="color: black; margin: 10px 15px;">测试结果：{{validateForm.value?.uploadingBackData}}</p>
+    </div>
+
     <button nz-button nzType="primary" [nzLoading]="uploadingState" (click)="funcUploadingTask()"><i nz-icon
         nzType="login" nzTheme="outline"></i>登录测试</button>
   </div>

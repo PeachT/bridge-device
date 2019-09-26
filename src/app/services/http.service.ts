@@ -26,7 +26,7 @@ export class HttpService {
    * @returns {Observable<any>}
    * @memberof HttpService
    */
-  public post(url: string, data: FormData): Observable<any> {
+  public post(url: string, data): Observable<any> {
     return this.http.post(`${url}`, data).pipe(
       map(this.extractData),
       catchError(this.handleError)
@@ -44,6 +44,7 @@ export class HttpService {
    * @param res 返回结果
    */
   private extractData(res: Response) {
+    console.log(res);
     const body = res;
     return body || {};
   }
@@ -58,7 +59,10 @@ export class HttpService {
       console.error(
         `Backend returned code ${error.status}, ` + `body was: ${error.error}`
       );
+      console.error(error);
+
     }
-    return throwError('Something bad happened; please try again later.');
+    return throwError(error);
   }
 }
+

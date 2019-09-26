@@ -294,8 +294,8 @@ export class TaskMenuComponent implements OnInit {
         // 86400000 时间戳24小时 ms
         if (this.filter.pouring.startDate
           && (
-            (getTime(o1.otherInfo[0].value) < this.filter.pouring.startDate + 86400000
-            || getTime(o1.otherInfo[0].value) > this.filter.pouring.entDate + 86400000)
+            (getTime(Number(o1.otherInfo[0].value)) < this.filter.pouring.startDate + 86400000
+            || getTime(Number(o1.otherInfo[0].value)) > this.filter.pouring.entDate + 86400000)
             )) {
           return false;
         }

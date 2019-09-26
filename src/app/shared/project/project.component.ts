@@ -12,7 +12,14 @@ import { AddOtherComponent } from '../add-other/add-other.component';
 import { HttpService } from 'src/app/services/http.service';
 import { Md5 } from 'ts-md5/dist/md5';
 import { getUploadingData } from 'src/app/Function/upService';
+import { uploadingData } from 'src/app/Function/uploading';
 
+const uploadingDataInit = {
+    url: null,
+    user: null,
+    password: null,
+    deviceNo: null
+};
 @Component({
   selector: 'app-project',
   templateUrl: './project.component.html',
@@ -31,11 +38,7 @@ export class ProjectComponent implements OnInit, OnChanges {
     '合同段',
     '桩号范围',
   ];
-  uploadingData = {
-    url: null,
-    user: null,
-    password: null
-  };
+  uploadingData = uploadingDataInit;
   uploadingState = false;
 
   get formArr(): FormArray {
@@ -153,31 +156,58 @@ export class ProjectComponent implements OnInit, OnChanges {
     this.validateForm.clearValidators();
   }
   /** 选择服务器 */
-  selectUp(name) {
-    this.uploadingData = getUploadingData(name);
+  selectUp() {
+    // this.uploadingData = uploadingDataInit;
   }
   /** 上传链接测试 */
   funcUploadingTask() {
-    // localStorage.setItem('uploadingData', JSON.stringify(this.uploadingData));
     this.uploadingState = true;
     this.validateForm.controls.uploadingLinkData.setValue(this.uploadingData);
-    const password = Md5.hashStr(this.uploadingData.password);
-    const formData = new FormData();
-    formData.append('userId', this.uploadingData.user);
-    formData.append('userPass', password.toString());
-    formData.append('loginTag', '0');
-    this.http.post(this.uploadingData.url, formData).subscribe(r => {
+    let formData: any = null;
+    let url = this.uploadingData.url;
+    switch (this.validateForm.value.uploadingName) {
+      case 'weepal':
+        formData = uploadingData.weepal(this.uploadingData);
+        break;
+      case 'xalj':
+        // tslint:disable-next-line:max-line-length
+        url = uploadingData.xalj(this.uploadingData);
+        break;
+      default:
+        break;
+    }
+
+    this.uploadingState = true;
+    this.validateForm.controls.uploadingLinkData.setValue(this.uploadingData);
+
+    this.http.post(url, formData).subscribe(r => {
       this.uploadingState = false;
       if (r.success) {
-        this.validateForm.controls.uploadingBackData.setValue(r);
+        switch (this.validateForm.value.uploadingName) {
+          case 'weepal':
+            this.validateForm.controls.uploadingBackData.setValue(r);
+            break;
+          case 'xalj':
+            const br = decodeURI(r);
+            this.validateForm.controls.uploadingBackData.setValue(br);
+            break;
+          default:
+            break;
+        }
         this.message.success('服务器链接成功');
       } else {
         this.message.error('服务器链接失败');
+        console.log(r);
       }
       this.cdr.markForCheck();
     }, err => {
       this.uploadingState = false;
-      this.message.error('服务器链接失败');
+      this.message.error(`${err.status} : 服务器链接失败`);
+      if (err.status === 200) {
+        const br = decodeURI(err.error.text);
+        this.validateForm.controls.uploadingBackData.setValue(br);
+      }
+      console.log(err)
     });
   }
 }

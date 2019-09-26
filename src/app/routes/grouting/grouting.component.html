@@ -119,6 +119,7 @@
           <app-operat [dbName]="dbName" [formData]="formData" (outEdit)="onEdit($event)" (outEditOk)="editOk($event)"
             [addFilterFun]="addFilterFun" [updateFilterFun]="updateFilterFun"
             [saveState]="groutingRecord?.formData?.valid" [coprState]="true" (outDelete)="delete()">
+            <button nz-button nzType="primary" (click)="upload()"><i nz-icon nzType="cloud-upload" nzTheme="outline"></i>上传</button>
             <button nz-button nzType="primary" (click)="monitoring()" *ngIf="!plcsub" [disabled]="!GPLCS.linkMsg.link">监控压浆</button>
             <button nz-button *ngIf="plcsub" (click)="stopMonitoring()" ><i [ngStyle]="{'color': monitoringMsg.color}" nz-icon nzType="loading" nzTheme="outline"></i>压浆监控中</button>
           </app-operat>

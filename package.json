@@ -7,7 +7,7 @@
     "email": "peachlin@outlook.com",
     "url": "https://github.com/PeachT/kairuimo"
   },
-  "description": "智能设备",
+  "description": "凌桥智能设备",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json",
@@ -41,7 +41,7 @@
     "@ngrx/store": "^8.3.0",
     "@ngrx/store-devtools": "^8.3.0",
     "core-js": "^3.2.1",
-    "date-fns": "^1.30.1",
+    "date-fns": "^2.3.0",
     "dexie": "^2.0.4",
     "echarts": "^4.2.1",
     "ng-zorro-antd": "^8.0.0",
@@ -80,7 +80,7 @@
   },
   "build": {
     "appId": "con.bridge-Tesk.app",
-    "productName": "智能设备",
+    "productName": "凌桥智能设备",
     "directories": {
       "output": "pack"
     },
@@ -91,7 +91,7 @@
       }
     ],
     "win": {
-      "icon": "build/icons/all/256x256.ico",
+      "icon": "build/icons/lq/256x256.ico",
       "target": [
         {
           "target": "nsis",
@@ -111,7 +111,7 @@
       "target": [
         "deb"
       ],
-      "icon": "build/icons/all"
+      "icon": "build/icons/lq"
     }
   },
   "keywords": [

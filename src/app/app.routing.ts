@@ -20,10 +20,10 @@ const routes: Routes = [
       { path: "", redirectTo: "login", pathMatch: "full" },
       {
         path: "login",
-        component: LoginComponent
-        // loadChildren: () =>
-        //   import("./routes/login/login.module").then(m => m.LoginModule),
-        // data: { title: "登录" }
+        // component: LoginComponent
+        loadChildren: () =>
+          import("./routes/login/login.module").then(m => m.LoginModule),
+        data: { title: "登录" }
       },
       {
         path: "auto",
@@ -111,18 +111,28 @@ const routes: Routes = [
       },
       {
         path: "help",
-        component: HelpComponent,
-        // loadChildren: () =>
-        //   import("./routes/help/help.module").then(m => m.HelpModule),
-        // data: { title: "帮助" },
+        // component: HelpComponent,
+        loadChildren: () =>
+          import("./routes/help/help.module").then(m => m.HelpModule),
+        data: { title: "帮助" },
         canDeactivate: [GlobalEditGuard]
       }
     ]
   }
 ];
 
+const COMPONENTS = [
+  // LoginComponent,
+  // HelpComponent
+];
 @NgModule({
+  declarations: [
+    ...COMPONENTS
+  ],
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [
+    RouterModule,
+    ...COMPONENTS
+  ]
 })
 export class AppRoutingModule {}

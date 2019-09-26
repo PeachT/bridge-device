@@ -23,11 +23,11 @@ export class AppService {
   uploadingData = JSON.parse(localStorage.getItem('uploadingData'));
   /** 软件信息 */
   public info = {
-    version: '0.0.2',
+    version: '0.0.3',
     unit: {
-      name: '企业名称',
+      name: '凌桥机械',
       tel: '888-8888888',
-      logo: 'assets/img/all/logo.png'
+      logo: 'assets/img/lq/logo.png'
     }
   };
   /** 运行环境是否是Electron */

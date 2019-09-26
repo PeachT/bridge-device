@@ -22,14 +22,6 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
 import { EffectsModule } from '@ngrx/effects';
 import { AppEffects } from './ngrx/effects/app.effects';
-import { JackComponent } from './routes/task/components/jack/jack.component';
-import { ProjectComponent } from './routes/task/components/project/project.component';
-import { ComponentComponent } from './routes/component/component.component';
-import { UserComponent } from './routes/user/user.component';
-import { HelpComponent } from './routes/help/help.component';
-import { TaskComponent } from './routes/task/task.component';
-import { GroutingComponent } from './routes/grouting/grouting.component';
-import { LoginComponent } from './routes/login/login.component';
 
 registerLocaleData(zh);
 
@@ -37,15 +29,6 @@ registerLocaleData(zh);
 @NgModule({
   declarations: [
     AppComponent,
-
-    // JackComponent,
-    // ProjectComponent,
-    // ComponentComponent,
-    // UserComponent,
-    // TaskComponent,
-    // GroutingComponent,
-    LoginComponent,
-    HelpComponent,
   ],
   imports: [
     NgxElectronModule,
