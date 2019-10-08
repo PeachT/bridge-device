@@ -6,8 +6,10 @@ import { JackItem, Jack } from './jack';
 export interface TaskBase extends IBase {
   project: number;
   component: any;
+  /** 开始时间 */
   startDate: any;
-  entDate: any;
+  /** 结束时间 */
+  endDate: any;
   otherInfo?: Array<OtherInfo>;
 }
 export interface TensionTask extends TaskBase {

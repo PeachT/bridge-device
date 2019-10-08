@@ -232,39 +232,72 @@ export class DbService {
     console.log(count);
     y = y || count;
     // y = count;
-    await this.db[dbName].filter(o1 => f(o1))
-      .reverse() // 按id 反序获取
-      .offset(p) // 第几条开始
-      .limit(y) // 获取几条
-      .each(v => {
-        if (state) {
-          r.push({ title: v.name, key: v.id, isLeaf: true });
-        } else {
-          const cls = {
-            a: false,
-            b: false,
-            c: false,
-            d: false,
-            e: false,
-          };
-          for (const g of v.groups) {
-            if (g.record) {
-              if (g.record.state === 2) {
+    if (dbName === 'task') {
+      await this.db[dbName].filter(o1 => f(o1))
+        .reverse() // 按id 反序获取
+        .offset(p) // 第几条开始
+        .limit(y) // 获取几条
+        .each((v: TensionTask) => {
+          if (state) {
+            r.push({ title: v.name, key: v.id, isLeaf: true });
+          } else {
+            const cls = {
+              a: false,
+              b: false,
+              c: false,
+              d: false,
+              e: false,
+            };
+            for (const g of v.groups) {
+              if (g.record) {
+                if (g.record.state === 2) {
+                  cls.a = true;
+                } else if (g.record.state === 1) {
+                  cls.b = true;
+                } else if (g.record.state === 3) {
+                  cls.c = true;
+                } else if (g.record.state === 4) {
+                  cls.d = true;
+                }
+              } else {
+                cls.e = true;
+              }
+            }
+            r.push({ name: v.name, id: v.id, cls });
+          }
+        });
+      } else {
+      await this.db[dbName].filter(o1 => f(o1))
+        .reverse() // 按id 反序获取
+        .offset(p) // 第几条开始
+        .limit(y) // 获取几条
+        .each((v: GroutingTask) => {
+          if (state) {
+            r.push({ title: v.name, key: v.id, isLeaf: true });
+          } else {
+            const cls = {
+              a: false,
+              b: false,
+              c: false,
+              d: false,
+              e: false,
+            };
+            for (const g of v.groutingInfo) {
+              if (g.state === 2) {
                 cls.a = true;
-              } else if (g.record.state === 1) {
+              } else if (g.state === 1) {
                 cls.b = true;
-              } else if (g.record.state === 3) {
+              } else if (g.state === 3) {
                 cls.c = true;
-              } else if (g.record.state === 4) {
+              } else if (g.state === 4) {
                 cls.d = true;
               }
-            } else {
-              cls.e = true;
             }
+            r.push({ name: v.name, id: v.id, cls });
           }
-          r.push({ name: v.name, id: v.id, cls });
-        }
-      });
+        });
+
+    }
     return {menus: r, count};
   }
   /** 任务数据导出菜单 */

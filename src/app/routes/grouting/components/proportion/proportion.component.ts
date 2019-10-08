@@ -2,7 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
 import { AppService } from 'src/app/services/app.service';
 import { arrayValidator } from 'src/app/Validator/repetition.validator';
-import { Proportion } from 'src/app/models/grouting';
+import { ProportionItem } from 'src/app/models/grouting';
+import { createProportionFormItem } from '../../createForm';
 
 @Component({
   // tslint:disable-next-line: component-selector
@@ -11,28 +12,33 @@ import { Proportion } from 'src/app/models/grouting';
   styleUrls: ['./proportion.component.less']
 })
 export class ProportionComponent implements OnInit {
-  @Input() validateForm: FormGroup;
+  @Input() formGroup: FormGroup;
   @Input() keys = null;
   @Input() iselect = null;
+  @Input() edit = true;
 
   get proportionrFormArr(): FormArray {
-    return this.validateForm.controls.proportions as FormArray;
+    const pi = this.formGroup.controls.proportionInfo as FormGroup;
+    return pi.controls.proportions as FormArray;
+  }
+  get piFormGroup(): FormGroup {
+    return this.formGroup.controls.proportionInfo as FormGroup;
   }
 
   constructor(
     public appS: AppService,
     private fb: FormBuilder,
   ) {
-    console.log(this.validateForm);
+    console.log(this.formGroup);
   }
 
   ngOnInit() {
-    console.log(this.validateForm);
+    console.log(this.formGroup);
     console.log(this.proportionrFormArr);
   }
 
   /** 其他信息 */
-  createForm(data: Array<Proportion> = []) {
+  createForm(data: Array<ProportionItem> = []) {
     const rarr = data.map((item, i) => {
       console.log(item);
       return this.proportionVisionsForm(i, item);
@@ -40,25 +46,24 @@ export class ProportionComponent implements OnInit {
     return rarr;
   }
   /** 其他form */
-  proportionVisionsForm(index: number, item: Proportion = {name: null, type: null, value: null, total: null}) {
+  proportionVisionsForm(index: number, item: ProportionItem = {name: null, type: null, value: null}) {
     return this.fb.group({
       name: [item.name, [Validators.required, arrayValidator(index, 'proportions', 'name')]],
       type: [item.type],
       value: [item.value, [Validators.required]],
-      total: [item.total],
     });
   }
   /** 添加其他数据 */
-  proportionAdd() {
+  add() {
     // tslint:disable-next-line:no-angle-bracket-type-assertion
-    const control = <FormArray> this.validateForm.controls.proportions;
-    const length = this.validateForm.value.proportions.length;
-    control.push(this.proportionVisionsForm(length));
+    const control = <FormArray> this.piFormGroup.controls.proportions;
+    const length = this.piFormGroup.value.proportions.length;
+    control.push(createProportionFormItem({ name: `外加剂${length - 2}`, type: 'xx外加剂', value: 0 }, length));
   }
   /** 删除其他数据 */
-  proportionSub(index) {
+  del(index) {
     // tslint:disable-next-line:no-angle-bracket-type-assertion
-    const control = <FormArray> this.validateForm.controls.proportions;
+    const control = <FormArray> this.piFormGroup.controls.proportions;
     control.removeAt(index);
   }
 
@@ -68,7 +73,7 @@ export class ProportionComponent implements OnInit {
   }
   /** 计算水浆比 */
   proportionCalculate() {
-    const ps = this.validateForm.value.proportions as Array<Proportion>;
+    const ps: Array<ProportionItem> = this.piFormGroup.value.proportions as Array<ProportionItem>;
     let count = 0;
     ps.map((item, i) => {
       console.log(item.value);
@@ -78,6 +83,6 @@ export class ProportionComponent implements OnInit {
     });
     const proportion = (ps[0].value / count).toFixed(2);
     console.log(proportion, count);
-    this.validateForm.controls.proportion.setValue(proportion);
+    this.piFormGroup.controls.waterBinderRatio.setValue(proportion);
   }
 }

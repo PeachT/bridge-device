@@ -1,0 +1,12 @@
+<div class="form-item" nz-col [nzXs]="colnzXs" [nzSm]="colnzSm" [nzMd]="colnzMd" [nzLg]="colnzLg" [nzXl]="colnzXl" [nzXXl]="colnzXXl">
+  <nz-form-label *ngIf="label">{{label}}</nz-form-label>
+  <nz-form-control [ngClass]="{'error': errors | ValidatorError}">
+    <ng-content select=".input"></ng-content>
+    <ng-content select="nz-switch"></ng-content>
+    <ng-content select="input"></ng-content>
+    <ng-content select="nz-select"></ng-content>
+    <ng-content select="nz-date-picker"></ng-content>
+
+    <div class="tip">{{errors | ValidatorError}}</div>
+  </nz-form-control>
+</div>

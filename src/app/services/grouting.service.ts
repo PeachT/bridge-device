@@ -21,6 +21,10 @@ export class GroutingService {
   private plcSub = new Subject();
   // 获得一个Observable;
   plcSubject = this.plcSub.asObservable();
+  /** PLC sub */
+  private plcSub1 = new Subject();
+  // 获得一个Observable;
+  plcSubject1 = this.plcSub1.asObservable();
 
   constructor(
     private e: ElectronService,
@@ -71,9 +75,20 @@ export class GroutingService {
       this.linkMsg.oldTime = time;
       // console.log(data);
       if (data.data[0]) {
-        console.error(data);
+        // console.error(data);
       }
       this.plcSub.next({state: true, data: data.data});
+    });
+    this.e.ipcRenderer.on(`groutingheartbeat1`, async (event, data) => {
+      this.linkMsg.link = true;
+      const time = new Date().getTime();
+      this.linkMsg.delayTime =  time - this.linkMsg.oldTime || time;
+      this.linkMsg.oldTime = time;
+      // console.log(data);
+      if (data.data[0]) {
+        // console.error(data);
+      }
+      this.plcSub1.next({state: true, data: data.data});
     });
   }
 }

@@ -11,16 +11,17 @@ import { PLC_D, PLC_M } from 'src/app/models/IPCChannel';
 import { decodeLock } from 'src/app/Function/lock';
 
 const menus = [
-  { platform: 'tension,windows', jurisdiction: 0, url: '/task', icon: 'swap', name: '张拉' },
+  // { platform: 'tension,windows', jurisdiction: 0, url: '/task', icon: 'swap', name: '张拉' },
   { platform: 'grouting,windows', jurisdiction: 0, url: '/grouting', icon: 'experiment', name: '压浆' },
-  { platform: 'tension,windows', jurisdiction: 1, url: '/jack', icon: 'usb', name: '千斤顶' },
+  // { platform: 'tension,windows', jurisdiction: 1, url: '/jack', icon: 'usb', name: '千斤顶' },
   { platform: 'all', jurisdiction: 1, url: '/project', icon: 'appstore', name: '项目' },
   { platform: 'all', jurisdiction: 1, url: '/component', icon: 'deployment-unit', name: '构建' },
   { platform: 'all', jurisdiction: 1, url: '/user', icon: 'user', name: '用户' },
-  { platform: 'tension', jurisdiction: 0, url: '/manual', icon: 'deployment-unit', name: '手动' },
-  { platform: 'tension', jurisdiction: 1, url: '/setting', icon: 'setting', name: '张拉设置' },
+  // { platform: 'tension', jurisdiction: 0, url: '/manual', icon: 'deployment-unit', name: '手动' },
+  // { platform: 'tension', jurisdiction: 1, url: '/setting', icon: 'setting', name: '张拉设置' },
   { platform: 'grouting,windows', jurisdiction: 1, url: '/grouting-setting', icon: 'setting', name: '压浆设置' },
-  { platform: 'tension', jurisdiction: 8, url: '/auto', icon: 'box-plot', name: '自动' },
+  { platform: 'grouting,windows', jurisdiction: 0, url: '/live-grouting', icon: 'fund', name: '压浆监控' },
+  // { platform: 'tension', jurisdiction: 8, url: '/auto', icon: 'box-plot', name: '自动' },
   { platform: 'all', jurisdiction: 0, url: '/help', icon: 'question', name: '帮助'},
 ];
 @Component({
@@ -43,7 +44,6 @@ export class LoginComponent implements OnInit {
     private odb: DbService,
     private message: NzMessageService,
     private router: Router,
-    public PLCS: PLCService,
     private cdr: ChangeDetectorRef,
   ) {
     this.db = this.odb.db;
@@ -120,14 +120,14 @@ export class LoginComponent implements OnInit {
           if (stateTension) {
             this.router.navigate(['/auto']);
           } else if (this.appS.platform === 'tension') {
-            this.router.navigate(['/task']);
+            this.router.navigate(['/grouting']);
           } else if (this.appS.platform === 'grouting') {
             this.router.navigate(['/grouting']);
           } else {
             const url = JSON.parse(localStorage.getItem(this.appS.userInfo.nameId));
             console.log('fsdkjflsdfjsdklfjsdj', url);
             if (!url) {
-              this.router.navigate(['/task']);
+              this.router.navigate(['/grouting']);
             } else {
               this.router.navigate([url.url]);
             }
@@ -143,39 +143,5 @@ export class LoginComponent implements OnInit {
   // }
   touch(msg) {
     console.log(msg);
-  }
-  /** 解锁 */
-  onLock() {
-    const j4 = decodeLock(this.lock, this.PLCS.lock.code);
-    if (j4) {
-      this.PLCS.ipcSend('zF016', PLC_D(3900), [j4.slice(0, 4), j4.slice(4, 8), j4.slice(8, 12), j4.slice(12, 16)]).then(() => {
-        this.message.success('解锁成功');
-        this.PLCS.lock.success = false;
-        const nowTime = Math.round(new Date().getTime() / 1000);
-        const lockTime = Number(j4);
-        this.lock.state = true;
-        if (nowTime < lockTime) {
-          this.lock.success = false;
-          this.PLCS.ipcSend(`cF05`, PLC_M(0), true);
-        }
-      });
-    } else {
-      this.message.warning('验证码错误');
-      this.PLCS.getLockID();
-    }
-  }
-  runPLC() {
-    this.PLCS.lock = {
-      state: false,
-      success: true,
-      code: null,
-    };
-    const lastTime = Number(localStorage.getItem('lastTime'));
-    const nowTime = new Date().getTime();
-    if (nowTime < lastTime) {
-      this.appS.lock = true;
-    } else {
-      this.PLCS.runSocket();
-    }
   }
 }

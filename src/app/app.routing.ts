@@ -3,14 +3,6 @@ import { Routes, RouterModule } from "@angular/router";
 import { DefaultComponent } from "./layout/default/default.component";
 import { HeaderComponent } from "./layout/header/header.component";
 import { GlobalEditGuard } from "./models/edit-guard";
-import { TaskComponent } from './routes/task/task.component';
-import { GroutingComponent } from './routes/grouting/grouting.component';
-import { JackComponent } from './routes/task/components/jack/jack.component';
-import { ProjectComponent } from './routes/task/components/project/project.component';
-import { ComponentComponent } from './routes/component/component.component';
-import { UserComponent } from './routes/user/user.component';
-import { HelpComponent } from './routes/help/help.component';
-import { LoginComponent } from './routes/login/login.component';
 
 const routes: Routes = [
   {
@@ -25,26 +17,26 @@ const routes: Routes = [
           import("./routes/login/login.module").then(m => m.LoginModule),
         data: { title: "登录" }
       },
-      {
-        path: "auto",
-        loadChildren: () =>
-          import("./routes/auto/auto.module").then(m => m.AutoModule),
-        data: { title: "自动" }
-      }
+      // {
+      //   path: "live-grouting",
+      //   loadChildren: () =>
+      //     import("./routes/live-grouting/live-grouting.module").then(m => m.LiveGroutingModule),
+      //   data: { title: "压浆监控" }
+      // }
     ]
   },
   {
     path: "",
     component: HeaderComponent,
     children: [
-      {
-        path: "task",
-        // component: TaskComponent,
-        loadChildren: () =>
-          import("./routes/task/task.module").then(m => m.TaskModule),
-        data: { title: "张拉" },
-        canDeactivate: [GlobalEditGuard]
-      },
+      // {
+      //   path: "task",
+      //   // component: TaskComponent,
+      //   loadChildren: () =>
+      //     import("./routes/task/task.module").then(m => m.TaskModule),
+      //   data: { title: "张拉" },
+      //   canDeactivate: [GlobalEditGuard]
+      // },
       {
         path: "grouting",
         // component: GroutingComponent,
@@ -55,18 +47,18 @@ const routes: Routes = [
         data: { title: "压浆" },
         canDeactivate: [GlobalEditGuard]
       },
-      {
-        path: "manual",
-        loadChildren: () =>
-          import("./routes/manual/manual.module").then(m => m.ManualModule),
-        data: { title: "手动" }
-      },
-      {
-        path: "setting",
-        loadChildren: () =>
-          import("./routes/setting/setting.module").then(m => m.SettingModule),
-        data: { title: "设置" }
-      },
+      // {
+      //   path: "manual",
+      //   loadChildren: () =>
+      //     import("./routes/manual/manual.module").then(m => m.ManualModule),
+      //   data: { title: "手动" }
+      // },
+      // {
+      //   path: "setting",
+      //   loadChildren: () =>
+      //     import("./routes/setting/setting.module").then(m => m.SettingModule),
+      //   data: { title: "设置" }
+      // },
       {
         path: "grouting-setting",
         loadChildren: () =>
@@ -75,14 +67,14 @@ const routes: Routes = [
           ),
         data: { title: "压浆设置" }
       },
-      {
-        path: "jack",
-        // component: JackComponent,
-        loadChildren: () =>
-          import("./routes/jack/jack.module").then(m => m.JackModule),
-        data: { title: "千斤顶" },
-        canDeactivate: [GlobalEditGuard]
-      },
+      // {
+      //   path: "jack",
+      //   // component: JackComponent,
+      //   loadChildren: () =>
+      //     import("./routes/jack/jack.module").then(m => m.JackModule),
+      //   data: { title: "千斤顶" },
+      //   canDeactivate: [GlobalEditGuard]
+      // },
       {
         path: "project",
         // component: ProjectComponent,
@@ -116,6 +108,12 @@ const routes: Routes = [
           import("./routes/help/help.module").then(m => m.HelpModule),
         data: { title: "帮助" },
         canDeactivate: [GlobalEditGuard]
+      },
+      {
+        path: "live-grouting",
+        loadChildren: () =>
+          import("./routes/live-grouting/live-grouting.module").then(m => m.LiveGroutingModule),
+        data: { title: "压浆监控" }
       }
     ]
   }

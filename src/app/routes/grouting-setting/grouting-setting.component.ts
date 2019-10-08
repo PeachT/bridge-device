@@ -23,7 +23,7 @@ export class GroutingSettingComponent implements OnInit {
     private odb: DbService,
     private message: NzMessageService,
     private cdr: ChangeDetectorRef,
-    public PLCS: GroutingService
+    public GPLCS: GroutingService
   ) { }
 
   ngOnInit() {
@@ -31,16 +31,16 @@ export class GroutingSettingComponent implements OnInit {
 
   tastLink() {
     this.tastLinkMsg.state = true;
-    localStorage.setItem('groutingConn', JSON.stringify(this.PLCS.connectionStr));
-    this.e.ipcRenderer.send('tastLink', `${this.PLCS.connectionStr.ip}`);
+    localStorage.setItem('groutingConn', JSON.stringify(this.GPLCS.connectionStr));
+    this.e.ipcRenderer.send('tastLink', `${this.GPLCS.connectionStr.ip}`);
     this.e.ipcRenderer.once(`tastLink`, (event, data) => {
       this.tastLinkMsg.state = false;
       this.tastLinkMsg.success = data.alive;
       console.log(data);
       if (data.alive) {
-        this.tastLinkMsg.msg = `${this.PLCS.connectionStr.ip} 测试成功！`;
+        this.tastLinkMsg.msg = `${this.GPLCS.connectionStr.ip} 测试成功！`;
       } else {
-        this.tastLinkMsg.msg = `${this.PLCS.connectionStr.ip} 测试失败！`;
+        this.tastLinkMsg.msg = `${this.GPLCS.connectionStr.ip} 测试失败！`;
       }
       this.cdr.detectChanges();
     });

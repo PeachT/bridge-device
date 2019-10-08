@@ -47,7 +47,6 @@ export class ComponentComponent implements OnInit {
     private message: NzMessageService,
     public appS: AppService,
     private cdr: ChangeDetectorRef,
-    private PLCS: PLCService
   ) {
   }
 

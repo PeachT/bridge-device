@@ -1,0 +1,55 @@
+<form nz-form [formGroup]="formData" [hidden]="!formData">
+  <div>
+    <app-form-item [row]="true" label="模板" [hidden]="!edit">
+      <nz-switch formControlName="template" nzCheckedChildren="是" nzUnCheckedChildren="否"></nz-switch>
+    </app-form-item>
+    <app-form-item label="梁号" [errors]="formData.get('name').errors">
+      <input type="text" nz-input placeholder="请输入梁号" formControlName="name">
+    </app-form-item>
+    <app-form-item label="构建" [errors]="formData.get('component').errors">
+      <nz-select style="width: 100%;" nzPlaceHolder="请选择构建" formControlName="component" (ngModelChange)="conponentChange($event)">
+        <nz-option [nzValue]="item.value" [nzLabel]="item.label" *ngFor="let item of componentMneu$ | async"></nz-option>
+      </nz-select>
+    </app-form-item>
+    <app-form-item label="梁长度" [errors]="formData.get('beamLength').errors">
+      <input type="number" nz-input placeholder="请输入梁长度" formControlName="beamLength">
+    </app-form-item>
+    <app-form-item label="浇筑日期" [errors]="formData.get('castingDate').errors">
+      <nz-date-picker formControlName="castingDate" placeholder="浇筑日期"></nz-date-picker>
+    </app-form-item>
+    <app-form-item label="张拉日期" [errors]="formData.get('tensinDate').errors">
+      <nz-date-picker formControlName="tensinDate" placeholder="张拉日期"></nz-date-picker>
+    </app-form-item>
+
+    <app-form-item label="施工员">
+      <input type="text" nz-input placeholder="施工员" formControlName="operator">
+    </app-form-item>
+    <app-form-item label="监理员">
+      <input type="text" nz-input placeholder="监理员" formControlName="supervisors">
+    </app-form-item>
+    <app-form-item label="自检员">
+      <input type="text" nz-input placeholder="自检员" formControlName="qualityInspector">
+    </app-form-item>
+  </div>
+  <div>
+    <app-add-other [formGroup]="formData" #otherInfo></app-add-other>
+  </div>
+  <!-- <div>
+    <grouting-proportion [formGroup]="formData" #proportionInfo></grouting-proportion>
+  </div>
+  <div>
+    <mixing-info [groutingInfo]="groutingInfo" #mixing></mixing-info>
+  </div>
+  <div>
+    <grouting-record ></grouting-record>
+  </div> -->
+  <div>
+    <grouting-proportion [formGroup]="formData"></grouting-proportion>
+  </div>
+  <div>
+    <mixing-info [formData]="formData" [groutingTask]="groutingTask"></mixing-info>
+  </div>
+  <div>
+    <grouting-record [formData]="formData" [groutingTask]="groutingTask"></grouting-record>
+  </div>
+</form>

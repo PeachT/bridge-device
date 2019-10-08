@@ -151,6 +151,9 @@ function createModbus() {
 
 /** ipc监听 */
 function IPCOn(d: string = 'z', tcp: ModbusTCP | PLCTcpModbus) {
+  ipcMain.on(`${d}F01`, (e, arg) => {
+    tcp.F01(arg.address, arg.value, arg.channel);
+  });
   ipcMain.on(`${d}F03`, (e, arg) => {
     tcp.F03(arg.address, arg.value, arg.channel);
   });

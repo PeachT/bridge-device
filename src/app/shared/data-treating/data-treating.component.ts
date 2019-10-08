@@ -14,8 +14,9 @@ import { DateFormat } from 'src/app/Function/DateFormat';
 import { utf8_to_b64, b64_to_utf8 } from 'src/app/Function/stringToBase64';
 import { TensionTask } from 'src/app/models/task.models';
 import { lastDayOfWeek, lastDayOfMonth, startOfWeek, startOfMonth, getTime, compareAsc, compareDesc, format } from 'date-fns';
-import { GroutingTask } from 'src/app/models/grouting';
 import { copyAny } from 'src/app/models/base';
+import { GroutingTask } from 'src/app/models/grouting';
+import { unit } from 'src/app/Function/unit';
 
 @Component({
   selector: 'app-data-treating',
@@ -92,12 +93,12 @@ export class DataTreatingComponent implements OnInit {
     no: false,
     tension: {
       startDate: null,
-      entDate: null,
+      endDate: null,
       date: [],
     },
     pouring: {
       startDate: null,
-      entDate: null,
+      endDate: null,
       date: [],
     },
     count: 0
@@ -114,7 +115,6 @@ export class DataTreatingComponent implements OnInit {
     private db: DbService,
     public apps: AppService,
     public e: ElectronService,
-    private PLCS: PLCService,
     private modalService: NzModalService
   ) { }
 
@@ -311,7 +311,7 @@ export class DataTreatingComponent implements OnInit {
         if (this.filter.ok) {
           if (!this.filter.tension.startDate) {
             return true;
-          } else if (o1.startDate >= this.filter.tension.startDate && o1.startDate <= this.filter.tension.entDate) {
+          } else if (o1.startDate >= this.filter.tension.startDate && o1.startDate <= this.filter.tension.endDate) {
             return true;
           }
         }
@@ -319,7 +319,7 @@ export class DataTreatingComponent implements OnInit {
         if (this.filter.pouring.startDate
           && (
             (getTime(Number(o1.otherInfo[0].value)) < this.filter.pouring.startDate + 86400000
-              || getTime(Number(o1.otherInfo[0].value)) > this.filter.pouring.entDate + 86400000)
+              || getTime(Number(o1.otherInfo[0].value)) > this.filter.pouring.endDate + 86400000)
           )) {
           return false;
         }
@@ -399,7 +399,7 @@ export class DataTreatingComponent implements OnInit {
     // outdata.data = JSON.stringify(outdata.record);
     // const exData = {data: outdata.data, exData: JSON.stringify(outdata.record)};
     console.log('导出的数据', outdata);
-    const channel = `ecxel${this.PLCS.constareChannel()}`;
+    const channel = `ecxel${unit.constareChannel()}`;
     this.e.ipcRenderer.send('derivedExcel', {
       channel,
       templatePath: this.tempPath,
@@ -520,8 +520,9 @@ export class DataTreatingComponent implements OnInit {
     outdata.data.project = project;
     outdata.data.bridgeInfo = {...data, groups: null};
     console.log(data, id);
-    outdata.record = data.groups.map(g => {
-      return {...g,  startDate: format(new Date(g.startDate), 'HH:mm:ss'), endDate: format(new Date(g.endDate), 'HH:mm:ss') };
+    outdata.record = data.groutingInfo.map(g => {
+      // tslint:disable-next-line:max-line-length
+      return {...g,  startDate: format(new Date(g.groups[0].startDate), 'HH:mm:ss'), endDate: format(new Date(g.groups[0].endDate), 'HH:mm:ss') };
     });
     console.log('处理后的数据', id, outdata);
     return outdata;
@@ -534,7 +535,7 @@ export class DataTreatingComponent implements OnInit {
     console.log('导出数据', datas, strb64);
 
     this.savePath = `${this.savePath}/${DateFormat(new Date(), 'yyyy年MM月dd日hh时mm分ss秒')}.db`;
-    const channel = `ecxel${this.PLCS.constareChannel()}`;
+    const channel = `ecxel${unit.constareChannel()}`;
     this.e.ipcRenderer.send('dateEX', {
       channel,
       outPath: this.savePath,
@@ -556,7 +557,7 @@ export class DataTreatingComponent implements OnInit {
   async inDb() {
     this.inData.state = true;
     console.log(this.inData.selsectPath);
-    const channel = `ecxel${this.PLCS.constareChannel()}`;
+    const channel = `ecxel${unit.constareChannel()}`;
     this.e.ipcRenderer.send('indb', {
       channel,
       inPath: this.inData.selsectPath,
@@ -709,7 +710,7 @@ export class DataTreatingComponent implements OnInit {
   }
   onFilterDate(e, key) {
     this.filter[key].startDate = getTime(e[0]);
-    this.filter[key].entDate = getTime(e[1]);
+    this.filter[key].endDate = getTime(e[1]);
     this.filter[key].date = e;
     this.getTaskBridge();
     console.log(e, this.filter);
@@ -734,7 +735,7 @@ export class DataTreatingComponent implements OnInit {
   async inHMIcsv() {
     this.inData.state = true;
     console.log(this.inData.selsectPath);
-    const channel = `ecxel${this.PLCS.constareChannel()}`;
+    const channel = `ecxel${unit.constareChannel()}`;
     this.e.ipcRenderer.send('inHMIcsv', {
       channel,
       inPath: this.inData.selsectPath,
@@ -771,12 +772,12 @@ export class DataTreatingComponent implements OnInit {
         this.progressState(g.name, 'jump');
       } else {
         g.groups.map(item => {
-          item.direction = tempdata.groups[0].direction;
+          item.direction = tempdata.groutingInfo[0].groups[0].direction;
         })
         const data: GroutingTask = copyAny(tempdata);
         data.name = g.name;
         data.template = false;
-        data.groups = g.groups;
+        data.groutingInfo = g.groups;
         const success = await this.db.addAsync('grouting', data,
           (o: GroutingTask) => o.name === g.name && o.project === tempdata.project && o.component === tempdata.component);
         if (success.success) {

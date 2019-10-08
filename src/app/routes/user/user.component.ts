@@ -1,24 +1,13 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import {
-  FormGroup, FormControl, FormBuilder, Validators, AsyncValidatorFn,
-  AbstractControl, ValidationErrors, FormArray
-} from '@angular/forms';
-import { DB, DbService, tableName } from 'src/app/services/db.service';
-import { NzMessageService, NzModalService } from 'ng-zorro-antd';
+  FormGroup, FormBuilder, Validators} from '@angular/forms';
+import { DbService } from 'src/app/services/db.service';
+import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
-import { Router } from '@angular/router';
-import { Observable, from } from 'rxjs';
-import { PLCService } from 'src/app/services/PLC.service';
-import { PLC_D } from 'src/app/models/IPCChannel';
-import { ManualComponent } from '../manual/manual.component';
-import { map } from 'rxjs/operators';
-import { reperitionValidator } from 'src/app/Validator/repetition.validator';
 import { User } from 'src/app/models/user.models';
 import { LeftMenuComponent } from 'src/app/shared/left-menu/left-menu.component';
-import { copyAny } from 'src/app/models/base';
 import { nameRepetition } from 'src/app/Validator/async.validator';
 
-const os = ['see'];
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
@@ -38,9 +27,6 @@ export class UserComponent implements OnInit {
     private db: DbService,
     private message: NzMessageService,
     public appS: AppService,
-    private router: Router,
-    private modalService: NzModalService,
-    public PLCS: PLCService,
     private cdr: ChangeDetectorRef,
   ) {
   }

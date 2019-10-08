@@ -1,21 +1,14 @@
 import {
-  Component, OnInit, Input, ChangeDetectionStrategy, ChangeDetectorRef, Output, EventEmitter,
-  ViewChildren, QueryList, ViewChild, ElementRef
+  Component, OnInit, Input, ChangeDetectorRef, Output, EventEmitter,
+  ViewChild, ElementRef
 } from '@angular/core';
-import { Menu } from 'src/app/models/menu';
 import { DbService } from 'src/app/services/db.service';
 import { AppService } from 'src/app/services/app.service';
 import { NzMessageService } from 'ng-zorro-antd';
-import { TensionTask, TaskBase } from 'src/app/models/task.models';
-import { LeftMenuComponent } from 'src/app/shared/left-menu/left-menu.component';
+import { TaskBase } from 'src/app/models/task.models';
 import { ActivatedRoute } from '@angular/router';
-import { fromEvent } from 'rxjs';
-import { debounceTime, map } from 'rxjs/operators';
-// import endOfMonth from 'date-fns/end_of_month';
-// import * as endOfMonth from 'date-fns/end_of_month';
-import { lastDayOfWeek, lastDayOfMonth, startOfWeek, startOfMonth, getTime, compareAsc, compareDesc} from 'date-fns';
+import { lastDayOfWeek, lastDayOfMonth, startOfWeek, startOfMonth, getTime} from 'date-fns';
 import { Project } from 'src/app/models/project';
-import { GroutingTask } from 'src/app/models/grouting';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -57,12 +50,12 @@ export class TaskMenuComponent implements OnInit {
     no: false,
     tension: {
       startDate: null,
-      entDate: null,
+      endDate: null,
       date: [],
     },
     pouring: {
       startDate: null,
-      entDate: null,
+      endDate: null,
       date: [],
     },
   };
@@ -79,7 +72,6 @@ export class TaskMenuComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
-    const date = new Date();
     await this.getProject();
     this.activatedRoute.queryParams.subscribe(queryParams => {
       let data = null;
@@ -243,7 +235,7 @@ export class TaskMenuComponent implements OnInit {
       await this.getBridgedb(null);
       this.pts.push(this.pt20);
       this.paddingTop = this.pts.reduce((prev, cur) => prev + cur, 0);
-      this.setPadding(data, 1);
+      this.setPadding(data);
       // console.log(scrollTop, this.paddingTop, sg, this.pt20);
     }
     if (sgd === 0 && this.sgs) {
@@ -253,7 +245,7 @@ export class TaskMenuComponent implements OnInit {
       await this.getBridgedb(null);
       this.pts.pop();
       this.paddingTop = this.pts.reduce((prev, cur) => prev + cur, 0);
-      this.setPadding(data, 2);
+      this.setPadding(data);
       // console.log(scrollTop, this.paddingTop, sg, this.pt20);
     }
 
@@ -264,11 +256,11 @@ export class TaskMenuComponent implements OnInit {
       this.sgs = true;
     }
     if (this.pt20 === 0) {
-      this.setPadding(data, 0);
+      this.setPadding(data);
     }
 
   }
-  async setPadding(target, state) {
+  async setPadding(target) {
     const children = target.children;
     this.pt20 = 0;
     for (let index = 1; index <= 15; index++) {
@@ -287,7 +279,7 @@ export class TaskMenuComponent implements OnInit {
         if (this.filter.ok) {
           if (!this.filter.tension.startDate) {
             return true;
-          } else if ( o1.startDate >= this.filter.tension.startDate && o1.startDate <= this.filter.tension.entDate) {
+          } else if ( o1.startDate >= this.filter.tension.startDate && o1.startDate <= this.filter.tension.endDate) {
             return true;
           }
         }
@@ -295,7 +287,7 @@ export class TaskMenuComponent implements OnInit {
         if (this.filter.pouring.startDate
           && (
             (getTime(Number(o1.otherInfo[0].value)) < this.filter.pouring.startDate + 86400000
-            || getTime(Number(o1.otherInfo[0].value)) > this.filter.pouring.entDate + 86400000)
+            || getTime(Number(o1.otherInfo[0].value)) > this.filter.pouring.endDate + 86400000)
             )) {
           return false;
         }
@@ -334,7 +326,7 @@ export class TaskMenuComponent implements OnInit {
   }
   onFilterDate(e, key) {
     this.filter[key].startDate = getTime(e[0]);
-    this.filter[key].entDate = getTime(e[1]);
+    this.filter[key].endDate = getTime(e[1]);
     this.filter[key].date = e;
     console.log(e, this.filter);
     this.getBridge();

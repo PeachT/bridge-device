@@ -10,12 +10,14 @@ import { arrayValidator } from 'src/app/Validator/repetition.validator';
   styleUrls: ['./add-other.component.less']
 })
 export class AddOtherComponent implements OnInit {
-  @Input() validateForm: FormGroup;
+  @Input() formGroup: FormGroup;
+  /** 候选的KEY */
   @Input() keys = [];
   @Input() iselect = null;
+  @Input() edit = true;
 
   get otherInforFormArr(): FormArray {
-    return this.validateForm.get('otherInfo') as FormArray;
+    return this.formGroup.get('otherInfo') as FormArray;
   }
 
   constructor(
@@ -43,17 +45,16 @@ export class AddOtherComponent implements OnInit {
     });
   }
   /** 添加其他数据 */
-  otherInfoAdd() {
+  add() {
     // tslint:disable-next-line:no-angle-bracket-type-assertion
-    const control = <FormArray> this.validateForm.controls.otherInfo;
-    const length = this.validateForm.value.otherInfo.length;
+    const control = <FormArray> this.formGroup.controls.otherInfo;
+    const length = this.formGroup.value.otherInfo.length;
     control.push(this.otherInfoVisionsForm(length));
   }
   /** 删除其他数据 */
-  otherInfoSub(index) {
+  remove(index: number) {
     // tslint:disable-next-line:no-angle-bracket-type-assertion
-    const control = <FormArray> this.validateForm.controls.otherInfo;
-    control.removeAt(index);
+    (<FormArray> this.formGroup.controls.otherInfo).removeAt(index);
   }
 
   bridgeOtherKeySelect() {

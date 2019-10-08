@@ -10,7 +10,6 @@ import { Observable } from 'rxjs';
 import { Jack } from 'src/app/models/jack';
 import { PLCService } from 'src/app/services/PLC.service';
 import { PLC_D } from 'src/app/models/IPCChannel';
-import { ManualComponent } from '../manual/manual.component';
 import { Project } from 'src/app/models/project';
 import { ProjectComponent as appProjectComponent } from 'src/app/shared/project/project.component';
 import { LeftMenuComponent } from 'src/app/shared/left-menu/left-menu.component';

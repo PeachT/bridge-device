@@ -1,14 +1,14 @@
 import { Component, Input, OnInit, ChangeDetectorRef, ViewChild, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { GroutingItem } from 'src/app/models/grouting';
+import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
-import { PLCService } from 'src/app/services/PLC.service';
 import { ElectronService } from 'ngx-electron';
 import { nameRepetition } from 'src/app/Validator/async.validator';
 import { AddOtherComponent } from 'src/app/shared/add-other/add-other.component';
 import { Subscription } from 'rxjs';
+import { GroutingInfo, GroutingTask } from 'src/app/models/grouting';
+import { GroutingRecordItemComponent } from '../grouting-record-item/grouting-record-item.component';
 
 @Component({
   // tslint:disable-next-line: component-selector
@@ -17,13 +17,28 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./grouting-record.component.less']
 })
 export class GroutingRecordComponent implements OnInit {
-  @ViewChild('otherInfo', null) otherIngoDom: AddOtherComponent;
+  @ViewChild('otherInfo', { read: AddOtherComponent, static: true }) otherIngoDom: AddOtherComponent;
+  @ViewChild('groutingrecorditem', { read: GroutingRecordItemComponent, static: true }) griDom: GroutingRecordItemComponent;
 
   @Input() show = false;
+  @Input() edit = true;
+
+  @Input() groutingTask: GroutingTask;
+  @Input() formData: FormGroup;
+  get groutingInfoForm(): FormArray {
+    return this.formData.controls.groutingInfo as FormArray;
+  }
+  get groutingInfo(): Array<GroutingInfo> {
+    if (this.groutingTask) {
+      return this.groutingTask.groutingInfo;
+    }
+    return null;
+  }
+
 
   otherKey = [];
-  formData: FormGroup;
   chsub: Subscription = null;
+  groupItem: GroutingInfo;
 
   @Output() updateHole = new EventEmitter();
 
@@ -32,59 +47,42 @@ export class GroutingRecordComponent implements OnInit {
     public odb: DbService,
     private message: NzMessageService,
     public appS: AppService,
-    public PLCS: PLCService,
     private e: ElectronService,
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
-    this.formData = this.fb.group({
-      /** 孔号 */
-      name: [],
-      otherInfo: this.fb.array(this.otherIngoDom.createForm([])),
-      /** 试验日期 */
-      testDate: [],
-      /** 压浆方向 */
-      direction: [],
-      /** 张拉开始时间 */
-      startDate: [],
-      /** 张拉结束时间 */
-      endDate: [],
-      /** 压浆压力 */
-      setMpa: [],
-      /** 通过 */
-      pass: [],
-      /** 冒浆情况 */
-      msg: [],
-      /** 停留时间 */
-      stayTime: [],
-      /** 稳压时间 */
-      steadyTime: [],
-      /** 稳压压力 */
-      steadyMpa: [],
-      /** 二次压浆 */
-      tow: [],
-      /** 压浆状态 */
-      state: [],
-      /** 上传状态 */
-      upState: [],
-      /** 压浆料量 */
-      materialsTotal: [],
-      /** 水量 */
-      waterTotal: [],
-      /** 搅拌时间 */
-      stirTime: [],
-      /** 水浆比 */
-      proportion: [],
-    });
-    this.chsub = this.formData.valueChanges.subscribe((e) => {
-      // console.log(e, this.holeForm.value);
-      this.updateHole.emit(this.formData.value);
-    });
+
+    // this.chsub = this.formData.valueChanges.subscribe((e) => {
+    //   // console.log(e, this.holeForm.value);
+    //   this.updateHole.emit(this.formData.value);
+    // });
   }
 
-  createFormData(data: GroutingItem) {
-    this.formData.reset(data);
+  createFormData(data: GroutingInfo) {
+    return this.fb.group({
+      /** 孔号 */
+      name: [data.name],
+      /** 压浆孔道采集数据 */
+      // groups: Array<GroutingHoleItem>;
+      /** 孔道内径 */
+      holeDiameter: [data.holeDiameter],
+      /** 孔道长度 */
+      holeLength: [data.holeLength],
+      /** 钢绞线数量 */
+      steelStrandNum: [data.steelStrandNum],
+      /** 上传状态 */
+      uploading: [data.uploading],
+      /** 压浆状态 */
+      state: [data.state],
+      /** 其他数据 */
+      otherInfo: this.fb.array(this.otherIngoDom.createForm([])),
+    });
+  }
+  /** 切换孔 */
+  switchHole(item: GroutingInfo) {
+    console.log(item);
+    this.groupItem = item;
   }
 
 }

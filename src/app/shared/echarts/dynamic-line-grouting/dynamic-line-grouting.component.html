@@ -1,0 +1,18 @@
+<div style="position: relative;">
+
+  <div #svg  style="height: 500px; min-width: 500px;">
+  </div>
+  <div
+  style="position: absolute;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32px;
+  color: #1890ff;
+  cursor: pointer;"
+  (click)="update(true)" *ngIf="show">点 击 查 看</div>
+</div>
+<!-- <div>{{data | json}}</div> -->

@@ -1,4 +1,5 @@
 import { ValidatorFn, AbstractControl } from '@angular/forms';
+import { copyAny } from '../models/base';
 
 export function reperitionValidator(value: string, key: string = 'name'): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
@@ -23,14 +24,25 @@ export function reperitionValidator(value: string, key: string = 'name'): Valida
  * @param {string} [key='name'] 比较key
  * @returns {ValidatorFn}
  */
-export function arrayValidator(index: number, arrKey: string, key: string): ValidatorFn {
+export function arrayValidator(index: number, arrKey: string | Array<string>, key: string): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     const rootvalue = control.root.value;
+
     if (control.dirty && rootvalue) {
-      const values = rootvalue[arrKey];
+      let values = copyAny(rootvalue);
+      if (typeof(arrKey) === 'string' ) {
+        values = values[arrKey];
+      } else {
+        arrKey.map(k => {
+          values = values[k];
+        });
+      }
+      console.log(values);
+
       values.splice(index, 1);
       for (const item of values) {
         if (!control.value || item[key] === control.value) {
+          console.log(rootvalue, arrKey, control.value);
           return { reperition: `${control.value} 已存在!!` };
         }
       }

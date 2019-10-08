@@ -1,0 +1,86 @@
+
+<form nz-form [formGroup]="formData" id="form">
+  <div formArrayName="groutingInfo" #groutingInfoDom>
+    <table class="gridtable" [formArrayName]="index">
+      <thead>
+        <tr>
+          <th>压浆方向</th>
+          <th>设置压浆压力(Mpa)</th>
+          <th>起止时间</th>
+          <th>进浆/回浆压力(Mpa)</th>
+          <th>稳压时间(s)</th>
+          <th>环境/浆液温度(℃)</th>
+          <th>进浆/回浆量(L)</th>
+          <th>真空压力(Mpa)</th>
+        </tr>
+      </thead>
+      <tbody formArrayName="groups">
+        <ng-container *ngFor="let item of groutingInfoHoleForm.controls; index as i" [formGroupName]="i">
+          <tr style="text-align: center;">
+            <td colspan="10" style="background-color: #baccd9; color: #45b787;">第 {{i + 1}} 次压浆数据</td>
+          </tr>
+          <tr>
+            <td><input type="text" nz-input placeholder="压浆方向" formControlName="direction"></td>
+            <td><input type="number" nz-input placeholder="设置压浆压力" formControlName="setGroutingPressure"></td>
+            <td>
+              <div class="row">
+                起&nbsp;<nz-date-picker nzShowTime formControlName="startDate" [nzAllowClear]="false"></nz-date-picker>
+              </div>
+              <div class="row">
+                止&nbsp;<nz-date-picker nzShowTime formControlName="endDate" [nzAllowClear]="false"></nz-date-picker>
+              </div>
+            </td>
+            <td>
+              <div class="row">
+                进&nbsp;<input type="number" nz-input placeholder="进浆压力" formControlName="intoPulpPressure">
+              </div>
+              <div class="row">
+                回&nbsp;<input type="number" nz-input placeholder="回浆压力" formControlName="outPulpPressure">
+              </div>
+            </td>
+            <td><input type="number" nz-input placeholder="稳压时间(s)" formControlName="steadyTime"></td>
+
+            <td>
+              <div class="row">
+                环&nbsp;<input type="number" nz-input placeholder="环境温度" formControlName="envTemperature">
+              </div>
+              <div class="row">
+                浆&nbsp;<input type="number" nz-input placeholder="浆液温度" formControlName="slurryTemperature">
+              </div>
+            </td>
+            <td>
+              <div class="row">
+                进&nbsp;<input type="number" nz-input placeholder="进浆量" formControlName="intoPulpvolume">
+              </div>
+              <div class="row">
+                回&nbsp;<input type="number" nz-input placeholder="回浆量" formControlName="outPulpvolume">
+              </div>
+            </td>
+            <td><input type="number" nz-input placeholder="真空" formControlName="vacuumPumpPressure"></td>
+          </tr>
+          <tr>
+            <td colspan="10">
+              <div style="display: flex; flex-direction: column;">
+                <div>
+                  <app-form-item label="通过情况">
+                    <input type="text" nz-input placeholder="通过情况" formControlName="passMsg">
+                  </app-form-item>
+                  <app-form-item label="冒浆情况">
+                    <input type="text" nz-input placeholder="冒浆情况" formControlName="slurryEmittingMsg">
+                  </app-form-item>
+                  <app-form-item label="其他说明">
+                    <input type="text" nz-input placeholder="其他说明" formControlName="remarks">
+                  </app-form-item>
+                </div>
+                <div>
+                  <echarts-dynamic-line-grouting [width]="(container.offsetWidth || 720) - 220" *ngIf="GroutingHoleItem && GroutingHoleItem[i]?.processDatas" [data]="GroutingHoleItem[i]?.processDatas"></echarts-dynamic-line-grouting>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+</form>
+<div style="position: fixed; width: 100%;" #container></div>

@@ -1,12 +1,9 @@
 <div class="plc-state">
   <div class="item" style="color: white;" [hidden]="!(appS.platform === 'tension' || appS.platform === 'grouting') || e.isWindows">{{time$ | async}}</div>
-  <div class="item" *ngIf="appS.platform === 'tesnsion'" [ngClass]="{'active': PLCS.plcState.z}">主:{{PLCS.plcState.zLT}}</div>
-  <div class="item" *ngIf="appS.platform === 'tesnsion'" [ngClass]="{'active': PLCS.plcState.c}">副:{{PLCS.plcState.cLT}}</div>
-  <button nz-button nzType="dashed" *ngIf="!PLCS.socketState && (appS.platform === 'tesnsion' || appS.platform === 'debug')" (click)="PLCS.runSocket()">张拉链接</button>
 
   <div class="item" *ngIf="GPLCS.linkMsg.link" [ngClass]="{'active': GPLCS.linkMsg.link}">压:{{GPLCS.linkMsg.delayTime}}</div>
   <button nz-button nzType="dashed" [nzLoading]="GPLCS.linkMsg.now"
-    *ngIf="!PLCS.socketState && (appS.platform === 'grouting' || appS.platform === 'debug') && !GPLCS.linkMsg.link"
+    *ngIf="(appS.platform === 'grouting' || appS.platform === 'debug') && !GPLCS.linkMsg.link"
     (click)="GPLCS.linkSocket()">压浆链接</button>
 </div>
 <router-outlet></router-outlet>
@@ -25,3 +22,4 @@
     <h1 *ngIf="!appS.powerDelay">正在{{appS.powerText}}...</h1>
   </div>
 </nz-modal>
+<!-- <app-fomr [formDynamin]="formDynamic"></app-fomr> -->

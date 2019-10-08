@@ -82,7 +82,7 @@ export class PLCTcpModbus {
   private heartbeat() {
     // console.log('hhhhhh', this.ifClient());
 
-    setTimeout(() => {
+    setTimeout(async () => {
       if (this.ifClient()) {
         // const d = new Date().getSeconds();
         // // this.F06(4195, d)
@@ -97,15 +97,24 @@ export class PLCTcpModbus {
         // }).catch((err) => {
         //   this.connection();
         // });
-        this.client.readCoils(2094, 1).then((data) => {
+        await this.client.readCoils(2094, 1).then((data) => {
           // console.log(data);
 
           this.IPCSend(`${this.connectionStr.uid}heartbeat`, { data: data.data });
-          this.heartbeat();
+          // this.heartbeat();
+          this.client.readCoils(2098, 1).then((data1) => {
+            // console.log(data);
+            this.IPCSend(`${this.connectionStr.uid}heartbeat1`, { data: data1.data });
+            this.heartbeat();
+          }).catch((err) => {
+            this.connection();
+            this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: false, msg: '设备链接错误', connectionStr: this.connectionStr});
+          });
         }).catch((err) => {
           this.connection();
           this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: false, msg: '设备链接错误', connectionStr: this.connectionStr});
         });
+        // this.heartbeat();
       }
     // tslint:disable-next-line:no-string-literal
     }, 20);
@@ -136,6 +145,23 @@ export class PLCTcpModbus {
   }
 
   /**
+   * 读取多个线圈
+   *
+   * @param {number} address 首地址
+   * @param {number} length 读取数据量
+   * @param {string} channel 通知UI名称
+   * @memberof ModbusTCP
+   */
+  public F01(address: number, length: number, channel: string): void {
+    if (this.ifClient()) {
+      this.client.readCoils(address, length).then((data) => {
+        this.IPCSend(channel, { data: data.data });
+      }).catch((err) => {
+        this.IPCSend(channel, err);
+      });
+    }
+  }
+  /**
    * 读取多个寄存器值
    *
    * @param {number} address 首地址
@@ -157,11 +183,14 @@ export class PLCTcpModbus {
   public F03ASCII(address: number, length: number, channel: string): void {
     if (this.ifClient()) {
       this.client.readHoldingRegisters(address, length).then((data) => {
-        const str = bf.bufferToAscii(data.buffer);
-        console.log('buffer', data.buffer);
+        // const str = bf.bufferToAscii(data.buffer);
+        // console.log('buffer', data.buffer);
+        const float = bf.bufferToFloat(data.buffer);
+        const dint16 = bf.bufferTo16int(data.buffer);
+        const str = data.buffer.swap16().toString('ascii');
         // const dint16 = bf.bufferTo16int(data.buffer);
         // const str = (Buffer.from(dint16)).toString();
-        this.IPCSend(channel, { uint16: data.data, str, buffer: data.buffer });
+        this.IPCSend(channel, { uint16: data.data, str, buffer: data.buffer, float, dint16 });
       }).catch((err) => {
         this.IPCSend(channel, err);
       });

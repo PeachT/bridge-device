@@ -1,99 +1,43 @@
-<div class="form-edit" [hidden]="!show">
-  <nz-divider style="min-width: auto;" nzText="压浆记录" nzOrientation="left"></nz-divider>
-  <form nz-form [ngClass]="{'form-edit': !appS.edit}" [formGroup]="formData">
-    <nz-form-item>
-      <nz-form-label [nzSm]="3">孔号</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <input type="text" nz-input placeholder="孔号" formControlName="name">
-      </nz-form-control>
+<div *ngIf="groutingInfo && groutingInfo.length > 0">
+  <nz-divider style="min-width: auto;" nzText="压浆数据" nzOrientation="left"></nz-divider>
+  <nz-form-item *ngIf="groutingInfo" style="z-index: 2;">
+    <nz-radio-group [nzButtonStyle]="'solid'" class="hole-groups">
+      <label nz-radio-button [nzValue]="item" *ngFor="let item of groutingInfo; index as i" (click)="switchHole(item)"
+        [ngClass]="{'hole-active': item.name === groupItem?.name}" [class]="'hole' + item.state"
+        class="hole">
+        <!-- <i nz-icon nzType="cloud" nzTheme="outline" style="color: #00E676" *ngIf="!item.uploading"></i> -->
+        <div *ngIf="item.uploading" class="template">
+        </div>
+        {{item.name}}</label>
+    </nz-radio-group>
+  </nz-form-item>
+  <form nz-form [formGroup]="formData"  [hidden]="!groupItem">
+    <div formArrayName="groutingInfo">
+      <ng-container *ngFor="let item of groutingInfoForm.controls; index as i" [formArrayName]="i" >
+        <div style="display: flex;flex-direction: column;" [hidden]="!(item.value.name === groupItem?.name)">
+          <div>
+            <app-form-item label="梁号">
+              <input type="text" nz-input placeholder="请输入梁号" formControlName="name">
+            </app-form-item>
+            <app-form-item label="孔道内径">
+              <input type="number" nz-input placeholder="请输入孔道内径" formControlName="holeDiameter">
+            </app-form-item>
+            <app-form-item label="孔道长度">
+              <input type="number" nz-input placeholder="请输入孔道长度" formControlName="holeLength">
+            </app-form-item>
+            <app-form-item label="钢绞线数量">
+              <input type="text" nz-input placeholder="请输入钢绞线数量" formControlName="steelStrandNum">
+            </app-form-item>
+          </div>
+          <div>
+            <app-add-other [formGroup]="item" #otherInfo></app-add-other>
+          </div>
+          <div >
+            <grouting-record-item #groutingrecorditem [formData]="formData" [index]="i" [GroutingHoleItem]="groupItem?.groups"></grouting-record-item>
+          </div>
+        </div>
+      </ng-container>
+    </div>
 
-      <nz-form-label [nzSm]="3" >试验日期</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <nz-date-picker readonly [nzAllowClear]="false" class="revise-date" nzFormat="yyyy-MM-dd" formControlName="testDate"></nz-date-picker>
-      </nz-form-control>
-
-      <nz-form-label [nzSm]="3">压浆方向</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <input type="text" nz-input placeholder="压浆方向" formControlName="direction">
-      </nz-form-control>
-
-      <nz-form-label [nzSm]="3">设置压浆压力</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <input type="number" nz-input placeholder="设置压浆压力" formControlName="setMpa">
-      </nz-form-control>
-
-      <nz-form-label [nzSm]="3" >开始时间</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <nz-time-picker readonly  class="revise-date" formControlName="startDate" ></nz-time-picker>
-      </nz-form-control>
-
-      <nz-form-label [nzSm]="3" >结束时间</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <nz-time-picker readonly  class="revise-date" formControlName="endDate" ></nz-time-picker>
-      </nz-form-control>
-
-      <nz-form-label [nzSm]="3">稳压压力</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <input type="number" nz-input placeholder="稳压压浆压力" formControlName="steadyMpa">
-      </nz-form-control>
-
-
-      <nz-form-label [nzSm]="3">稳压时间</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <nz-input-group nzSuffix="s">
-          <input type="number" nz-input placeholder="稳压时间" formControlName="steadyTime">
-        </nz-input-group>
-      </nz-form-control>
-
-      <nz-form-label [nzSm]="3">搅拌时间</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <nz-input-group nzSuffix="s">
-          <input type="number" nz-input placeholder="搅拌时间" formControlName="stirTime">
-        </nz-input-group>
-      </nz-form-control>
-
-      <nz-form-label [nzSm]="3">停留时间</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <nz-input-group nzSuffix="s">
-          <input type="number" nz-input placeholder="停留时间" formControlName="stayTime">
-        </nz-input-group>
-      </nz-form-control>
-
-
-      <nz-form-label [nzSm]="3">压浆料量</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <nz-input-group nzSuffix="kg">
-          <input type="number" nz-input placeholder="压浆料量" formControlName="materialsTotal">
-        </nz-input-group>
-      </nz-form-control>
-
-      <nz-form-label [nzSm]="3">水量</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <nz-input-group nzSuffix="kg">
-          <input type="number" nz-input placeholder="水量" formControlName="waterTotal">
-        </nz-input-group>
-      </nz-form-control>
-
-      <nz-form-label [nzSm]="3">水浆比</nz-form-label>
-      <nz-form-control [nzSm]="5">
-        <nz-input-group >
-          <input type="number" nz-input placeholder="水浆比" formControlName="proportion">
-        </nz-input-group>
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-label [nzSm]="3">通过</nz-form-label>
-      <nz-form-control [nzSm]="21">
-        <input type="text" nz-input placeholder="通过" formControlName="pass">
-      </nz-form-control>
-
-      <nz-form-label [nzSm]="3">冒浆情况</nz-form-label>
-      <nz-form-control [nzSm]="21">
-        <input type="text" nz-input placeholder="冒浆情况" formControlName="msg">
-      </nz-form-control>
-    </nz-form-item>
-
-    <app-add-other [validateForm]="formData" [keys]="otherKey" #otherInfo></app-add-other>
   </form>
-  <div class="edit" [ngClass]="{'edit-on': appS.edit}" *ngIf="!appS.edit"></div>
 </div>

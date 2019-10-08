@@ -1,3 +1,5 @@
+import { groutingTaskBase } from '../routes/grouting/createForm';
+
 export interface IBase {
   /** Id */
   id?: any;
@@ -164,47 +166,10 @@ const base = {
     otherInfo: [{ key: '浇筑日期', value: null }],
     holeRadio: null,
     startDate: null,
-    entDate: null,
+    endDate: null,
     groups: [],
   },
-  grouting: {
-    id: null,
-    createdDate: null,
-    modificationDate: null,
-    user: null,
-    project: null,
-    /** 构建名称与梁名称 */
-    component: null,
-    holeRadio: null,
-    /** 气温 */
-    airTemperature: null,
-    /** 水温 */
-    waterTemperature: null,
-    /** 压浆温度 */
-    groutingTemperature: null,
-    /** 泌水率 */
-    bleedingRate: null,
-    /** 流动度 */
-    mobility: null,
-    /** 黏稠度 */
-    viscosity: null,
-    /** 压浆量 */
-    groutingDosage: null,
-    /** 浆液水浆比 */
-    proportion: null,
-    proportions: [
-      {name: '水', type: '水', value: 28, total: null},
-      {name: '水泥', type: '水泥', value: 100, total: null},
-    ],
-    /** 第一个孔完成开始时间 */
-    startDate: null,
-    /** 最后一个孔完成时间 */
-    entDate: null,
-    /** 其他信息 */
-    otherInfo: [{ key: '浇筑日期', value: null }],
-    /** 压浆组信息 */
-    groups: null,
-  }
+  grouting: groutingTaskBase
 };
 
 export function getModelBase(name: string) {
