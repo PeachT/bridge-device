@@ -91,6 +91,7 @@ export class DbService {
         t.jack = d.jack;
         data = t;
       }
+
       console.log('处理', data);
       data.modificationDate = new Date().getTime();
       const r = await this.db[tName].update(data.id, data);

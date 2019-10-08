@@ -17,6 +17,15 @@ export class GroutingSettingComponent implements OnInit {
     msg: null,
     success: false,
   };
+  devices = {
+    envTemperature: false,
+    slurryTemperature: false,
+    waterTemperature: false,
+    intoPulpPressure: true,
+    outPulpPressure: false,
+    intoPulpvolume: false,
+    outPulpvolume: false,
+  }
   constructor(
     public appS: AppService,
     private e: ElectronService,
@@ -27,6 +36,7 @@ export class GroutingSettingComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.devices = this.appS.groutingDevicesInfo;
   }
 
   tastLink() {
@@ -44,5 +54,12 @@ export class GroutingSettingComponent implements OnInit {
       }
       this.cdr.detectChanges();
     });
+  }
+  devicesSet() {
+    setTimeout(() => {
+      console.log(this.devices, JSON.stringify(this.devices));
+      this.appS.groutingDevicesInfo = this.devices;
+      localStorage.setItem('groutingDevicesInfo', JSON.stringify(this.devices));
+    }, 1);
   }
 }

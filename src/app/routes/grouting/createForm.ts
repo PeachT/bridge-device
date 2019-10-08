@@ -171,7 +171,7 @@ export function createForm(data: GroutingTask): FormGroup {
     /** 是否作为模板 */
     template: [data.template],
     /** 其他数据信息 */
-    otherInfo: otherInfoForm([]),
+    otherInfo: otherInfoForm(data.otherInfo),
     /** 施工员 */
     operator: [data.operator],
     /** 监理员 */
@@ -293,6 +293,9 @@ export function groutingHoleItemFormGroupItem(data: GroutingHoleItem) {
     slurryEmittingMsg: [data.slurryEmittingMsg],
     /** 其他说明 */
     remarks: [data.remarks],
+    /** 压浆过程数据 */
+    processDatas: [data.processDatas]
+
     // otherInfo: this.fb.array(this.otherIngoDom.createForm([])),
   });
   // fg.setValue(gh);

@@ -22,16 +22,17 @@ function xaljData(data: GroutingTask) {
   // console.log(data.proportions, data.proportions[1].type, data.proportions.length >= 2);
   console.log(data);
   return data.groutingInfo.map(g => {
+    console.log(g);
     let datas = [];
     if (g.groups[0].processDatas && g.groups[0].processDatas.date && g.groups[0].processDatas.date.length > 0) {
       datas = g.groups[0].processDatas.date.map((item, i) => {
         return {
-          timeSeconds: i,
+          timeSeconds: `${i}`,
           state: '',
-          intoPulpPressure: g.groups[0].processDatas.intoPulpPressure[i] || 0,
-          outPulpPressure: g.groups[0].processDatas.outPulpPressure[i] || 0,
-          intoPulpvolume: g.groups[0].processDatas.intoPulpvolume[i] || 0,
-          outPulpvolume: g.groups[0].processDatas.outPulpvolume[i] || 0,
+          intoPulpPressure: g.groups[0].processDatas.intoPulpPressure.length >= i ? g.groups[0].processDatas.intoPulpPressure[i] || 0 : 0,
+          outPulpPressure: g.groups[0].processDatas.outPulpPressure.length >= i ? g.groups[0].processDatas.outPulpPressure[i] || 0 : 0,
+          intoPulpvolume: g.groups[0].processDatas.intoPulpvolume.length >= i ? g.groups[0].processDatas.intoPulpvolume[i] || 0 : 0,
+          outPulpvolume: g.groups[0].processDatas.outPulpvolume.length >= i ? g.groups[0].processDatas.outPulpvolume[i] || 0 : 0,
         }
       })
     } else {
@@ -58,13 +59,13 @@ function xaljData(data: GroutingTask) {
       /** 压浆方向 */
       groutingDirection: g.groups[0].direction || '',
       /** 步骤次数 */
-      stepsTimes: '',
+      stepsTimes: data.otherInfo && data.otherInfo.length >= 1 ? data.otherInfo[0].value : '',
       /** 步骤参数 */
-      stepParameters: '',
+      stepParameters: data.otherInfo && data.otherInfo.length >= 2 ? data.otherInfo[1].value : '',
       /** 初始流动速度（s） */
-      initFlowVelocity: '',
+      initFlowVelocity: data.otherInfo && data.otherInfo.length >= 3 ? data.otherInfo[2].value : '',
       /** 流动度( ) */
-      fluidity: '',
+      fluidity: data.otherInfo && data.otherInfo.length >= 4 ? data.otherInfo[3].value : '',
       /** 值班人员 */
       dutyPersonnel: data.operator || '',
       /** 梁号 */
@@ -72,7 +73,7 @@ function xaljData(data: GroutingTask) {
       /** 孔道号 */
       holeNO: g.name,
       /** 压浆模式 */
-      groutingModel: '' || '',
+      groutingModel: data.otherInfo && data.otherInfo.length >= 5 ? data.otherInfo[4].value : '',
       /** 张拉日期 yyyy-MM dd */
       stretchDrawDate: format(new Date(data.tensinDate), 'yyyy-MM-dd') || '',
       /** 钢绞线股数 */
@@ -84,7 +85,8 @@ function xaljData(data: GroutingTask) {
       /** 压浆日期 yyyy-MM dd */
       groutingDate: format(new Date(g.groups[0].startDate), 'yyyy-MM-dd') || '',
       /** 配合比 */
-      mixingProportion: '',
+      // tslint:disable-next-line:max-line-length
+      mixingProportion: `${data.proportionInfo.proportions[2].value}:${data.proportionInfo.proportions[1].value}:${data.proportionInfo.proportions[0].value}`,
       /** 水胶比 */
       waterGlueProportion: data.proportionInfo.waterBinderRatio || '',
       /** 搅拌时长(s) */

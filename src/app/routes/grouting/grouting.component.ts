@@ -8,7 +8,7 @@ import { copyAny } from 'src/app/models/base';
 import { GroutingRecordComponent } from './components/grouting-record/grouting-record.component';
 import { ProportionComponent } from './components/proportion/proportion.component';
 import { TaskMenuComponent } from 'src/app/shared/task-menu/task-menu.component';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 import { GroutingService } from 'src/app/services/grouting.service';
 import { PLC_D } from 'src/app/models/IPCChannel';
 import { Project } from 'src/app/models/project';
@@ -374,6 +374,8 @@ export class GroutingComponent implements OnInit, OnDestroy {
 
   /** 选项卡显示index */
   tabsetShow = 0;
+  /** 上传 */
+  uploading = false;
   /** 添加数据判断 */
   addFilterFun = (o1: any, o2: any) => o1.name === o2.name
     && o1.component === o2.component && o1.project === o2.project
@@ -469,8 +471,14 @@ export class GroutingComponent implements OnInit, OnDestroy {
       return;
     }
     this.data = data;
+    this.uploading = false;
+    this.data.groutingInfo.map(g => {
+      if (!g.uploading) {
+        this.uploading = true;
+      }
+    });
     this.formInit(this.data);
-    console.log('梁梁梁梁', this.data);
+    console.log('梁梁梁梁', this.data, this.uploading);
   }
 
   /**
@@ -479,7 +487,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
   onEdit(data: GroutingTask) {
     /** 复制 */
     if (!data) {
-      data = {...this.data};
+      data = { ...this.data };
       data.id = null;
       data.tensinDate = null;
       data.castingDate = null;
@@ -489,7 +497,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
         g.state = 0;
         const groups: Array<GroutingHoleItem> = [];
         for (const item of g.groups) {
-          groups.push({...groutingHoleitemBase, direction: item.direction, setGroutingPressure: item.setGroutingPressure});
+          groups.push({ ...groutingHoleitemBase, direction: item.direction, setGroutingPressure: item.setGroutingPressure });
         }
         g.groups = groups;
         console.log(g);
@@ -552,12 +560,35 @@ export class GroutingComponent implements OnInit, OnDestroy {
         break;
     }
     console.log(data);
-    // data.map(g => {
-    //   this.http.post(url, { Data: g }).subscribe(r => {
-    //     console.log(r);
+    const i = 0;
+    const ups = [];
+    data.map(g => {
+      this.http.post(url, { Data: g }).subscribe(r => {
+        console.log(r);
+      }, err => {
+        const result: any = decodeURI(err.error.text);
+        ups.push({success: result, name: g.holeNO});
+        console.log(result, ups);
+        if (ups.length === data.length) {
+          console.log('更新数据');
+
+          this.data.groutingInfo.map(hg => {
+            const up = ups.filter(f => f.name === hg.name);
+            console.log('123', up);
+            if (up.length > 0 && up[0].success.indexOf('压浆数据上传完成') !== -1) {
+              hg.uploading = true;
+            }
+          });
+          this.odb.updateAsync('grouting', this.data, (o: any) => this.updateFilterFun(o, this.data));
+        }
+      });
+    });
+    // const uphttp = data.map(g => this.http.post(url, { Data: g }));
+    // forkJoin(uphttp).subscribe(val => {
+    //     console.log('上传返回成功', val)
     //   }, err => {
-    //     console.log(decodeURI(err.error.text))
-    //   });
-    // });
+    //     console.log('上传返回错误', err)
+    //   }
+    // );
   }
 }

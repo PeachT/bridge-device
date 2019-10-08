@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ChangeDetectorRef, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectorRef, ViewChild, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { NzMessageService } from 'ng-zorro-antd';
@@ -16,7 +16,7 @@ import { GroutingRecordItemComponent } from '../grouting-record-item/grouting-re
   templateUrl: './grouting-record.component.html',
   styleUrls: ['./grouting-record.component.less']
 })
-export class GroutingRecordComponent implements OnInit {
+export class GroutingRecordComponent implements OnInit, OnChanges {
   @ViewChild('otherInfo', { read: AddOtherComponent, static: true }) otherIngoDom: AddOtherComponent;
   @ViewChild('groutingrecorditem', { read: GroutingRecordItemComponent, static: true }) griDom: GroutingRecordItemComponent;
 
@@ -25,6 +25,7 @@ export class GroutingRecordComponent implements OnInit {
 
   @Input() groutingTask: GroutingTask;
   @Input() formData: FormGroup;
+  bid = null;
   get groutingInfoForm(): FormArray {
     return this.formData.controls.groutingInfo as FormArray;
   }
@@ -52,11 +53,12 @@ export class GroutingRecordComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-
-    // this.chsub = this.formData.valueChanges.subscribe((e) => {
-    //   // console.log(e, this.holeForm.value);
-    //   this.updateHole.emit(this.formData.value);
-    // });
+  }
+  ngOnChanges(changes: SimpleChanges) {
+    console.log('切换梁', changes);
+    if (changes.formData.currentValue.value.id !== this.bid) {
+      this.groupItem = null;
+    }
   }
 
   createFormData(data: GroutingInfo) {

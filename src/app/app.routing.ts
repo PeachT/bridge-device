@@ -113,7 +113,8 @@ const routes: Routes = [
         path: "live-grouting",
         loadChildren: () =>
           import("./routes/live-grouting/live-grouting.module").then(m => m.LiveGroutingModule),
-        data: { title: "压浆监控" }
+        data: { title: "压浆监控" },
+        canDeactivate: [GlobalEditGuard]
       }
     ]
   }

@@ -183,13 +183,11 @@ export class PLCTcpModbus {
   public F03ASCII(address: number, length: number, channel: string): void {
     if (this.ifClient()) {
       this.client.readHoldingRegisters(address, length).then((data) => {
-        // const str = bf.bufferToAscii(data.buffer);
-        // console.log('buffer', data.buffer);
         const float = bf.bufferToFloat(data.buffer);
         const dint16 = bf.bufferTo16int(data.buffer);
-        const str = data.buffer.swap16().toString('ascii');
-        // const dint16 = bf.bufferTo16int(data.buffer);
-        // const str = (Buffer.from(dint16)).toString();
+        // const str0 = data.buffer.swap16().toString('ascii');
+        const str = data.buffer.toString('ascii');
+
         this.IPCSend(channel, { uint16: data.data, str, buffer: data.buffer, float, dint16 });
       }).catch((err) => {
         this.IPCSend(channel, err);

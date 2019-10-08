@@ -8,11 +8,11 @@ import { AppService } from '../services/app.service';
 export class GlobalEditGuard implements CanDeactivate<any> {
   constructor(
     private message: NzMessageService,
-    private apps: AppService,
+    private appS: AppService,
     private router: Router
   ) { }
   canDeactivate(): boolean | Observable<boolean> | Promise<boolean> {
-    const editState = this.apps.edit;
+    const editState = this.appS.edit || this.appS.groutingLive;
     console.log(editState, this.router);
     if (editState) {
       return new Observable((observer) => {
@@ -24,13 +24,17 @@ export class GlobalEditGuard implements CanDeactivate<any> {
         //     this.apps.edit = false;
         //   }
         // });
-        this.message.warning('请完成编辑！！');
+        let msg = '请完成编辑！！';
+        if (this.appS.groutingLive) {
+          msg = '正在压浆监控,不允许跳转！！';
+        }
+        this.message.warning(msg);
         observer.next(false);
         observer.complete();
       });
     } else {
       console.log('可以跳转');
-      this.apps.leftMenu = null;
+      this.appS.leftMenu = null;
       return true;
     }
   }

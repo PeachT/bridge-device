@@ -19,7 +19,7 @@
             [addFilterFun]="addFilterFun" [updateFilterFun]="updateFilterFun"
             [coprState]="true"
             >
-            <button nz-button nzType="primary" (click)="upload()" [disabled]="!(data?.groutingInfo?.length > 0)"><i nz-icon nzType="cloud-upload"
+            <button nz-button nzType="primary" (click)="upload()" [disabled]="!(data?.groutingInfo?.length > 0) || !uploading"><i nz-icon nzType="cloud-upload"
               nzTheme="outline"></i>上传</button>
           </app-operat>
         </div>

@@ -40,12 +40,24 @@ export class AppService {
   public nowRoute = null;
   /** 编辑状态 */
   public edit = false;
+  /** 压浆监控状态 */
+  public groutingLive = false;
   /** 数据导入导出 */
   dataTreatingShow = false;
   /** 调试 */
   debugShow = false;
   /** 刷新率 */
   refresh = 50;
+  /** 压浆设备信息 */
+  groutingDevicesInfo = {
+    envTemperature: false,
+    slurryTemperature: false,
+    waterTemperature: false,
+    intoPulpPressure: true,
+    outPulpPressure: false,
+    intoPulpvolume: false,
+    outPulpvolume: false,
+  };
 
   public powerState = false;
   public powerDelay = 5;
@@ -77,6 +89,13 @@ export class AppService {
     if (!this.ID) {
       localStorage.setItem('ID', new Date().getTime().toString());
       this.ID = localStorage.getItem('ID');
+    }
+    /** 压浆设备信息设置获取 */
+    const groutingDevicesInfo = JSON.parse(localStorage.getItem('groutingDevicesInfo'));
+    if (!groutingDevicesInfo) {
+      localStorage.setItem('groutingDevicesInfo', JSON.stringify(this.groutingDevicesInfo));
+    } else {
+      this.groutingDevicesInfo = groutingDevicesInfo;
     }
   }
   // /** 搜索事件 */

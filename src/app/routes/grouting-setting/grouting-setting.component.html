@@ -34,4 +34,29 @@
       <span style="color: green;">{{tastLinkMsg.msg}}</span>
     </ng-template>
   </div>
+  <div>
+    <nz-divider style="min-width: auto;" nzText="设备" nzOrientation="left"></nz-divider>
+    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="环境温度">
+      <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.envTemperature" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
+    </app-form-item>
+    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="浆液温度">
+      <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.slurryTemperature" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
+    </app-form-item>
+    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="水温度">
+      <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.waterTemperature" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
+    </app-form-item>
+
+    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="进浆压力">
+      <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.intoPulpPressure" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
+    </app-form-item>
+    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="回浆压力">
+      <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.outPulpPressure" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
+    </app-form-item>
+    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="进浆量">
+      <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.intoPulpvolume" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
+    </app-form-item>
+    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="回浆量">
+      <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.outPulpvolume" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
+    </app-form-item>
+  </div>
 </main>
