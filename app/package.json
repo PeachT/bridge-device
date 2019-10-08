@@ -1,13 +1,13 @@
 {
-  "name": "bridge-device",
-  "version": "0.0.3",
+  "name": "common-bridge-device",
+  "version": "1.0.1",
   "main": "./js/main.js",
   "author": {
     "name": "Peach",
     "email": "peachlin@outlook.com",
-    "url": "https://github.com/PeachT/kairuimo"
+    "url": "https://github.com/PeachT/"
   },
-  "description": "凌桥智能设备",
+  "description": "智能设备",
   "scripts": {
     "tsc": "tsc"
   },

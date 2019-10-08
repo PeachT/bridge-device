@@ -79,7 +79,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
     /** 是否作为模板 */
     template: false,
     /** 其他数据信息 */
-    otherInfo: null,
+    otherInfo: [],
     /** 施工员 */
     operator: null,
     /** 监理员 */
@@ -90,9 +90,9 @@ export class GroutingComponent implements OnInit, OnDestroy {
     proportionInfo: {
       waterBinderRatio: 0.99,
       proportions: [
-        { name: '水', type: '水', value: 33 },
-        { name: '水泥', type: '水泥', value: 22 },
-        { name: '压浆剂', type: '压浆剂', value: 11 }
+        { name: '水', type: '水', value: 30 },
+        { name: '辅料', type: '压浆剂', value: 10 },
+        { name: '主料', type: '水泥', value: 100 },
       ],
     },
     /** 压浆数据 */
@@ -569,6 +569,11 @@ export class GroutingComponent implements OnInit, OnDestroy {
         const result: any = decodeURI(err.error.text);
         ups.push({success: result, name: g.holeNO});
         console.log(result, ups);
+        if (result.indexOf('压浆数据上传完成') !== -1) {
+          this.message.success(`${g.holeNO}上传成功`);
+        } else {
+          this.message.error(`${g.holeNO}上传失败 \n错误：${result}`);
+        }
         if (ups.length === data.length) {
           console.log('更新数据');
 
@@ -579,7 +584,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
               hg.uploading = true;
             }
           });
-          this.odb.updateAsync('grouting', this.data, (o: any) => this.updateFilterFun(o, this.data));
+          this.odb.updateAsync('grouting', this.data, (o: any) => this.updateFilterFun(o, this.data), true);
         }
       });
     });

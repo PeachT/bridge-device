@@ -25,6 +25,7 @@ export class GroutingSettingComponent implements OnInit {
     outPulpPressure: false,
     intoPulpvolume: false,
     outPulpvolume: false,
+    svgHeight: 350,
   }
   constructor(
     public appS: AppService,

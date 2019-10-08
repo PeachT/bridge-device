@@ -28,7 +28,7 @@ export const groutingTaskBase: GroutingTask = {
   /** 是否作为模板 */
   template: false,
   /** 其他数据信息 */
-  otherInfo: null,
+  otherInfo: [],
   /** 施工员 */
   operator: null,
   /** 监理员 */

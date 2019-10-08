@@ -58,5 +58,8 @@
     <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="回浆量">
       <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.outPulpvolume" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
     </app-form-item>
+    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="曲线高度">
+      <input nz-input type="number" nzSize="large" [(ngModel)]="devices.svgHeight" (change)="devicesSet()"/>
+    </app-form-item>
   </div>
 </main>

@@ -72,10 +72,11 @@ export class DbService {
    * @param {string} tName 名库称
    * @param {IBase} data 修改的数据
    * @param {(obj: any) => boolean} filterFunction 重复查询
+   * @param {boolean} uploading 上传修改
    * @returns
    * @memberof DbService
    */
-  public async updateAsync(tName: string, data: IBase, filterFunction: (obj: any) => boolean) {
+  public async updateAsync(tName: string, data: IBase, filterFunction: (obj: any) => boolean, uploading: boolean = false) {
     if (await this.repetitionAsync(tName, filterFunction) > 0) {
       return { success: false, msg: '已存在' };
     }
@@ -91,7 +92,13 @@ export class DbService {
         t.jack = d.jack;
         data = t;
       }
-
+      if (tName === 'grouting' && !uploading) {
+        const gdata: GroutingTask = data as GroutingTask;
+        gdata.groutingInfo.map(g => {
+          g.uploading = false;
+        });
+        data = gdata;
+      }
       console.log('处理', data);
       data.modificationDate = new Date().getTime();
       const r = await this.db[tName].update(data.id, data);

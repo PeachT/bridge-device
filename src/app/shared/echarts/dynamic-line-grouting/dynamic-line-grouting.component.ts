@@ -48,8 +48,7 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges {
   @Input() live = 0;
   @Input() data;
   @Input() width: number | string = 'auto';
-  @Input()
-  height: number | string = '500';
+  @Input() height: number | string = '300';
   @Input()
   index: null;
   @Input()
@@ -113,7 +112,7 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges {
       this.data = data;
     }
     // 基于准备好的dom，初始化echarts实例
-    this.myChart = echarts.init(this.svgDom.nativeElement, null);
+    this.myChart = echarts.init(this.svgDom.nativeElement, null, {width: this.width, height: this.height});
     // 绘制图表
     this.myChart.setOption(
       {
