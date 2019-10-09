@@ -275,7 +275,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
         this.mixingData.waterBinderRatio = waterBinderRatio(this.mixingData.dosage);
         this.mixingData.mixingTime = backData.out3.uint16[0];
         /** 搅拌开始 */
-        if (!this.mixingDataNow.state && backData.out6.data[0]) {
+        if (!this.mixingDataNow.state && backData.out6.data[0] && this.mixingData.mixingTime > 0) {
           this.mixingDataNow.time = this.mixingData.mixingTime;
           this.mixingDataNow.state = true;
           this.mixingDataNow.date = new Date();
