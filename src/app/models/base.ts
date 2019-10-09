@@ -1,4 +1,5 @@
 import { groutingInfoBase, groutingHoleitemBase, mixingInfoBase, groutingTaskBase } from './groutingBase';
+import { projectBase } from './projectBase';
 
 export interface IBase {
   /** Id */
@@ -14,27 +15,7 @@ export interface IBase {
 }
 
 const base = {
-  project: {
-    id: null,
-    createdDate: null,
-    modificationDate: null,
-    jurisdiction: 0,
-    user: null,
-    name: null,
-    uploadingName: null,
-    uploadingMode: false,
-    uploadingLinkData: null,
-    uploadingBackData: null,
-    otherInfo: [],
-    supervisions: [
-      {
-        name: null,
-        phone: null,
-        unit: null,
-        ImgBase64: null,
-      }
-    ],
-  },
+  project: projectBase,
   comp: {
     id: null,
     createdDate: null,

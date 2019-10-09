@@ -1,64 +1,60 @@
 <main class="setting">
-  <div >
-    <nz-divider style="min-width: auto;" nzText="链接参数" nzOrientation="left"></nz-divider>
-    <nz-col nz-col nzSpan="6">
-      <nz-input-group nzAddOnBefore="IP">
+  <div style="display: flex; flex-direction: column;">
+    <nz-divider style="min-width: auto;" nzText="设备通信参数" nzOrientation="left"></nz-divider>
+    <div>
+      <app-form-item label="IP">
         <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.ip"/>
-      </nz-input-group>
-    </nz-col>
-    <nz-col nz-col nzSpan="6">
-      <nz-input-group nzAddOnBefore="端口号">
-        <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.port"/>
-      </nz-input-group>
-    </nz-col>
-    <nz-col nz-col nzSpan="6">
-      <nz-input-group nzAddOnBefore="PLC地址">
-        <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.address"/>
-      </nz-input-group>
-    </nz-col>
-    <nz-col nz-col nzSpan="6">
-      <nz-input-group nzAddOnBefore="设备uid">
-        <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.uid"/>
-      </nz-input-group>
-    </nz-col>
-    <nz-col nz-col nzSpan="6">
-      <nz-input-group nzAddOnBefore="通信延时">
-        <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.setTimeout"/>
-      </nz-input-group>
-    </nz-col>
-    <button nz-button nzType="primary" [nzLoading]="tastLinkMsg.state" (click)="tastLink()">保存测试链接</button>
-    <ng-container *ngIf="tastLinkMsg.msg && !tastLinkMsg.success; else elseTemplate">
-      <span style="color: red;">{{tastLinkMsg.msg}}</span>
-    </ng-container>
-    <ng-template #elseTemplate>
-      <span style="color: green;">{{tastLinkMsg.msg}}</span>
-    </ng-template>
+      </app-form-item>
+      <app-form-item label="端口号">
+          <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.port"/>
+      </app-form-item>
+      <app-form-item label="PLC地址">
+          <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.address"/>
+      </app-form-item>
+      <app-form-item label="设备uid">
+          <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.uid"/>
+      </app-form-item>
+      <app-form-item label="通信延时">
+          <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.setTimeout"/>
+      </app-form-item>
+      <app-form-item label="IP">
+        <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.ip"/>
+      </app-form-item>
+    </div>
+    <div style="display: flex; align-items: center; margin-left: 100px;">
+      <button nz-button nzType="primary" [nzLoading]="tastLinkMsg.state" (click)="tastLink()">保存测试链接</button>
+        <nz-alert style="flex: 1;" *ngIf="tastLinkMsg.msg && !tastLinkMsg.success" nzType="error" [nzMessage]="tastLinkMsg.msg" nzShowIcon
+          nzDescription="检查路由器、网线、电脑网路。不能解决请联系售后人员！"
+        ></nz-alert>
+        <nz-alert style="flex: 1;" *ngIf="tastLinkMsg.msg && tastLinkMsg.success" nzType="error" [nzMessage]="tastLinkMsg.msg" nzShowIcon></nz-alert>
+    </div>
+
   </div>
   <div>
     <nz-divider style="min-width: auto;" nzText="设备" nzOrientation="left"></nz-divider>
-    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="环境温度">
+    <app-form-item label="环境温度">
       <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.envTemperature" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
     </app-form-item>
-    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="浆液温度">
+    <app-form-item label="浆液温度">
       <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.slurryTemperature" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
     </app-form-item>
-    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="水温度">
+    <app-form-item label="水温度">
       <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.waterTemperature" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
     </app-form-item>
 
-    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="进浆压力">
+    <app-form-item label="进浆压力">
       <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.intoPulpPressure" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
     </app-form-item>
-    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="回浆压力">
+    <app-form-item label="回浆压力">
       <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.outPulpPressure" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
     </app-form-item>
-    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="进浆量">
+    <app-form-item label="进浆量">
       <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.intoPulpvolume" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
     </app-form-item>
-    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="回浆量">
+    <app-form-item label="回浆量">
       <nz-switch (ngModelChange)="devicesSet()" [(ngModel)]="devices.outPulpvolume" nzCheckedChildren="有" nzUnCheckedChildren="无"></nz-switch>
     </app-form-item>
-    <app-form-item colnzMd="6" colnzLg="6" colnzXl="6" colnzXXl="6" label="曲线高度">
+    <app-form-item label="曲线高度">
       <input nz-input type="number" nzSize="large" [(ngModel)]="devices.svgHeight" (change)="devicesSet()"/>
     </app-form-item>
   </div>

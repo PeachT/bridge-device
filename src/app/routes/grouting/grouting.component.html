@@ -24,8 +24,6 @@
             <button nz-button nzType="primary" (click)="test()" >测试</button>
           </app-operat>
         </div>
-
-        <!-- <app-delete-modal *ngIf="deleteShow" (outDelete)="deleteOk($event)"></app-delete-modal> -->
       </nz-tab>
       <nz-tab nzTitle="其他">
         <p>创建者：{{data?.user}}</p>
@@ -36,5 +34,4 @@
   </div>
 </app-left>
 <app-delete-modal *ngIf="deleteShow" (outDelete)="deleteOk($event)"></app-delete-modal>
-<!-- <app-grouting-template *ngIf="groutingTemplateShow" [projectId]="taskMenuDom.project.select.id"
-  (selectOut)="selectGroutingTemp($event)" (cancel)="groutingTemplateShow=false"></app-grouting-template> -->
+

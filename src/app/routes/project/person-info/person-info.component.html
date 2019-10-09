@@ -1,0 +1,36 @@
+<form nz-form [formGroup]="formGroup">
+  <div [formArrayName]="formArrayName">
+    <nz-form-item >
+      <nz-divider style="min-width: auto;" [nzText]="dividerText" nzOrientation="left"></nz-divider>
+      <button nz-button nzType="primary" nzSearch (click)="add()" type="button" *ngIf="appS.edit">添 加</button>
+    </nz-form-item>
+    <div class="content" nz-row>
+      <ng-container *ngFor="let item of forFormArr.controls; index as i" [formGroupName]="i">
+        <div class="card" nz-col nzSm="24" nzLg="12">
+          <div class="item">
+            <app-form-item [row]="true" label="监理姓名" [errors]="item.get('name').errors">
+              <input placeholder="监理姓名" nz-input formControlName="name" />
+            </app-form-item>
+            <app-form-item [row]="true" label="监理公司" >
+              <input placeholder="监理公司" nz-input formControlName="unit" />
+            </app-form-item>
+            <app-form-item [row]="true" label="联系方式">
+              <input placeholder="联系方式" nz-input formControlName="phone" />
+            </app-form-item>
+            <div class="btn-close">
+              <button nz-button nzType="default" nzShape="circle" (click)="remove(i)"><i nz-icon type="close"></i></button>
+            </div>
+          </div>
+
+          <!-- <nz-form-item>
+                <nz-form-label [nzSm]="6">图片</nz-form-label>
+                <nz-form-control [nzSm]="18">
+                    <input type="text" nz-input placeholder="图片" formControlName="ImgBase64">
+                </nz-form-control>
+              </nz-form-item> -->
+
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</form>

@@ -5,7 +5,7 @@
       <button nz-button nzType="primary" nzSearch (click)="add()" type="button">添 加</button>
     </nz-form-item>
     <nz-form-item>
-      <ng-container *ngFor="let item of otherInforFormArr.controls; index as i" [formGroupName]="i">
+      <ng-container *ngFor="let item of otherInfoFormArr.controls; index as i" [formGroupName]="i">
         <div class="other-edit" *ngIf="appS.edit">
           <div class="edit-item">
             <app-form-item [errors]="item.get('key').errors">
@@ -21,7 +21,7 @@
           </div>
         </div>
         <ng-container *ngIf="!appS.edit">
-          <app-form-item [label]="item.value.key">
+          <app-form-item [label]="item.value.key || '没有设置'">
             <input type="text" nz-input placeholder="内容" formControlName="value">
           </app-form-item>
         </ng-container>

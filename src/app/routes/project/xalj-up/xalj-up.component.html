@@ -1,0 +1,22 @@
+<!-- 西安璐江 -->
+<form nz-form [formGroup]="formData" *ngIf="formGroup.controls">
+  <div formArrayName="uploadingLinkData">
+    <app-form-item label="链接地址" [errors]="formGroup.get('url').errors" [row]="true">
+      <input type="text" nz-input placeholder="请输入链接地址" formControlName="url">
+    </app-form-item>
+    <app-form-item label="用户名" [errors]="formGroup.get('user').errors">
+      <input type="text" nz-input placeholder="请输入用户名" formControlName="user">
+    </app-form-item>
+    <app-form-item label="密码" [errors]="formGroup.get('password').errors">
+      <input type="password" nz-input placeholder="请输入密码" formControlName="password">
+    </app-form-item>
+    <app-form-item label="设备编码" [errors]="formGroup.get('deviceNo').errors">
+      <input type="text" nz-input placeholder="请输入设备编码" formControlName="deviceNo">
+    </app-form-item>
+  </div>
+  <div style="display: flex; align-items: center;">
+    <button nz-button nzType="primary" [nzLoading]="uploadingState" (click)="funcUploadingTask()" [disabled]="!formGroup.valid" style="z-index: 1;"><i nz-icon
+      nzType="login" nzTheme="outline"></i>登录测试</button>
+      <nz-alert nzType="info" [nzMessage]="serviceRetrun" *ngIf="serviceRetrun"></nz-alert>
+  </div>
+</form>

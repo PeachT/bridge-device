@@ -60,94 +60,7 @@ export class AppComponent implements OnInit {
     // 判断运行环境适合是 Electron
     this.appS.Environment = navigator.userAgent.indexOf("Electron") !== -1;
     this.db = this.odb.db;
-    /** 添加管理员 */
-    this.db.users
-      .count()
-      .then(async data => {
-        console.log("获取用户数量", data);
-        if (data === 0) {
-          const user: User = {
-            name: "Administrator",
-            password: "admin",
-            jurisdiction: 9,
-            operation: [],
-            createdDate: new Date().getTime(),
-            modificationDate: new Date().getTime(),
-            user: "sys"
-          };
-          this.db.users
-            .add(user)
-            .then(() => {
-              this.message.success("添加成功🙂");
-            })
-            .catch(() => {
-              this.message.error("添加失败😔");
-            });
-          const user2: User = {
-            name: "技术员",
-            password: "123456",
-            jurisdiction: 1,
-            operation: [],
-            createdDate: new Date().getTime(),
-            modificationDate: new Date().getTime(),
-            user: "sys"
-          };
-          this.db.users
-            .add(user2)
-            .then(() => {
-              this.message.success("添加成功🙂");
-            })
-            .catch(() => {
-              this.message.error("添加失败😔");
-            });
-          for (let index = 0; index < 10; index++) {
-            const user1: User = {
-              name: `admin${index}`,
-              password: "admin",
-              jurisdiction: 8,
-              operation: [],
-              createdDate: new Date().getTime(),
-              modificationDate: new Date().getTime(),
-              user: "sys"
-            };
-            this.db.users
-              .add(user1)
-              .then(() => {
-                this.message.success("添加成功🙂");
-              })
-              .catch(() => {
-                this.message.error("添加失败😔");
-              });
-          }
-        }
-      })
-      .catch(error => {
-        console.log("数据库错误！！", error);
-      });
-    /** 添加测试项目 */
-    this.db.project
-      .count()
-      .then(data => {
-        console.log("获取项目数量", data);
-        if (data === 0) {
-          const project: Project = getModelBase("project");
-          project.name = "测试项目";
-          project.jurisdiction = 8;
-          delete project.id;
-          this.db.project
-            .add(project)
-            .then(() => {
-              this.message.success("添加测试项目成功🙂");
-            })
-            .catch(err => {
-              console.log(err);
-              this.message.error("项目添加失败😔");
-            });
-        }
-      })
-      .catch(error => {
-        console.log("数据库错误！！", error);
-      });
+
     router.events.subscribe((event: any) => {
       if (event instanceof NavigationEnd) {
         if (!this.appS.userInfo) {
@@ -167,7 +80,96 @@ export class AppComponent implements OnInit {
   //     this.PLCS.runSocket();
   //   }
   // }
-  ngOnInit() {
+  async ngOnInit() {
+    /** 添加管理员 */
+    await this.db.users
+      .count()
+      .then(async data => {
+        console.log("获取用户数量", data);
+        if (data === 0) {
+          const user: User = {
+            name: "Administrator",
+            password: "admin",
+            jurisdiction: 9,
+            operation: [],
+            createdDate: new Date().getTime(),
+            modificationDate: new Date().getTime(),
+            user: "sys"
+          };
+          this.db.users
+            .add(user)
+            .then(() => {
+              // // this.message.success("添加成功🙂");
+            })
+            .catch(() => {
+              this.message.error("添加失败😔");
+            });
+          const user2: User = {
+            name: "技术员",
+            password: "123456",
+            jurisdiction: 1,
+            operation: [],
+            createdDate: new Date().getTime(),
+            modificationDate: new Date().getTime(),
+            user: "sys"
+          };
+          this.db.users
+            .add(user2)
+            .then(() => {
+              // // this.message.success("添加成功🙂");
+            })
+            .catch(() => {
+              this.message.error("添加失败😔");
+            });
+          for (let index = 0; index < 10; index++) {
+            const user1: User = {
+              name: `admin${index}`,
+              password: "admin",
+              jurisdiction: 8,
+              operation: [],
+              createdDate: new Date().getTime(),
+              modificationDate: new Date().getTime(),
+              user: "sys"
+            };
+            this.db.users
+              .add(user1)
+              .then(() => {
+                // this.message.success("添加成功🙂");
+              })
+              .catch(() => {
+                this.message.error("添加失败😔");
+              });
+          }
+        }
+      })
+      .catch(error => {
+        console.log("数据库错误！！", error);
+      });
+    /** 添加测试项目 */
+    await this.db.project
+      .count()
+      .then(data => {
+        console.log("获取项目数量", data);
+        if (data === 0) {
+          const project: Project = getModelBase("project");
+          project.name = "测试项目";
+          project.jurisdiction = 8;
+          delete project.id;
+          this.db.project
+            .add(project)
+            .then(() => {
+              this.message.success('数据初始化完成');
+              this.router.navigate(["/help"]);
+            })
+            .catch(err => {
+              console.log(err);
+              this.message.error("项目添加失败😔");
+            });
+        }
+      })
+      .catch(error => {
+        console.log("数据库错误！！", error);
+      });
     let keyboard = JSON.parse(localStorage.getItem("keyboard"));
     if (!keyboard) {
       console.log("没有数据");

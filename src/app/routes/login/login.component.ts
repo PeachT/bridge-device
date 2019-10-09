@@ -9,6 +9,7 @@ import { randomWord } from 'src/app/Function/randomWord';
 import { PLCService } from 'src/app/services/PLC.service';
 import { PLC_D, PLC_M } from 'src/app/models/IPCChannel';
 import { decodeLock } from 'src/app/Function/lock';
+import { ElectronService } from 'ngx-electron';
 
 const menus = [
   // { platform: 'tension,windows', jurisdiction: 0, url: '/task', icon: 'swap', name: '张拉' },
@@ -40,6 +41,7 @@ export class LoginComponent implements OnInit {
 
   constructor(
     public appS: AppService,
+    public e: ElectronService,
     private fb: FormBuilder,
     private odb: DbService,
     private message: NzMessageService,

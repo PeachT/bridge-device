@@ -1,20 +1,11 @@
 import { Component, OnInit, ViewChild, ChangeDetectorRef, OnChanges } from '@angular/core';
-import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
-import { DB, DbService, tableName } from 'src/app/services/db.service';
-import { NzMessageService, NzModalService } from 'ng-zorro-antd';
+import { DbService } from 'src/app/services/db.service';
+import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
-import { User } from 'src/app/models/user.models';
-import { Router } from '@angular/router';
-import { GroupItem, TensionTask } from 'src/app/models/task.models';
-import { Observable } from 'rxjs';
-import { Jack } from 'src/app/models/jack';
-import { PLCService } from 'src/app/services/PLC.service';
-import { PLC_D } from 'src/app/models/IPCChannel';
 import { Project } from 'src/app/models/project';
-import { ProjectComponent as appProjectComponent } from 'src/app/shared/project/project.component';
 import { LeftMenuComponent } from 'src/app/shared/left-menu/left-menu.component';
-import { copyAny } from 'src/app/models/base';
-import { DeleteModalComponent } from 'src/app/shared/delete-modal/delete-modal.component';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { nameRepetition } from 'src/app/Validator/async.validator';
 
 
 @Component({
@@ -25,12 +16,52 @@ import { DeleteModalComponent } from 'src/app/shared/delete-modal/delete-modal.c
 })
 export class ProjectComponent implements OnInit, OnChanges {
   dbName = 'project';
-  @ViewChild('prjDom', null) prjDom: appProjectComponent;
   @ViewChild('leftMenu', null) leftMenu: LeftMenuComponent;
-  @ViewChild('del', null) deleteDom: DeleteModalComponent;
-
-  data: Project;
+  formData: FormGroup;
+  data: Project = {
+    id: null,
+    name: '模拟数据',
+    /** 监理 */
+    supervisions: [{
+      /** 名字 */
+      name: '监理',
+      /** 联系方式 */
+      phone: '监理',
+      /** 监理公司 */
+      unit: '监理',
+      /** 头像 */
+      imgBase64: null
+    }],
+    /** 质检员信息 */
+    qualityInspector: [{
+      /** 名字 */
+      name: '自检员',
+      /** 联系方式 */
+      phone: '自检员',
+      /** 监理公司 */
+      unit: '自检员',
+      /** 头像 */
+      imgBase64: null
+    }],
+    /** 项目权限 */
+    jurisdiction: 0,
+    /** 其他信息 */
+    otherInfo: [
+      { key: '其他数据', value: '其他数据'}
+    ],
+    /** 上传服务器名称 */
+    uploadingName: 'lzlq',
+    /** 上传方式 */
+    uploadingMode: false,
+    /** 链接服务器数据 */
+    uploadingLinkData: {
+      url: 'lingqiao',
+      user: 'lingqiao',
+      password: 'lingqiao',
+    }
+  };
   deleteShow = false;
+
 
   menuFilter = (o1: Project) => o1.jurisdiction !== 8;
 
@@ -38,36 +69,72 @@ export class ProjectComponent implements OnInit, OnChanges {
     private message: NzMessageService,
     private db: DbService,
     public appS: AppService,
-    private modalService: NzModalService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.menuFilter = (o1: Project) => o1.jurisdiction !== 8 || this.appS.userInfo.jurisdiction > 1;
+    this.formInit(this.data);
   }
 
   ngOnChanges() {
-    console.log('78999999999999999999999999999999999999999999978978');
+  }
+  /** 初始化数据 */
+  formInit(data: Project) {
+    const fb = new FormBuilder();
+    this.formData = fb.group({
+      id: [data.id],
+      /** 名称 */
+      name: [data.name, [Validators.required]],
+      /** 监理 */
+      supervisions: fb.array([]),
+      /** 质检员 */
+      qualityInspectors: fb.array([]),
+      /** 项目权限 */
+      jurisdiction: [data.jurisdiction],
+      /** 其他信息 */
+      otherInfo: fb.array([]),
+      /** 上传服务器名称 */
+      uploadingName: [data.uploadingName],
+      /** 上传方式 */
+      uploadingMode: [data.uploadingMode],
+      /** 上传服务器数据 */
+      uploadingLinkData: fb.group([])
+    });
+
+    // this.formData.setValue(data);
+    console.log('初始化数据', data, !data.id && data.name);
+    this.formData.controls.name.setAsyncValidators([nameRepetition(this.db, this.dbName)]);
+    if (!data.id && data.name) {
+      setTimeout(() => {
+        // tslint:disable-next-line:forin
+        for (const i in this.formData.controls) {
+          this.formData.controls[i].markAsDirty();
+          this.formData.controls[i].updateValueAndValidity();
+        }
+      }, 1);
+    }
   }
 
   onMneu(data: Project) {
     console.log('一条数据', data);
     this.data = data;
-    this.prjDom.reset(this.data);
+    this.formInit(data);
   }
 
   /**
    * *编辑
    */
   edit(data) {
+    /** 复制一条数据 */
     if (!data) {
       this.data.id = null;
+    /** 添加一条数据 */
     } else {
       this.data = data;
     }
+    this.formInit(data);
     console.log(this.data, data);
-    this.prjDom.reset(this.data);
-    this.leftMenu.markForCheck();
   }
   /**
    * *编辑完成
@@ -83,7 +150,6 @@ export class ProjectComponent implements OnInit, OnChanges {
   /** 删除 */
   async delete() {
     const id = this.appS.leftMenu;
-
     const count = await this.db.db.task.filter(t => t.project === id).count();
     if (count === 0) {
       this.deleteShow = true;

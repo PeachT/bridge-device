@@ -91,10 +91,12 @@ export class ProportionComponent implements OnInit, OnChanges {
    */
   arrayValidator(index: number): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
-      const values: Array<ProportionItem> = this.proportionrFormArr.getRawValue();
-      for (let i = 0; i < values.length; i++) {
-        if (i !== index && values[i].type === control.value) {
-          return { reperition: `${control.value} 已存在!!` };
+      if (control.value) {
+        const values: Array<ProportionItem> = this.proportionrFormArr.getRawValue();
+        for (let i = 0; i < values.length; i++) {
+          if (i !== index && values[i].type === control.value) {
+            return { reperition: `${control.value} 已存在!!` };
+          }
         }
       }
       return null;

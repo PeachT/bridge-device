@@ -2,26 +2,26 @@ import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/cor
 import { FormGroup, FormArray, Validators, FormBuilder, ValidatorFn, AbstractControl } from '@angular/forms';
 import { AppService } from 'src/app/services/app.service';
 import { OtherInfo } from 'src/app/models/common';
+import { PersonInfo } from 'src/app/models/project';
 
 @Component({
-  selector: 'app-add-other',
-  templateUrl: './add-other.component.html',
-  styleUrls: ['./add-other.component.less']
+  // tslint:disable-next-line:component-selector
+  selector: 'project-person-info',
+  templateUrl: './person-info.component.html',
+  styleUrls: ['./person-info.component.less']
 })
-export class AddOtherComponent implements OnInit, OnChanges {
+export class PersonInfoComponent implements OnInit, OnChanges {
   @Input() formGroup: FormGroup;
   /** 候选的KEY */
   @Input() keys = [];
   @Input() iselect = null;
   @Input() edit = false;
-  @Input() data: Array<OtherInfo> = [];
-  @Input() nameKey = null;
+  @Input() data: Array<PersonInfo> = [];
+  @Input() formArrayName: 'supervisions' | 'qualityInspectors' = 'supervisions';
+  @Input() dividerText: string = null;
 
-  get otherInfoFormArr(): FormArray {
-    return this.formGroup.controls.otherInfo as FormArray;
-  }
-  set otherInfoFormArr(formArray: FormArray) {
-    this.formGroup.controls.otherInfo = formArray;
+  get forFormArr(): FormArray {
+    return this.formGroup.get(this.formArrayName) as FormArray;
   }
 
   constructor(
@@ -34,37 +34,38 @@ export class AddOtherComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     this.createForm(this.data).map(si => {
-      this.otherInfoFormArr.push(si)
+      this.forFormArr.push(si)
     })
   }
 
   /** 其他信息 */
-  createForm(data: Array<OtherInfo> = []) {
+  createForm(data: Array<PersonInfo> = []) {
     return data.map((item, i) => {
-      return this.otherInfoVisionsForm(i, item);
+      return this.createControl(i, item);
     });
   }
   /** 其他form */
-  otherInfoVisionsForm(index: number, item = { key: null, value: null }): FormGroup {
+  createControl(index: number, item: PersonInfo = { name: null, phone: null, unit: null }): FormGroup {
     return this.fb.group({
       /** 名字 */
-      key: [item.key, [Validators.required, this.arrayValidator(index)]],
-      /** 内容 */
-      value: [item.value, [Validators.required]],
+      name: [item.name, [Validators.required, this.arrayValidator(index)]],
+      phone: [item.phone],
+      unit: [item.unit],
+      imgBase64: [item.imgBase64]
     });
   }
   /** 添加其他数据 */
   add() {
-    const length = this.otherInfoFormArr.value.length;
-    this.otherInfoFormArr.push(this.otherInfoVisionsForm(length));
+    const length = this.forFormArr.value.length;
+    this.forFormArr.push(this.createControl(length));
   }
   /** 删除其他数据 */
   remove(index: number) {
-    this.otherInfoFormArr.removeAt(index);
+    this.forFormArr.removeAt(index);
   }
-
+  /** key过滤 */
   bridgeOtherKeySelect() {
-    const arr = this.otherInfoFormArr.value.map(v => v.key);
+    const arr = this.forFormArr.value.map(v => v.key);
     return this.keys.filter(v => arr.indexOf(v) === -1);
   }
 
@@ -80,9 +81,9 @@ export class AddOtherComponent implements OnInit, OnChanges {
   arrayValidator(index: number): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       if (control.value) {
-        const values: Array<OtherInfo> = this.otherInfoFormArr.getRawValue();
+        const values: Array<PersonInfo> = this.forFormArr.getRawValue();
         for (let i = 0; i < values.length; i++) {
-          if (i !== index && values[i].key === control.value) {
+          if (i !== index && values[i].name === control.value) {
             return { reperition: `${control.value} 已存在!!` };
           }
         }

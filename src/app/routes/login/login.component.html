@@ -42,7 +42,7 @@
         </nz-form-item>
         <nz-form-item>
           <div class="power-btn">
-            <button class="restart" (click)="appS.powerState = true"> <i nz-icon nzType="poweroff" style="color:lime"></i>电  源 </button>
+            <button class="restart" (click)="appS.powerState = true" *ngIf="e.isLinux"> <i nz-icon nzType="poweroff" style="color:lime"></i>电  源 </button>
             <!-- <button class="shutdown" (click)="appS.powerState = true"> <i nz-icon nzType="poweroff" style="color:brown"></i> 关 机</button> -->
           </div>
         </nz-form-item>

@@ -1,10 +1,5 @@
 <app-left>
   <div class="sider sider-menu">
-    <!-- <ul class="menu-2">
-      <li *ngFor="let item of menu.datas; index as i" [ngClass]="{'active': menu.select === item.id}"
-        (click)="onMneu(item.id)">{{item.name}}</li>
-    </ul> -->
-    <!-- {{appS.sss('变更')}} -->
     <app-left-menu [dbName]="dbName" (menuChange)="onMneu($event)" #leftMenu></app-left-menu>
   </div>
   <div class="main scroll-y">

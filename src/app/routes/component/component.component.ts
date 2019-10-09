@@ -97,21 +97,6 @@ export class ComponentComponent implements OnInit {
     });
   }
 
-  // arrayValidator(index: number, value: string = 'hole', key: string = 'name'): ValidatorFn {
-  //   return (control: AbstractControl): { [key: string]: any } | null => {
-  //     const rootvalue = control.root.value;
-  //     if (control.dirty && rootvalue) {
-  //       const values = rootvalue[value];
-  //       values.splice(index, 1);
-  //       for (const item of values) {
-  //         if (!control.value || item[key] === control.value) {
-  //           return { reperition: `${control.value} 已存在!!` };
-  //         }
-  //       }
-  //     }
-  //     return null;
-  //   };
-  // }
 
   onMneu(data: Comp) {
     console.log('一条数据', data);
