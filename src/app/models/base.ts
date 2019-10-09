@@ -1,4 +1,4 @@
-import { groutingTaskBase } from '../routes/grouting/createForm';
+import { groutingInfoBase, groutingHoleitemBase, mixingInfoBase, groutingTaskBase } from './groutingBase';
 
 export interface IBase {
   /** Id */
@@ -169,11 +169,27 @@ const base = {
     endDate: null,
     groups: [],
   },
-  grouting: groutingTaskBase
+  groutingTask: groutingTaskBase,
+  groutingInfo: groutingInfoBase,
+  groutingHoleitem: groutingHoleitemBase,
+  mixingInfo: mixingInfoBase,
 };
 
+export enum baseEnum {
+  project = 'project',
+  comp = 'comp',
+  jack = 'jack',
+  users = 'users',
+  task = 'task',
+  groutingTask = 'groutingTask',
+  groutingInfo = 'groutingInfo',
+  groutingHoleitem = 'groutingHoleitem',
+  mixingInfo = 'mixingInfo',
+}
+
 export function getModelBase(name: string) {
-  return Object.assign(JSON.parse(JSON.stringify(base[name])));
+  // return Object.assign(JSON.parse(JSON.stringify(base[name])));
+  return {...base[name]};
 }
 
 export function copyAny(data: any) {

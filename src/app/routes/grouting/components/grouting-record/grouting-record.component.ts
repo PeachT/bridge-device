@@ -1,14 +1,7 @@
-import { Component, Input, OnInit, ChangeDetectorRef, ViewChild, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
-import { DbService } from 'src/app/services/db.service';
-import { NzMessageService } from 'ng-zorro-antd';
-import { AppService } from 'src/app/services/app.service';
-import { ElectronService } from 'ngx-electron';
-import { nameRepetition } from 'src/app/Validator/async.validator';
-import { AddOtherComponent } from 'src/app/shared/add-other/add-other.component';
+import { Component, Input, OnInit, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
+import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { GroutingInfo, GroutingTask } from 'src/app/models/grouting';
-import { GroutingRecordItemComponent } from '../grouting-record-item/grouting-record-item.component';
 
 @Component({
   // tslint:disable-next-line: component-selector
@@ -17,26 +10,23 @@ import { GroutingRecordItemComponent } from '../grouting-record-item/grouting-re
   styleUrls: ['./grouting-record.component.less']
 })
 export class GroutingRecordComponent implements OnInit, OnChanges {
-  @ViewChild('otherInfo', { read: AddOtherComponent, static: true }) otherIngoDom: AddOtherComponent;
-  @ViewChild('groutingrecorditem', { read: GroutingRecordItemComponent, static: true }) griDom: GroutingRecordItemComponent;
-
   @Input() show = false;
   @Input() edit = true;
 
-  @Input() groutingTask: GroutingTask;
+  @Input() data: GroutingTask;
   @Input() formData: FormGroup;
+  /** 上一次数据id */
   bid = null;
-  get groutingInfoForm(): FormArray {
+
+  get groutingInfoFormArray(): FormArray {
     return this.formData.controls.groutingInfo as FormArray;
   }
   get groutingInfo(): Array<GroutingInfo> {
-    if (this.groutingTask) {
-      return this.groutingTask.groutingInfo;
+    if (this.data) {
+      return this.data.groutingInfo;
     }
     return null;
   }
-
-
   otherKey = [];
   chsub: Subscription = null;
   groupItem: GroutingInfo;
@@ -44,29 +34,32 @@ export class GroutingRecordComponent implements OnInit, OnChanges {
   @Output() updateHole = new EventEmitter();
 
   constructor(
-    private fb: FormBuilder,
-    public odb: DbService,
-    private message: NzMessageService,
-    public appS: AppService,
-    private e: ElectronService,
-    private cdr: ChangeDetectorRef
+    private fb: FormBuilder
   ) { }
 
   ngOnInit() {
   }
   ngOnChanges(changes: SimpleChanges) {
-    console.log('切换梁', changes);
-    if (changes.formData.currentValue.value.id !== this.bid) {
+    console.log('压浆记录数据变更', changes, this.data.id, this.bid);
+    if (this.data.id !== this.bid) {
+      this.bid = this.data.id;
       this.groupItem = null;
     }
+    this.createForm(this.groutingInfo).map(si => {
+      this.groutingInfoFormArray.push(si);
+    })
   }
-
-  createFormData(data: GroutingInfo) {
+  createForm(arrData: Array<GroutingInfo> = []): FormGroup[] {
+    return arrData.map(d => {
+      return this.corateFormGroup(d);
+    })
+  }
+  corateFormGroup(data: GroutingInfo) {
     return this.fb.group({
       /** 孔号 */
       name: [data.name],
       /** 压浆孔道采集数据 */
-      // groups: Array<GroutingHoleItem>;
+      groups: this.fb.array([]),
       /** 孔道内径 */
       holeDiameter: [data.holeDiameter],
       /** 孔道长度 */
@@ -78,7 +71,7 @@ export class GroutingRecordComponent implements OnInit, OnChanges {
       /** 压浆状态 */
       state: [data.state],
       /** 其他数据 */
-      otherInfo: this.fb.array(this.otherIngoDom.createForm([])),
+      otherInfo: this.fb.array([]),
     });
   }
   /** 切换孔 */

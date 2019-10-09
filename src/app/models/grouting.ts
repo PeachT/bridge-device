@@ -145,6 +145,8 @@ export interface MixingInfo {
   bleedingRate: number;
   /** 流动度 */
   fluidity: number;
+  /** 初始流动度 */
+  initFluidity?: number;
   /** 黏稠度 */
   viscosity: number;
   /** 水胶比 */

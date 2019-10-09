@@ -13,7 +13,7 @@
   </nz-form-item>
   <form nz-form [formGroup]="formData"  [hidden]="!groupItem">
     <div formArrayName="groutingInfo">
-      <ng-container *ngFor="let item of groutingInfoForm.controls; index as i" [formArrayName]="i" >
+      <ng-container *ngFor="let item of groutingInfoFormArray.controls; index as i" [formArrayName]="i" >
         <div style="display: flex;flex-direction: column;" [hidden]="!(item.value.name === groupItem?.name)">
           <div>
             <app-form-item label="梁号">
@@ -30,10 +30,10 @@
             </app-form-item>
           </div>
           <div>
-            <app-add-other [formGroup]="item" #otherInfo></app-add-other>
+            <app-add-other [formGroup]="item" [data]="groutingInfo[i].otherInfo"></app-add-other>
           </div>
           <div >
-            <grouting-record-item #groutingrecorditem [formData]="formData" [index]="i" [GroutingHoleItem]="groupItem?.groups"></grouting-record-item>
+            <grouting-record-item [formData]="formData" [index]="i" [data]="groutingInfo[i].groups"></grouting-record-item>
           </div>
         </div>
       </ng-container>

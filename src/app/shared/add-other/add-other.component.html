@@ -1,24 +1,26 @@
 <form nz-form [formGroup]="formGroup">
   <div formArrayName="otherInfo" class="other-info">
-    <nz-form-item *ngIf="edit" class="divider">
+    <nz-form-item *ngIf="appS.edit" class="divider">
       <nz-divider style="min-width: auto;" nzText="其他信息" nzOrientation="left"></nz-divider>
       <button nz-button nzType="primary" nzSearch (click)="add()" type="button">添 加</button>
     </nz-form-item>
     <nz-form-item>
       <ng-container *ngFor="let item of otherInforFormArr.controls; index as i" [formGroupName]="i">
-        <div class="other-edit" *ngIf="edit">
-          <app-form-item [errors]="item.get('key').errors">
-            <input placeholder="显示名称" nz-input formControlName="key" [nzAutocomplete]="auto" />
-            <nz-autocomplete [nzDataSource]="bridgeOtherKeySelect()" #auto> </nz-autocomplete>
-          </app-form-item>
-          <app-form-item>
-            <input type="text" nz-input placeholder="内容" formControlName="value">
-          </app-form-item>
-          <div class="btn-close">
-            <button nz-button nzType="default" nzShape="circle" (click)="remove(i)"><i nz-icon type="close"></i></button>
+        <div class="other-edit" *ngIf="appS.edit">
+          <div class="edit-item">
+            <app-form-item [errors]="item.get('key').errors">
+              <input placeholder="显示名称" nz-input formControlName="key" [nzAutocomplete]="auto" />
+              <nz-autocomplete [nzDataSource]="bridgeOtherKeySelect()" #auto> </nz-autocomplete>
+            </app-form-item>
+            <app-form-item [errors]="item.get('value').errors">
+              <input type="text" nz-input placeholder="内容" formControlName="value">
+            </app-form-item>
+            <div class="btn-close">
+              <button nz-button nzType="default" nzShape="circle" (click)="remove(i)"><i nz-icon type="close"></i></button>
+            </div>
           </div>
         </div>
-        <ng-container *ngIf="!edit">
+        <ng-container *ngIf="!appS.edit">
           <app-form-item [label]="item.value.key">
             <input type="text" nz-input placeholder="内容" formControlName="value">
           </app-form-item>

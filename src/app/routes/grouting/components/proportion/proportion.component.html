@@ -22,7 +22,7 @@
             </td>
           </tr>
           <tr>
-            <td [attr.colspan]="edit ? 2 : 5">{{piFormGroup.get('waterBinderRatio').value}}</td>
+            <td [attr.colspan]="edit ? 2 : 5">水胶比：{{piFormGroup.get('waterBinderRatio').value}}</td>
             <td *ngIf="edit" colspan="3">
               <button style="width: 100%;" nz-button nzType="primary" nzSearch (click)="add()" type="button">添 加</button>
             </td>

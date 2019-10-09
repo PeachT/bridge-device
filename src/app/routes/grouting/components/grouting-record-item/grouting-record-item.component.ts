@@ -1,13 +1,7 @@
-import { Component, Input, OnInit, ChangeDetectorRef, ViewChild, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
-import { DbService } from 'src/app/services/db.service';
-import { NzMessageService } from 'ng-zorro-antd';
-import { AppService } from 'src/app/services/app.service';
-import { ElectronService } from 'ngx-electron';
-import { nameRepetition } from 'src/app/Validator/async.validator';
-import { AddOtherComponent } from 'src/app/shared/add-other/add-other.component';
+import { Component, Input, OnInit, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { GroutingInfo, GroutingHoleItem, ProcessData } from 'src/app/models/grouting';
+import { GroutingHoleItem } from 'src/app/models/grouting';
 
 @Component({
   // tslint:disable-next-line: component-selector
@@ -15,14 +9,14 @@ import { GroutingInfo, GroutingHoleItem, ProcessData } from 'src/app/models/grou
   templateUrl: './grouting-record-item.component.html',
   styleUrls: ['./grouting-record-item.component.less']
 })
-export class GroutingRecordItemComponent implements OnInit {
+export class GroutingRecordItemComponent implements OnInit, OnChanges {
   @Input() formData: FormGroup;
   @Input() index: number;
-  @Input() GroutingHoleItem: GroutingHoleItem;
-  get groutingInfoHoleForm(): FormArray {
+  @Input() data: Array<GroutingHoleItem>;
+
+  get groutingInfoHoleFormArray(): FormArray {
     return ((this.formData.controls.groutingInfo as FormArray).at(this.index) as FormGroup).controls.groups as FormArray;
   }
-
 
   otherKey = [];
   chsub: Subscription = null;
@@ -31,55 +25,55 @@ export class GroutingRecordItemComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    public odb: DbService,
-    public appS: AppService,
   ) { }
 
   ngOnInit() {
-    console.log('123456789', this.formData, document.getElementById('form').offsetWidth);
   }
-
-  resetValue(data: Array<GroutingHoleItem>) {
-    // console.log(data);
-    // this.formData = new FormArray([]);
-    // data.map(g => {
-    //   this.formData.controls.push(this.corateFormGroup());
-    // });
-    // this.formData.reset(data);
+  ngOnChanges(changes: SimpleChanges) {
+    this.createForm(this.data).map(si => {
+      this.groutingInfoHoleFormArray.push(si);
+    })
   }
-  corateFormGroup() {
+  createForm(arrData: Array<GroutingHoleItem> = []): FormGroup[] {
+    return arrData.map(d => {
+      return this.corateFormGroup(d);
+    })
+  }
+  corateFormGroup(data: GroutingHoleItem) {
     return this.fb.group({
       /** 压浆方向 */
-      direction: [],
+      direction: [data.direction],
       /** 设置压浆压力 */
-      setGroutingPressure: [],
+      setGroutingPressure: [data.setGroutingPressure],
       /** 环境温度 */
-      envTemperature: [],
+      envTemperature: [data.envTemperature],
       /** 浆液温度 */
-      slurryTemperature: [],
+      slurryTemperature: [data.slurryTemperature],
       /** 开始时间 */
-      startDate: [],
+      startDate: [data.startDate],
       /** 完成时间 */
-      endDate: [],
+      endDate: [data.endDate],
       /** 进浆压力 */
-      intoPulpPressure: [],
+      intoPulpPressure: [data.intoPulpPressure],
       /** 回浆压力 */
-      outPulpPressure: [],
+      outPulpPressure: [data.outPulpPressure],
       /** 进浆量 (L) */
-      intoPulpvolume: [],
+      intoPulpvolume: [data.intoPulpvolume],
       /** 回浆量 (L) */
-      outPulpvolume: [],
+      outPulpvolume: [data.outPulpvolume],
       /** 真空泵压力 */
-      vacuumPumpPressure: [],
+      vacuumPumpPressure: [data.vacuumPumpPressure],
       /** 稳压时间 */
-      steadyTime: [],
+      steadyTime: [data.steadyTime],
       /** 通过情况 */
-      passMsg: [],
+      passMsg: [data.passMsg],
       /** 冒浆情况 */
-      slurryEmittingMsg: [],
+      slurryEmittingMsg: [data.slurryEmittingMsg],
       /** 其他说明 */
-      remarks: [],
-      // otherInfo: this.fb.array(this.otherIngoDom.createForm([])),
+      remarks: [data.remarks],
+      /** 压浆过程数据 */
+      processDatas: [data.processDatas],
+      otherInfo: this.fb.array([]),
     });
   }
 }

@@ -1,13 +1,9 @@
-import { Component, Input, OnInit, ChangeDetectorRef, ViewChild, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
+import { Component, Input, OnInit, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
-import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
-import { ElectronService } from 'ngx-electron';
-import { nameRepetition } from 'src/app/Validator/async.validator';
-import { AddOtherComponent } from 'src/app/shared/add-other/add-other.component';
 import { Subscription } from 'rxjs';
-import { GroutingInfo, GroutingHoleItem, MixingInfo, GroutingTask } from 'src/app/models/grouting';
+import { MixingInfo, GroutingTask } from 'src/app/models/grouting';
 
 @Component({
   // tslint:disable-next-line: component-selector
@@ -15,61 +11,31 @@ import { GroutingInfo, GroutingHoleItem, MixingInfo, GroutingTask } from 'src/ap
   templateUrl: './mixing-info.component.html',
   styleUrls: ['./mixing-info.component.less']
 })
-export class MixingInfoComponent implements OnInit {
-  @Input() groutingTask: GroutingTask;
+export class MixingInfoComponent implements OnInit, OnChanges {
   @Input() formData: FormGroup;
+  @Input() data: GroutingTask;
 
   get mixingInfoForm(): FormArray {
     return this.formData.controls.mixingInfo as FormArray;
   }
-  otherKey = [];
-  // formData: FormArray = new FormArray([]);
-  chsub: Subscription = null;
-
-
-  @Output() updateHole = new EventEmitter();
 
   constructor(
     private fb: FormBuilder,
-    public odb: DbService,
-    public appS: AppService,
   ) { }
 
   ngOnInit() {
-    console.log('搅拌数据', this.groutingTask, this.formData);
-    this.formData.valueChanges.subscribe(() => {
-      console.log('搅拌数据跟新');
-    });
+    console.log('搅拌数据', this.data, this.formData);
   }
-  initFormData(mixingInfos) {
-    const af = new FormArray([]);
-    mixingInfos.map(d => {
-      af.push(this.corateFormGroup(d));
+  ngOnChanges(changes: SimpleChanges) {
+    console.log('配比数据更新', changes, this.data);
+    this.createForm(this.data.mixingInfo).map(si => {
+      this.mixingInfoForm.push(si);
     })
-    return af;
   }
-  add() {
-    // const af =this.corateFormGroup({
-    //   /** 用量 */
-    //   dosage: [33, 111, 11],
-    //   /** 开始时间 */
-    //   startTime: new Date(),
-    //   /** 搅拌时间 */
-    //   mixingTime: 20,
-    //   /** 泌水率 */
-    //   bleedingRate: 1,
-    //   /** 流动度 */
-    //   fluidity: 28,
-    //   /** 黏稠度 */
-    //   viscosity: 0.5,
-    //   /** 水胶比 */
-    //   waterBinderRatio: 0.28,
-    //   /** 水温 */
-    //   waterTemperature: 22,
-    //   /** 环境温度 */
-    //   envTemperature: 35,
-    // });
-    // this.formData.push(af);
+  createForm(mixingInfos: Array<MixingInfo> = []): FormGroup[] {
+    return mixingInfos.map(d => {
+      return this.corateFormGroup(d);
+    })
   }
   corateFormGroup(mixingInfo: MixingInfo) {
     return this.fb.group({
@@ -83,6 +49,8 @@ export class MixingInfoComponent implements OnInit {
       bleedingRate: [mixingInfo.bleedingRate],
       /** 流动度 */
       fluidity: [mixingInfo.fluidity],
+      /** 流动度 */
+      initFluidity: [mixingInfo.initFluidity],
       /** 黏稠度 */
       viscosity: [mixingInfo.viscosity],
       /** 水胶比 */
@@ -92,6 +60,8 @@ export class MixingInfoComponent implements OnInit {
       /** 环境温度 */
       envTemperature: [mixingInfo.envTemperature],
     });
+  }
+  add() {
   }
 
 }

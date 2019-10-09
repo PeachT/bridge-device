@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild, ChangeDetectorRef, OnDestroy, TemplateRef } from '@angular/core';
-import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
+import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { NzMessageService, NzModalService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
 import { ElectronService } from 'ngx-electron';
-import { copyAny } from 'src/app/models/base';
+import { copyAny, getModelBase, baseEnum } from 'src/app/models/base';
 import { GroutingRecordComponent } from './components/grouting-record/grouting-record.component';
 import { ProportionComponent } from './components/proportion/proportion.component';
 import { TaskMenuComponent } from 'src/app/shared/task-menu/task-menu.component';
@@ -17,7 +17,7 @@ import { uploadingData } from 'src/app/Function/uploading';
 import { GroutingTask, GroutingInfo, GroutingHoleItem } from 'src/app/models/grouting';
 import { GroutingMianComponent } from './components/mian/mian.component';
 import { MixingInfoComponent } from './components/mixing-info/mixing-info.component';
-import { createForm, createMixingInfoForm, createGroutingInfoForm, groutingTaskBase, groutingInfoBase, groutingHoleitemBase } from './createForm';
+import { createForm } from './createForm';
 import { nameRepetition } from 'src/app/Validator/async.validator';
 
 @Component({
@@ -401,29 +401,56 @@ export class GroutingComponent implements OnInit, OnDestroy {
   }
   /** 初始化数据 */
   formInit(data: GroutingTask) {
-    this.formData = createForm(data);
-    if (data.mixingInfo) {
-      /** 初始化搅拌数据 */
-      this.mixingInfoForm = createMixingInfoForm(data.mixingInfo);
-      // this.mixingInfoForm.patchValue(data.mixingInfo);
-    }
-    if (data.groutingInfo) {
-      /** 初始化压浆距离数据 */
-      this.groutingInfoForm = createGroutingInfoForm(data.groutingInfo);
-      this.groutingInfoForm.patchValue(data.groutingInfo);
-    }
-    /** 初始化配比数据 */
-    this.formData.controls.proportionInfo.patchValue(data.proportionInfo);
+    const fb = new FormBuilder();
+    this.formData = fb.group({
+      id: [data.id],
+      project: [data.project],
+      /** 梁号 */
+      name: [data.name, [Validators.required]],
+      /** 构建 */
+      component: [data.component, [Validators.required]],
+      /** 梁长度 */
+      beamLength: [data.beamLength, [Validators.required]],
+      /** 张拉日期 */
+      tensinDate: [data.tensinDate, [Validators.required]],
+      /** 浇筑日期 */
+      castingDate: [data.castingDate, [Validators.required]],
+      /** 压浆顺序 */
+      sort: [data.sort],
+      /** 设备编号 */
+      deviceNo: [data.deviceNo],
+      /** 是否作为模板 */
+      template: [data.template],
+      /** 其他数据信息 */
+      otherInfo: fb.array([]),
+      /** 施工员 */
+      operator: [data.operator],
+      /** 监理员 */
+      supervisors: [data.supervisors],
+      /** 自检员 */
+      qualityInspector: [data.qualityInspector],
+      /** 配比信息 */
+      proportionInfo: fb.group({
+        waterBinderRatio: [0.28],
+        proportions: fb.array([])
+      }),
+      /** 搅拌数据 */
+      mixingInfo: fb.array([]),
+      groutingInfo: fb.array([]),
+    });
+
     // this.formData.setValue(data);
-    console.log('初始化数据', data);
+    console.log('初始化数据', data, !data.id && data.name);
     this.formData.controls.name.setAsyncValidators([nameRepetition(this.odb, this.dbName, this.updateFilterFun)]);
-    setTimeout(() => {
-      // tslint:disable-next-line:forin
-      for (const i in this.formData.controls) {
-        this.formData.controls[i].markAsDirty();
-        this.formData.controls[i].updateValueAndValidity();
-      }
-    }, 1);
+    if (!data.id && data.name) {
+      setTimeout(() => {
+        // tslint:disable-next-line:forin
+        for (const i in this.formData.controls) {
+          this.formData.controls[i].markAsDirty();
+          this.formData.controls[i].updateValueAndValidity();
+        }
+      }, 1);
+    }
   }
 
   /** 选择构建 */
@@ -431,7 +458,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
     console.log(value);
     const groutingInfo = [];
     value.map(name => {
-      const g = { ...groutingInfoBase, name };
+      const g = { ...getModelBase(baseEnum.groutingInfo), name };
       groutingInfo.push(g)
     });
     console.log(groutingInfo);
@@ -497,7 +524,8 @@ export class GroutingComponent implements OnInit, OnDestroy {
         g.state = 0;
         const groups: Array<GroutingHoleItem> = [];
         for (const item of g.groups) {
-          groups.push({ ...groutingHoleitemBase, direction: item.direction, setGroutingPressure: item.setGroutingPressure });
+          // tslint:disable-next-line:max-line-length
+          groups.push({ ...getModelBase(baseEnum.groutingHoleitem), direction: item.direction, setGroutingPressure: item.setGroutingPressure });
         }
         g.groups = groups;
         console.log(g);
@@ -507,7 +535,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
       this.data = data;
       /** 添加 */
     } else {
-      this.data = groutingTaskBase;
+      this.data = getModelBase(baseEnum.groutingTask);
       this.data.project = this.taskMenuDom.project.select.id;
     }
     console.log('添加', this.data);

@@ -32,7 +32,7 @@
     </app-form-item>
   </div>
   <div>
-    <app-add-other [formGroup]="formData" #otherInfo></app-add-other>
+    <app-add-other [formGroup]="formData" #otherInfo nameKey="主数据其他数据" [data]="groutingTask.otherInfo"></app-add-other>
   </div>
   <!-- <div>
     <grouting-proportion [formGroup]="formData" #proportionInfo></grouting-proportion>
@@ -44,12 +44,12 @@
     <grouting-record ></grouting-record>
   </div> -->
   <div>
-    <grouting-proportion [formGroup]="formData"></grouting-proportion>
+    <grouting-proportion [formGroup]="formData" [data]="groutingTask.proportionInfo"></grouting-proportion>
   </div>
   <div>
-    <mixing-info [formData]="formData" [groutingTask]="groutingTask"></mixing-info>
+    <mixing-info [formData]="formData" [data]="groutingTask"></mixing-info>
   </div>
   <div>
-    <grouting-record [formData]="formData" [groutingTask]="groutingTask"></grouting-record>
+    <grouting-record [formData]="formData" [data]="groutingTask"></grouting-record>
   </div>
 </form>

@@ -93,7 +93,7 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges {
     if (!this.data) {
       this.carterSvg();
     } else {
-      if (this.width !== 0 && this.oldWidth !== this.width) {
+      if (this.myChart && this.width !== 0 && this.oldWidth !== this.width) {
         if (this.width < 500) {
           this.width = 500;
         }

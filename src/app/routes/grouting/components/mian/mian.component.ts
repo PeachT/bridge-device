@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { NzMessageService, NzModalService } from 'ng-zorro-antd';
@@ -17,8 +17,8 @@ import { Comp } from 'src/app/models/component';
   templateUrl: './mian.component.html',
   styleUrls: ['./mian.component.less']
 })
-export class GroutingMianComponent implements OnInit {
-  // @ViewChild('otherInfo', { read: AddOtherComponent, static: true }) otherIngoDom: AddOtherComponent;
+
+export class GroutingMianComponent implements OnInit, OnChanges {
   @Input() groutingTask: GroutingTask;
   @Input() formData: FormGroup;
   @Input() edit = false;
@@ -41,6 +41,18 @@ export class GroutingMianComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.getComponent();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    // console.log('配比数据更新', changes, this.data);
+    // this.piFormGroup.controls.waterBinderRatio.setValue(this.data.waterBinderRatio);
+    // this.createForm(this.data.proportions).map(si => {
+    //   this.proportionrFormArr.push(si)
+    // })
+  }
+  /** 获取构建菜单 */
+  getComponent() {
     this.componentMneu$ = from(this.odb.db.comp.toArray()).pipe(
       map(comps => {
         const arr = [];
@@ -56,10 +68,16 @@ export class GroutingMianComponent implements OnInit {
       })
     );
   }
+  /** 初始化Form */
+  createForm(data: GroutingTask) {
+  }
 
+  /** 构建选择 */
   conponentChange(value) {
     console.log(value, this.componentHoles);
     this.outSelectComponent.emit(this.componentHoles.filter(f => f.value === value)[0].holes);
   }
+
+
 
 }

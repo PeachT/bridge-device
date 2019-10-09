@@ -1,4 +1,4 @@
-<div *ngIf="groutingTask?.mixingInfo?.length > 0">
+<div *ngIf="data?.mixingInfo?.length > 0">
   <nz-divider style="min-width: auto;" nzText="搅拌数据" nzOrientation="center"></nz-divider>
   <form nz-form [formGroup]="formData">
     <table class="gridtable">
@@ -9,7 +9,7 @@
           <th>搅拌时间(s)</th>
           <th>水胶比</th>
           <th>水/环境温度(℃)</th>
-          <th>流动度(s)</th>
+          <th>初始流动度/流动度(s)</th>
           <th>泌水率(%)</th>
           <th>黏稠度(%)</th>
         </tr>
@@ -18,7 +18,7 @@
         <ng-container *ngFor="let item of mixingInfoForm.controls; index as i" [formGroupName]="i">
           <tr>
             <td>
-              <ng-container *ngFor="let prop of groutingTask.proportionInfo.proportions; index as popi">
+              <ng-container *ngFor="let prop of data.proportionInfo.proportions; index as popi">
                 <div class="row" formArrayName="dosage">
                   <nz-input-group [nzAddOnBefore]="prop.name">
                     <input type="number" nz-input [formControlName]="popi" />
@@ -39,7 +39,14 @@
                 环&nbsp;<input type="number" nz-input placeholder="环境温度" formControlName="envTemperature">
               </div>
               </td>
-            <td><input type="number" nz-input placeholder="流动度" formControlName="fluidity"></td>
+            <td>
+              <div class="row">
+                初&nbsp;<input type="number" nz-input placeholder="初始流动度" formControlName="initFluidity">
+              </div>
+              <div class="row">
+                流&nbsp;<input type="number" nz-input placeholder="流动度" formControlName="fluidity">
+              </div>
+            </td>
             <td><input type="number" nz-input placeholder="泌水率" formControlName="bleedingRate"></td>
             <td><input type="number" nz-input placeholder="黏稠度" formControlName="viscosity"></td>
           </tr>

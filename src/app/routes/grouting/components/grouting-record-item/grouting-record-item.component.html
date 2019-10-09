@@ -15,7 +15,7 @@
         </tr>
       </thead>
       <tbody formArrayName="groups">
-        <ng-container *ngFor="let item of groutingInfoHoleForm.controls; index as i" [formGroupName]="i">
+        <ng-container *ngFor="let item of groutingInfoHoleFormArray.controls; index as i" [formGroupName]="i">
           <tr style="text-align: center;">
             <td colspan="10" style="background-color: #baccd9; color: #45b787;">第 {{i + 1}} 次压浆数据</td>
           </tr>
@@ -73,7 +73,10 @@
                   </app-form-item>
                 </div>
                 <div>
-                  <echarts-dynamic-line-grouting [width]="(container.offsetWidth || 720) - 220" *ngIf="GroutingHoleItem && GroutingHoleItem[i]?.processDatas" [data]="GroutingHoleItem[i]?.processDatas"></echarts-dynamic-line-grouting>
+                  <app-add-other [formGroup]="item" [data]="data[i].otherInfo"></app-add-other>
+                </div>
+                <div>
+                  <echarts-dynamic-line-grouting [width]="(container.offsetWidth || 720) - 220" *ngIf="data && data[i]?.processDatas" [data]="data[i]?.processDatas"></echarts-dynamic-line-grouting>
                 </div>
               </div>
             </td>
