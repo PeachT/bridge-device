@@ -107,11 +107,12 @@ export class ProjectComponent implements OnInit, OnChanges {
     this.formData.controls.name.setAsyncValidators([nameRepetition(this.db, this.dbName)]);
     if (!data.id && data.name) {
       setTimeout(() => {
+        this.formData.controls.name.updateValueAndValidity();
         // tslint:disable-next-line:forin
-        for (const i in this.formData.controls) {
-          this.formData.controls[i].markAsDirty();
-          this.formData.controls[i].updateValueAndValidity();
-        }
+        // for (const i in this.formData.controls) {
+        //   this.formData.controls[i].markAsDirty();
+        //   this.formData.controls[i].updateValueAndValidity();
+        // }
       }, 1);
     }
   }

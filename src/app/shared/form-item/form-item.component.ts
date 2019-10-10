@@ -15,6 +15,7 @@ export class FormItemComponent implements OnInit {
   @Input() row = false;
   @Input() label: string;
   @Input() errors: any;
+  @Input() errorMsg: any = null;
   constructor() { }
 
   ngOnInit() {

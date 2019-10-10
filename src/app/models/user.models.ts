@@ -6,6 +6,7 @@ import { IBase } from './base';
  * @export
  */
 export interface LoginUser {
+  id: any;
   name: string;
   jurisdiction: number;
   nameId: string;

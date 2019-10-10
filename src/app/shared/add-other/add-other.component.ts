@@ -62,7 +62,7 @@ export class AddOtherComponent implements OnInit, OnChanges {
   remove(index: number) {
     this.otherInfoFormArr.removeAt(index);
   }
-
+  /** 预设key过滤 */
   bridgeOtherKeySelect() {
     const arr = this.otherInfoFormArr.value.map(v => v.key);
     return this.keys.filter(v => arr.indexOf(v) === -1);

@@ -7,66 +7,12 @@
 
     <div class="scroll-content">
       <form nz-form [ngClass]="{'form-edit': !appS.edit}" [formGroup]="formData">
-        <nz-form-item>
-          <nz-form-label [nzSm]="3" nzRequired nzFor="name">构建名称：</nz-form-label>
-          <nz-form-control [nzSm]="21" [ngClass]="{'in-error': formData.get('name').errors}" [nzErrorTip]="formData.get('name').errors | ValidatorError">
-            <input type="text" nz-input placeholder="构建名称" formControlName="name">
-            <!-- <nz-form-explain *ngIf="appS.edit">{{formData.get('name').errors | ValidatorError}}</nz-form-explain> -->
-          </nz-form-control>
-        </nz-form-item>
-
-        <div class="hole">
-          <div>
-            <span>梁型：</span>
-            <button nz-button nzType="primary" nzSearch (click)="addHole()" type="button">添 加</button>
-          </div>
-          <div nz-row nzGutter="25" formArrayName="hole">
-            <div nz-col nzSm="24" nzLg="12" *ngFor="let item of formArr.controls; index as i" [formGroupName]="i">
-              <div class="card">
-                <div class="btn">
-                  <div (click)="delHole(i, $event)">
-                    <button nz-button *ngIf="formArr.controls.length > 1" nzType="default" nzShape="circle"
-                      ><i nz-icon type="close"></i></button>
-                  </div>
-                </div>
-                <div class="content">
-                  <!-- <nz-form-item>
-                    <nz-form-label [nzSm]="6">图片</nz-form-label>
-                    <nz-form-control [nzSm]="18">
-                      <input type="text" nz-input placeholder="图片" formControlName="ImgBase64">
-                    </nz-form-control>
-                  </nz-form-item> -->
-
-                  <nz-form-item>
-                    <nz-form-label [nzSm]="6" nzRequired>梁名称</nz-form-label>
-                    <nz-form-control [nzSm]="18" [ngClass]="{'in-error': item.get('name').errors}" [nzErrorTip]="item.get('name').errors | ValidatorError">
-                      <input type="text" nz-input placeholder="梁名称" formControlName="name">
-                    </nz-form-control>
-                  </nz-form-item>
-
-                  <div>
-                    <nz-form-item *ngIf="appS.edit">
-                      <nz-form-label [nzSm]="6" >孔号</nz-form-label>
-                      <nz-form-control [nzSm]="18">
-                          <input nz-input nzSize="large"  placeholder="添加孔" type="text"
-                          (blur)="handleInputConfirm($event, item.get('holes'))"
-                          (keydown.enter)="handleInputConfirm($event, item.get('holes'))" />
-                      </nz-form-control>
-                    </nz-form-item>
-                    <div class="hole-tag">
-                      <span *ngFor="let tag of item.get('holes').value; index as hi">
-                        {{tag}}
-                        <i nz-icon type="close" theme="outline" (click)="handleClose(item.get('holes'), tag)"></i>
-                      </span>
-                    </div>
-                  </div>
-                  <nz-form-control *ngIf="appS.edit && item.get('holes').errors">
-                    <span style="color: red;"> 至少需要要个孔号！</span>
-                  </nz-form-control>
-                </div>
-              </div>
-            </div>
-          </div>
+        <app-form-item label="构建名称" [row]="true" [errors]="formData.get('name').errors">
+          <input placeholder="例：T梁 或 预制箱梁" nz-input formControlName="name" [nzAutocomplete]="auto" />
+          <nz-autocomplete [nzDataSource]="bridgeOtherKeySelect()" #auto> </nz-autocomplete>
+        </app-form-item>
+        <div>
+          <component-birdge-model [formGroup]="formData" [data]="data.hole"></component-birdge-model>
         </div>
         <div class="edit" [ngClass]="{'edit-on': appS.edit}"></div>
       </form>

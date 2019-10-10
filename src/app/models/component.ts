@@ -15,7 +15,7 @@ export interface Hole {
   /** 名字 */
   name: string;
   /** 孔明细 */
-  holes: [];
+  holes: Array<string>;
   /** 图片 */
-  ImgBase64: any;
+  imgBase64?: any;
 }

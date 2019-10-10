@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
-import {
-  FormGroup, FormBuilder, Validators} from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
@@ -16,14 +15,18 @@ import { nameRepetition } from 'src/app/Validator/async.validator';
 })
 export class UserComponent implements OnInit {
   dbName = 'users';
-  @ViewChild('leftMenu' , null) leftMenu: LeftMenuComponent;
+  @ViewChild('leftMenu', null) leftMenu: LeftMenuComponent;
   formData: FormGroup;
-  data: User;
+  data: User = {
+    name: '用户',
+    password: '123',
+    jurisdiction: 0,
+    operation: []
+  };
   deleteShow = false;
-  menuFilter = (f) => f.jurisdiction < 8;
+  menuFilter = (f) => false;
 
   constructor(
-    private fb: FormBuilder,
     private db: DbService,
     private message: NzMessageService,
     public appS: AppService,
@@ -32,34 +35,35 @@ export class UserComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.carterFormGroup();
+    this.menuFilter = (f) => f.jurisdiction < 9 && (this.appS.userInfo.jurisdiction > f.jurisdiction || this.appS.userInfo.id === f.id);
+    this.formInit();
   }
-  reset() {
-    // this.carterFormGroup();
-    this.formData.setValue(this.data);
-    this.formData.controls.name.updateValueAndValidity();
-    // tslint:disable-next-line:forin
-    // for (const i in this.formData.controls) {
-    //   this.formData.controls[i].markAsDirty();
-    // }
-  }
-  carterFormGroup() {
-    this.formData = this.fb.group({
-      id: [],
-      createdDate: [],
-      modificationDate: [],
-      user: [],
-      name: [null, [Validators.required], [nameRepetition(this.db, 'users')]],
-      password: [null, [Validators.required]],
-      jurisdiction: [0],
-      operation: []
+
+  /** 初始化数据 */
+  formInit() {
+    const data = this.data;
+    const fb = new FormBuilder();
+    this.formData = fb.group({
+      id: [data.id],
+      name: [data.name, [Validators.required]],
+      password: [data.password, [Validators.required]],
+      jurisdiction: [data.jurisdiction || 0],
+      operation: [data.operation]
     });
+
+    console.log('初始化数据', data, !data.id && data.name);
+    this.formData.controls.name.setAsyncValidators([nameRepetition(this.db, this.dbName)]);
+    if (!data.id && data.name) {
+      setTimeout(() => {
+        this.formData.controls.name.updateValueAndValidity();
+      }, 1);
+    }
   }
 
   onMneu(data: User) {
     console.log('一条数据', data);
     this.data = data;
-    this.reset();
+    this.formInit();
   }
 
   /**
@@ -72,7 +76,7 @@ export class UserComponent implements OnInit {
       this.data = data;
       console.log(this.data, data);
     }
-    this.reset();
+    this.formInit();
     this.leftMenu.markForCheck();
   }
   /**

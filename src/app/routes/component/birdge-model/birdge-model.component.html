@@ -1,0 +1,48 @@
+<form nz-form [formGroup]="formGroup">
+  <div formArrayName="hole">
+    <nz-form-item>
+      <nz-divider style="min-width: auto;" nzText="梁型" nzOrientation="left"></nz-divider>
+      <button nz-button nzType="primary" nzSearch (click)="add()" type="button" *ngIf="appS.edit">添 加</button>
+    </nz-form-item>
+    <div class="content" nz-row>
+      <ng-container *ngFor="let item of forFormArr.controls; index as i" [formGroupName]="i">
+        <div class="card" nz-col nzSm="24" nzLg="12">
+          <div class="item">
+            <app-form-item [row]="true" label="梁型名称" [errors]="item.get('name').errors">
+              <input placeholder="例：20米5孔" nz-input formControlName="name" />
+            </app-form-item>
+            <app-form-item [row]="true" label="空号" [errors]="item.get('holes').errors" [errorMsg]="{required: '至少需要一个孔号！'}">
+              <nz-input-group nzSearch nzSize="large" [nzAddOnAfter]="suffixButton">
+                <input type="text" nz-input placeholder="例：N1 或 N1左"
+                  (change)="addHoleName(item, $event)"
+                  (input)="addHoleInput(item, $event.target.value)"/>
+                <input type="text" hidden formControlName="holes">
+              </nz-input-group>
+              <ng-template #suffixButton>
+                <button nz-button nzType="primary" nzSize="large" nzSearch>确定</button>
+              </ng-template>
+            </app-form-item>
+            <div class="hole-tag">
+              <span *ngFor="let tag of item.value.holes; index as hi">
+                {{tag}}
+                <i nz-icon type="close" theme="outline" (click)="delHoleName(item, hi)"></i>
+              </span>
+            </div>
+            <div class="btn-close">
+              <button nz-button nzType="default" nzShape="circle" (click)="remove(i)"><i nz-icon
+                  type="close"></i></button>
+            </div>
+          </div>
+
+          <!-- <nz-form-item>
+                <nz-form-label [nzSm]="6">图片</nz-form-label>
+                <nz-form-control [nzSm]="18">
+                    <input type="text" nz-input placeholder="图片" formControlName="ImgBase64">
+                </nz-form-control>
+              </nz-form-item> -->
+
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</form>

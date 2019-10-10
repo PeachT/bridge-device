@@ -444,11 +444,12 @@ export class GroutingComponent implements OnInit, OnDestroy {
     this.formData.controls.name.setAsyncValidators([nameRepetition(this.odb, this.dbName, this.updateFilterFun)]);
     if (!data.id && data.name) {
       setTimeout(() => {
+        this.formData.controls.name.updateValueAndValidity();
         // tslint:disable-next-line:forin
-        for (const i in this.formData.controls) {
-          this.formData.controls[i].markAsDirty();
-          this.formData.controls[i].updateValueAndValidity();
-        }
+        // for (const i in this.formData.controls) {
+        //   this.formData.controls[i].markAsDirty();
+        //   this.formData.controls[i].updateValueAndValidity();
+        // }
       }, 1);
     }
   }

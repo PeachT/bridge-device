@@ -17,15 +17,10 @@ export interface IBase {
 const base = {
   project: projectBase,
   comp: {
-    id: null,
-    createdDate: null,
-    modificationDate: null,
-    user: null,
     name: null,
     hole: [
       {
         name: null,
-        ImgBase64: null,
         holes: []
       }
     ],
@@ -125,14 +120,10 @@ const base = {
     },
   },
   users: {
-    id: null,
-    createdDate: null,
-    modificationDate: null,
-    user: null,
     name: null,
     password: null,
     jurisdiction: 0,
-    operation: ['see']
+    operation: []
   },
   task: {
     id: null,

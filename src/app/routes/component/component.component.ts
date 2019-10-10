@@ -29,20 +29,18 @@ export class ComponentComponent implements OnInit {
   @ViewChild('leftMenu', null) leftMenu: LeftMenuComponent;
 
   formData: FormGroup;
-  data: Comp;
+  data: Comp = {
+    name: '模拟',
+    hole: [
+      {
+        name: '空号',
+        holes: ['N1', 'N2']
+      }
+    ]
+  };
   deleteShow = false;
 
-  get formArr(): FormArray {
-    return this.formData.get('hole') as FormArray;
-  }
-
-  tags = ['Unremovable', 'Tag 2', 'Tag 3'];
-  inputVisible = false;
-  inputValue = '';
-  @ViewChild('inputElement', null) inputElement: ElementRef;
-
   constructor(
-    private fb: FormBuilder,
     private db: DbService,
     private message: NzMessageService,
     public appS: AppService,
@@ -51,57 +49,36 @@ export class ComponentComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.createFormGroup();
+    this.formInit();
   }
-  createFormGroup() {
-    this.formData = this.fb.group({
-      id: [],
-      createdDate: [],
-      modificationDate: [],
-      user: [],
-      name: [null, [Validators.required], [nameRepetition(this.db, 'comp')]],
-      hole: this.fb.array(
-        this.holeForm()
-      )
+  /** 初始化数据 */
+  formInit() {
+    const data = this.data;
+    const fb = new FormBuilder();
+    this.formData = fb.group({
+      id: [data.id],
+      /** 名称 */
+      name: [data.name, [Validators.required]],
+      hole: fb.array([])
     });
-  }
-  reset() {
-    // this.createFormGroup();
-    this.formData.setControl('hole', this.fb.array(this.holeForm()));
-    this.formData.setValue(this.data);
-    console.log(this.formData, this.data);
-    // tslint:disable-next-line:forin
-    for (const i in this.formData.controls) {
-      this.formData.controls[i].markAsDirty();
-      this.formData.controls[i].updateValueAndValidity();
-    }
-  }
-  /** 孔form */
-  holeForm() {
-    console.log(!this.data);
-    if (this.data) {
-      return this.data.hole.map((v, i) => {
-        return this.createHoleForm(i);
-      });
-    }
-    return [this.createHoleForm(0)];
-  }
-  createHoleForm(index: number) {
-    return this.fb.group({
-      /** 名字 */
-      name: [null, [Validators.required, arrayValidator(index, 'hole', 'name')]],
-      /** 孔明细 */
-      holes: [null, [Validators.required]],
-      /** 图片 */
-      ImgBase64: [],
-    });
-  }
 
+    // this.formData.setValue(data);
+    console.log('初始化数据', data, !data.id && data.name);
+    this.formData.controls.name.setAsyncValidators([nameRepetition(this.db, this.dbName)]);
+    if (!data.id && data.name) {
+      setTimeout(() => this.formData.controls.name.updateValueAndValidity(), 1);
+    }
+  }
+  /** 预设构建名称 */
+  bridgeOtherKeySelect() {
+    const arr = this.leftMenu.menus.map(v => v.name);
+    return ['T梁', '预制箱梁', '盖梁', '空心板梁'].filter(v => arr.indexOf(v) === -1);
+  }
 
   onMneu(data: Comp) {
     console.log('一条数据', data);
     this.data = data;
-    this.reset();
+    this.formInit();
   }
   /**
    * * 编辑
@@ -114,8 +91,7 @@ export class ComponentComponent implements OnInit {
       this.data = data;
       console.log(this.data, data);
     }
-    this.reset();
-    this.leftMenu.markForCheck();
+    this.formInit();
   }
   /**
    * *编辑完成
@@ -148,76 +124,5 @@ export class ComponentComponent implements OnInit {
       this.leftMenu.getMenuData();
     }
     this.deleteShow = false;
-  }
-
-
-  addHole() {
-    // tslint:disable-next-line:no-angle-bracket-type-assertion
-    const control = <FormArray>this.formData.controls.hole;
-    const length = this.formData.value.hole.length;
-    control.push(this.createHoleForm(length));
-    this.data = this.formData.value;
-  }
-  /**
-   * *删除梁型
-   * @param index 序号
-   */
-  delHole(index = null, event) {
-    console.log('删除构建梁', index, event, event.x);
-    if (index === null || event.x === 0) {
-      return;
-    }
-    // tslint:disable-next-line:no-angle-bracket-type-assertion
-    const control = <FormArray>this.formData.controls.hole;
-    control.removeAt(index);
-    this.data = this.formData.value;
-  }
-
-  handleClose(form: FormControl, tag): void {
-    const v = form.value || [];
-    console.log(tag, v);
-    const tags = v.filter(f => f !== tag);
-    form.setValue(tags);
-  }
-
-  sliceTagName(tag: string): string {
-    const isLongTag = tag.length > 20;
-    return isLongTag ? `${tag.slice(0, 20)}...` : tag;
-  }
-
-  showInput(): void {
-    this.inputVisible = true;
-    setTimeout(() => {
-      this.inputElement.nativeElement.focus();
-    }, 10);
-  }
-
-  handleInputConfirm(event, form: FormControl): void {
-    const iv = event.target.value.replace(/\s+/g, '');
-    console.log(iv, iv.length, this.formData.valid);
-    // tslint:disable-next-line:forin
-    for (const i in this.formData.controls) {
-      //   this.formData.controls[i].markAsDirty();
-      this.formData.controls[i].updateValueAndValidity();
-      console.log('表单校验', i, this.formData.controls[i].valid);
-    }
-    if (iv.length <= 0) {
-      return;
-    }
-    const v = form.value || [];
-    // console.log(event, form, v);
-    if (v.indexOf(iv) === -1) {
-      // this.tags = [...this.tags, this.inputValue];
-      form.setValue([...v, iv]);
-      event.target.value = null;
-    } else {
-      this.message.error('孔号已存在');
-    }
-    // this.inputValue = '';
-    // this.inputVisible = false;
-  }
-  ss() {
-    console.log(this.data);
-    this.formData.setValue(this.data);
   }
 }

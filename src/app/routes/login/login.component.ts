@@ -24,6 +24,8 @@ const menus = [
   { platform: 'grouting,windows', jurisdiction: 0, url: '/live-grouting', icon: 'fund', name: '压浆监控' },
   // { platform: 'tension', jurisdiction: 8, url: '/auto', icon: 'box-plot', name: '自动' },
   { platform: 'all', jurisdiction: 0, url: '/help', icon: 'question', name: '帮助'},
+
+  { platform: 'all', jurisdiction: 0, url: '/help', icon: 'question', name: 'LINUX', linux: true},
 ];
 @Component({
   selector: 'app-login',
@@ -81,27 +83,29 @@ export class LoginComponent implements OnInit {
       this.login();
     }, 1000);
   }
+  /** 管理登录 */
   adminLogin() {
     clearTimeout(this.dyLogin);
     this.dyLogin = null;
     this.login(true);
     console.log('22222222222222222');
   }
-  login(jurisdiction = false) {
+  login(admin = false) {
     // tslint:disable-next-line:forin
     for (const i in this.validateForm.controls) {
       this.validateForm.controls[i].markAsDirty();
       this.validateForm.controls[i].updateValueAndValidity();
     }
     const value = this.validateForm.value;
-    console.log(value, jurisdiction, (jurisdiction && 1 >= 5));
-    this.db.users.filter(a => a.name === value.userName && a.password === value.password &&
-      ((!jurisdiction && a.jurisdiction < 5) || (jurisdiction && a.jurisdiction >= 5)))
+    console.log(value, admin, (admin && 1 >= 5));
+    this.db.users.filter(a => (a.name === value.userName && a.password === value.password)
+      && ((!admin  && a.jurisdiction < 8) || (admin && a.jurisdiction >= 8)) )
       .first().then((user: User) => {
-        console.log(user);
+        console.log('登录用户', user);
         if (user) {
           // sessionStorage.setItem('user', JSON.stringify(admin));
           this.appS.userInfo = {
+            id: user.id,
             name: user.name,
             jurisdiction: user.jurisdiction,
             nameId: `${user.name}-${user.id}`,
@@ -109,14 +113,17 @@ export class LoginComponent implements OnInit {
           };
           const stateTension = localStorage.getItem('stateTension');
           console.log('stateTension', stateTension, localStorage.getItem('stateTension'));
-          this.message.success('登录成功🙂');
+          // this.message.success('登录成功🙂');
+          /** 菜单过滤 */
           this.appS.menus = menus.filter(menu => {
-            if (this.appS.platform === 'debug') {
-              return true;
-            } else if (menu.platform === 'all') {
-              return menu.jurisdiction <= user.jurisdiction;
-            } else if (menu.platform.indexOf(this.appS.platform) > -1 ) {
-              return menu.jurisdiction <= user.jurisdiction;
+            if (this.appS.platform === 'debug' || menu.platform.indexOf(this.appS.platform) > -1 ) {
+              if (menu.linux) {
+                if (this.e.isLinux) {
+                  return menu.jurisdiction <= user.jurisdiction;
+                }
+              } else {
+                return menu.jurisdiction <= user.jurisdiction;
+              }
             }
           });
           if (stateTension) {

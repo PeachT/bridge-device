@@ -16,6 +16,7 @@ export class OperatComponent implements OnInit {
   @Input() formData: FormGroup;
   @Input() saveState = true;
   @Input() coprState = false;
+  @Input() addState = true;
 
   @Output() outEditOk = new EventEmitter();
   @Output() outEdit = new EventEmitter();

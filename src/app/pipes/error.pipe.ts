@@ -2,14 +2,18 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({ name: 'ValidatorError' })
 export class ValidatorErrorPipe implements PipeTransform {
-  transform(controlsError: any): string {
+  transform(controlsError: any, errorMsg: any = null): string {
     if (controlsError) {
       const e = [];
       // tslint:disable-next-line:forin
       for (const key in controlsError) {
         switch (key) {
           case 'required':
-            e.push('必须输入！');
+            if (!errorMsg) {
+              e.push('必须输入！');
+            } else {
+              e.push(errorMsg[key] || '必须输入！');
+            }
             break;
           default:
             if (controlsError[key]) {

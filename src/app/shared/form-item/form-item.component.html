@@ -7,7 +7,9 @@
     <ng-content select="nz-select"></ng-content>
     <ng-content select="nz-date-picker"></ng-content>
     <ng-content select="nz-radio-group"></ng-content>
+    <ng-content select="nz-input-group"></ng-content>
+    <ng-content select="nz-checkbox-wrapper"></ng-content>
 
-    <div class="tip">{{errors | ValidatorError}}</div>
+    <div class="tip">{{errors | ValidatorError: errorMsg}}</div>
   </nz-form-control>
 </div>
