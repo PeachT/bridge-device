@@ -65,9 +65,7 @@ export class ComponentComponent implements OnInit {
     // this.formData.setValue(data);
     console.log('初始化数据', data, !data.id && data.name);
     this.formData.controls.name.setAsyncValidators([nameRepetition(this.db, this.dbName)]);
-    if (!data.id && data.name) {
-      setTimeout(() => this.formData.controls.name.updateValueAndValidity(), 1);
-    }
+    setTimeout(() => this.formData.controls.name.updateValueAndValidity(), 1);
   }
   /** 预设构建名称 */
   bridgeOtherKeySelect() {

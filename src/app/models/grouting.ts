@@ -5,9 +5,9 @@ export interface GroutingTask extends TaskBase {
   /** 梁长度 */
   beamLength: number;
   /** 张拉日期 */
-  tensinDate: Date;
+  tensinDate: Date | string;
   /** 浇筑日期 */
-  castingDate: Date;
+  castingDate: Date | string;
   /** 压浆顺序 */
   sort: string;
   /** 设备编号 */
@@ -59,9 +59,9 @@ export interface GroutingHoleItem {
   /** 浆液温度 */
   slurryTemperature?: number;
   /** 开始时间 */
-  startDate: Date;
+  startDate: Date | string;
   /** 完成时间 */
-  endDate: Date;
+  endDate: Date | string;
   /** 进浆压力 */
   intoPulpPressure?: number;
   /** 回浆压力 */

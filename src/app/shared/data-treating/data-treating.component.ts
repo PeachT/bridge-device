@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, ViewChild, TemplateRef } from '@angular/core';
-import { of } from 'rxjs';
+import { of, from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DbService } from 'src/app/services/db.service';
 import { NzFormatEmitEvent, NzTreeComponent } from 'ng-zorro-antd';
@@ -14,9 +14,10 @@ import { DateFormat } from 'src/app/Function/DateFormat';
 import { utf8_to_b64, b64_to_utf8 } from 'src/app/Function/stringToBase64';
 import { TensionTask } from 'src/app/models/task.models';
 import { lastDayOfWeek, lastDayOfMonth, startOfWeek, startOfMonth, getTime, compareAsc, compareDesc, format } from 'date-fns';
-import { copyAny } from 'src/app/models/base';
-import { GroutingTask } from 'src/app/models/grouting';
+import { copyAny, getModelBase, baseEnum } from 'src/app/models/base';
+import { GroutingTask, GroutingHoleItem, GroutingInfo } from 'src/app/models/grouting';
 import { unit } from 'src/app/Function/unit';
+import { HMIModel } from './grouting';
 
 @Component({
   selector: 'app-data-treating',
@@ -70,7 +71,7 @@ export class DataTreatingComponent implements OnInit {
     msg: null
   };
   indatas: Array<TensionTask>;
-  inHMIcsvData: Array<any>;
+  inHMIcsvData: Array<HMIModel>;
   selectIndatas: Array<TensionTask>;
   upanState = {
     path: null,
@@ -107,6 +108,9 @@ export class DataTreatingComponent implements OnInit {
   groutingTemplateShow = false;
   /** HMI模板id */
   groutingTemplateId = null;
+  /** 导入模板 */
+  groutingtemplateMenu$: Observable<Array<{label: string; value: any;}>>;
+
   rangesDate = { 本周: [startOfWeek(new Date()), lastDayOfWeek(new Date())], 本月: [startOfMonth(new Date()), lastDayOfMonth(new Date())] };
 
   constructor(
@@ -251,7 +255,7 @@ export class DataTreatingComponent implements OnInit {
   /** 获取项目数据 */
   async getTaskProject() {
     this.taskData.project = await this.db.getTaskDataTreatingProject();
-    console.log(this.taskData.project);
+    console.log('获取项目数据', this.taskData.project);
     if (this.taskData.project.length === 1) {
       this.taskData.sp = this.taskData.project[0].key;
       this.getTaskComponent();
@@ -294,13 +298,6 @@ export class DataTreatingComponent implements OnInit {
   }
   /** 获取任务梁数据 */
   async getTaskBridge() {
-    // this.taskData.bridge = await this.db.getTaskBridgeMenuData(
-    //   (o1) => o1.project === this.taskData.sp && o1.component === this.taskData.sc);
-    // console.log(this.taskData.bridge);
-    // this.cdr.detectChanges();
-
-    // const bridge = await this.db.getTaskBridgeMenuData(
-    //   'task',
     this.taskData.bridge = [];
     const bridge = await this.db.getTaskBridgeMenuData(
       this.dbName,
@@ -338,6 +335,26 @@ export class DataTreatingComponent implements OnInit {
     console.log(this.filter);
     this.cdr.detectChanges();
   }
+  /** 获取模板 */
+  getGroutingTemplate() {
+    console.log(this.taskData);
+
+    this.groutingtemplateMenu$ = from(this.db.db.grouting.filter(f => f.project === this.taskData.sp && f.template).toArray()).pipe(
+      map(comps => {
+        const arr = [];
+        comps.map((item: GroutingTask) => {
+          arr.push({ label: `${item.component}-${item.name}`, value: item.id });
+        });
+        if (arr.length === 1) {
+          this.groutingTemplateId = arr[0].value;
+        } else {
+          this.groutingTemplateId = null;
+        }
+        this.cdr.detectChanges();
+        return arr;
+      })
+    );
+  }
   /** 选择梁 */
   setBridge(b) {
     const id = b;
@@ -373,8 +390,7 @@ export class DataTreatingComponent implements OnInit {
         this.inDataRun();
         break;
       case 4:
-        this.message.warning('功能没有实现');
-        this.groutingTemplateShow = true;
+        this.inHMIcsvOK();
         break;
       default:
         break;
@@ -498,33 +514,24 @@ export class DataTreatingComponent implements OnInit {
   /** 压浆导出表格数据处理 */
   async groutingExecl(id) {
     // this.savePath = this.savePath.replace(new RegExp(/(\\)/g), '/');
-    const outdata = {
-      record: [],
-      data: {
-        name: null,
-        component: null,
-        tensionDate: null,
-        project: null,
-        bridgeOtherInfo: null,
-        bridgeInfo: null,
-      }
-    };
+    const outdata: any = {};
     this.progress.state = true;
     // {mm: 12.25, sumMm: 24.01, percent: -3.96, remm: 17.27}
     console.log(id);
-    const data = await this.db.db.grouting.filter(t => t.id === id).first();
+    const data: GroutingTask = await this.db.db.grouting.filter(t => t.id === id).first();
     const project = await this.db.db.project.filter(p => p.id === this.taskData.sp).first();
-    outdata.data.name = data.name;
-    outdata.data.component = data.component;
-    outdata.data.bridgeOtherInfo = data.otherInfo;
-    outdata.data.project = project;
-    outdata.data.bridgeInfo = {...data, groups: null};
+    outdata.project = project;
+    outdata.bridgeInfo = {...data};
     console.log(data, id);
-    outdata.record = data.groutingInfo.map(g => {
-      // tslint:disable-next-line:max-line-length
-      return {...g,  startDate: format(new Date(g.groups[0].startDate), 'HH:mm:ss'), endDate: format(new Date(g.groups[0].endDate), 'HH:mm:ss') };
+    outdata.bridgeInfo.groutingInfo = data.groutingInfo.map((g: GroutingInfo) => {
+      return {...g, groups: g.groups.map((hg: GroutingHoleItem) => {
+        // tslint:disable-next-line:max-line-length
+        return {...hg, startDate: format(new Date(g.groups[0].startDate), 'HH:mm:ss'), endDate: format(new Date(g.groups[0].endDate), 'HH:mm:ss')}}
+      )};
     });
-    console.log('处理后的数据', id, outdata);
+    outdata.other = {};
+    outdata.other.groutingDate = format(new Date(data.groutingInfo[0].groups[0].endDate), 'yyyy-MM-dd')
+    console.log('导出处理后的数据', id, outdata);
     return outdata;
   }
   /** 导出数据 */
@@ -747,8 +754,10 @@ export class DataTreatingComponent implements OnInit {
         console.log(this.taskData.project);
         if (this.taskData.project.length === 1) {
           this.taskData.sp = this.taskData.project[0].key;
+          this.getGroutingTemplate();
         }
         this.inHMIcsvData = data.data;
+        console.log('处理好的HMI数据', this.inHMIcsvData);
         this.inData.state = false;
         this.cdr.detectChanges();
       } else {
@@ -761,24 +770,46 @@ export class DataTreatingComponent implements OnInit {
     });
   }
   /** 确定导入HMI数据 */
-  async inHMIcsvOK(id) {
+  async inHMIcsvOK() {
+    const id = this.groutingTemplateId;
     console.log(id);
     this.groutingTemplateShow = false;
-    const tempdata = await this.db.db.grouting.filter(g => g.id === id).first();
-    this.inHMIcsvData.map(async g => {
+    const tempdata: GroutingTask = await this.db.db.grouting.filter(g => g.id === id).first();
+    this.inHMIcsvData.filter(f => this.taskData.sb.indexOf(f.name) !== -1 ).map(async g => {
       const count = await this.db.repetitionAsync('grouting',
         (o: GroutingTask) => o.name === g.name && o.project === tempdata.project && o.component === tempdata.component);
       if (count) {
         this.progressState(g.name, 'jump');
       } else {
-        g.groups.map(item => {
-          item.direction = tempdata.groutingInfo[0].groups[0].direction;
+        const groutingInfo = g.groups.map(item => {
+          const r: GroutingInfo = {
+            ...tempdata.groutingInfo[0],
+            name: item.name,
+            state: 2,
+            uploading: false,
+            groups: [{...getModelBase(baseEnum.groutingHoleitem),
+              direction: tempdata.groutingInfo[0].groups[0].direction,
+              setGroutingPressure: item.setMpa,
+              startDate: item.startDate,
+              endDate: item.endDate,
+              intoPulpPressure: item.steadyMpa,
+              steadyTime: item.steadyTime
+            }]
+          }
+          return r;
         })
-        const data: GroutingTask = copyAny(tempdata);
-        data.name = g.name;
-        data.template = false;
-        data.groutingInfo = g.groups;
-        const success = await this.db.addAsync('grouting', data,
+        const bridge: GroutingTask = {...tempdata,
+          name: g.name,
+          tensinDate: null,
+          castingDate: null,
+          template: false,
+          mixingInfo: [],
+          groutingInfo
+        };
+        delete bridge.id;
+        console.log('HMI导入一条数据', bridge);
+
+        const success = await this.db.addAsync('grouting', bridge,
           (o: GroutingTask) => o.name === g.name && o.project === tempdata.project && o.component === tempdata.component);
         if (success.success) {
           this.progressState(g.name, 'add');

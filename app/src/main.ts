@@ -262,21 +262,13 @@ ipcMain.on('get-dbfile', async (event, data) => {
 
 // 导出表格
 ipcMain.on('derivedExcel', async (event, data) => {
-  // console.log('123456789', path);
-  // 获得Excel模板的buffer对象
-  // derived = {
-  //   templatePath: null,
-  //   outPath: null,
-  // };
   const outPath = data.outPath;
   if (!fs.existsSync(outPath)) {
     fs.mkdirSync(outPath);
-    // tslint:disable-next-line: no-use-before-declare
-    // exec(`sudo mkdir ${outPath}`, { async: true }, (code, stdout, stderr) => {});
   }
 
   const filePath = data.templatePath;
-  const savePath = `${outPath}/${data.data.data.name}${data.fileName}记录.xlsx`;
+  const savePath = `${outPath}/${data.data.bridgeInfo.name}${data.fileName}记录.xlsx`;
   try {
     console.log(filePath, savePath, outPath, data.outPath);
     const exlBuf = await readFileAsync(filePath);

@@ -313,7 +313,7 @@ export class DbService {
     const r = [];
     const j =  this.appS.userInfo.jurisdiction;
     await this.db.project.filter((o1: Project) => {
-      if ((j < 8 && o1.jurisdiction !== 8) || j >= 8) {
+      if (j >= 8 || o1.jurisdiction < 8) {
         return true;
       }
     }).each(v => {

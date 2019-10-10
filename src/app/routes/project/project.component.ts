@@ -105,16 +105,14 @@ export class ProjectComponent implements OnInit, OnChanges {
     // this.formData.setValue(data);
     console.log('初始化数据', data, !data.id && data.name);
     this.formData.controls.name.setAsyncValidators([nameRepetition(this.db, this.dbName)]);
-    if (!data.id && data.name) {
-      setTimeout(() => {
-        this.formData.controls.name.updateValueAndValidity();
-        // tslint:disable-next-line:forin
-        // for (const i in this.formData.controls) {
-        //   this.formData.controls[i].markAsDirty();
-        //   this.formData.controls[i].updateValueAndValidity();
-        // }
-      }, 1);
-    }
+    setTimeout(() => {
+      this.formData.controls.name.updateValueAndValidity();
+      // tslint:disable-next-line:forin
+      // for (const i in this.formData.controls) {
+      //   this.formData.controls[i].markAsDirty();
+      //   this.formData.controls[i].updateValueAndValidity();
+      // }
+    }, 1);
   }
 
   onMneu(data: Project) {

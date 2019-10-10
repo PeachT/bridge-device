@@ -167,10 +167,17 @@
       </nz-radio-group>
       <span style="color: red;" *ngIf="!taskData.sp">请选择项目！！</span>
     </div>
+    <hr>
     <div *ngIf="exportMode === 3">
       选择顶：
       <nz-radio-group [(ngModel)]="taskData.sj" (ngModelChange)="selectTaskJack($event)">
         <label nz-radio [nzValue]="j.title" *ngFor="let j of taskData.jack">{{j.title}}</label>
+      </nz-radio-group>
+    </div>
+    <div *ngIf="exportMode === 4">
+      选择模板：
+      <nz-radio-group [(ngModel)]="groutingTemplateId" nzSize="large">
+        <label nz-radio nzSize="large" [nzValue]="c.value" *ngFor="let c of groutingtemplateMenu$ | async">{{c.label}}</label>
       </nz-radio-group>
     </div>
     <table class="gridtable border-top" *ngIf="exportMode === 3">
@@ -224,9 +231,9 @@
         <ng-container *ngFor="let task of inHMIcsvData; index as i">
           <tr>
             <td>
-              <label class="checkbox" [ngClass]="{'check': taskData.sb.indexOf(task.id) > -1}">
-                <input type="checkbox" [checked]="taskData.sb.indexOf(task.id) > -1" (click)="setBridge(task.id)"
-                  [value]="task.id" />
+              <label class="checkbox" [ngClass]="{'check': taskData.sb.indexOf(task.name) > -1}">
+                <input type="checkbox" [checked]="taskData.sb.indexOf(task.name) > -1" (click)="setBridge(task.name)"
+                  [value]="task.name" />
               </label>
             </td>
             <td>{{task.name}}</td>
@@ -246,7 +253,7 @@
       style="margin-right: 15px;"
       nz-button nzType="primary"
       (click)="exportOk()"
-      [disabled]="!(taskData.sb.length > 0) || (!savePath && exportMode < 3) || !(progress.btnTitle && !progress.success) || !taskData.sp"
+      [disabled]="!(taskData.sb.length > 0) || (!savePath && exportMode < 3) || !(progress.btnTitle && !progress.success) || !taskData.sp || (exportMode === 4 && !groutingTemplateId)"
       [nzLoading]="progress.state">{{progress.btnTitle || '操作'}}</button>
       <!-- <p>{{!(taskData.sb.length > 0)}} {{!savePath && exportMode < 3}} {{!(progress.btnTitle && !progress.success)}}</p> -->
     <div *ngIf="exportMode !== 2" style="flex: 1; display: flex;">

@@ -3,7 +3,7 @@
 
   <div class="item" *ngIf="GPLCS.linkMsg.link" [ngClass]="{'active': GPLCS.linkMsg.link}">压:{{GPLCS.linkMsg.delayTime}}</div>
   <button nz-button nzType="dashed" [nzLoading]="GPLCS.linkMsg.now"
-    *ngIf="(appS.platform === 'grouting' || appS.platform === 'debug') && !GPLCS.linkMsg.link"
+    *ngIf="(appS.platform === 'grouting' || appS.platform === 'debug') && !GPLCS.linkMsg.link && appS.userInfo"
     (click)="GPLCS.linkSocket()">压浆链接</button>
 </div>
 <router-outlet></router-outlet>
