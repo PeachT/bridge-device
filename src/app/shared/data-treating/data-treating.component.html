@@ -218,8 +218,8 @@
     <table class="gridtable border-top" *ngIf="exportMode === 4">
       <thead>
         <tr>
-          <th>选择</th>
-          <th>梁号</th>
+          <th style="min-width: 80px;">选择</th>
+          <th style="min-width: 80px;">梁号</th>
           <th>压浆孔道</th>
           <!-- <th>油泵编号</th>
             <th>标定系数a</th>
@@ -238,8 +238,10 @@
             </td>
             <td>{{task.name}}</td>
             <td>
-              <span class="record" [ngClass]="{'ok': item.record}"
+              <div style="display: flex; flex-wrap: wrap;">
+                <span class="record" [ngClass]="{'ok': item.record}"
                 *ngFor="let item of task.groups">{{item.name}}</span>
+              </div>
             </td>
           </tr>
         </ng-container>

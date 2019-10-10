@@ -24,7 +24,6 @@ const menus = [
   { platform: 'grouting,windows', jurisdiction: 0, url: '/live-grouting', icon: 'fund', name: '压浆监控' },
   // { platform: 'tension', jurisdiction: 8, url: '/auto', icon: 'box-plot', name: '自动' },
   { platform: 'all', jurisdiction: 0, url: '/help', icon: 'question', name: '帮助'},
-
   { platform: 'all', jurisdiction: 0, url: '/help', icon: 'question', name: 'LINUX', linux: true},
 ];
 @Component({
@@ -116,7 +115,7 @@ export class LoginComponent implements OnInit {
           // this.message.success('登录成功🙂');
           /** 菜单过滤 */
           this.appS.menus = menus.filter(menu => {
-            if (this.appS.platform === 'debug' || menu.platform.indexOf(this.appS.platform) > -1 ) {
+            if (this.appS.platform === 'debug' || menu.platform.indexOf(this.appS.platform) > -1 || menu.platform === 'all') {
               if (menu.linux) {
                 if (this.e.isLinux) {
                   return menu.jurisdiction <= user.jurisdiction;

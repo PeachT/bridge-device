@@ -21,7 +21,7 @@
             >
             <button nz-button nzType="primary" (click)="upload()" [disabled]="!(data?.groutingInfo?.length > 0) || !uploading"><i nz-icon nzType="cloud-upload"
               nzTheme="outline"></i>上传</button>
-            <button nz-button nzType="primary" (click)="test()" >测试</button>
+            <button nz-button nzType="primary" (click)="test()" *ngIf="appS.platform === 'debug'">测试</button>
           </app-operat>
         </div>
       </nz-tab>

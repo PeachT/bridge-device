@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, ViewChild, TemplateRef } from '@angular/core';
 import { of, from, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, groupBy, mergeMap, toArray } from 'rxjs/operators';
 import { DbService } from 'src/app/services/db.service';
 import { NzFormatEmitEvent, NzTreeComponent } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
@@ -751,13 +751,54 @@ export class DataTreatingComponent implements OnInit {
       console.log('HMIcsv数据', data);
       if (data.success) {
         this.taskData.project = await this.db.getTaskDataTreatingProject();
+        const arr = data.data;
+        const arrData = [];
+        let example: Observable<any> = null;
+        for (let index = 16; index < arr.length; index += 16 ) {
+          const a: any = {};
+          const name = `${arr[index]}${arr[index + 1]}`;
+          if (!name || name === 'undefined') {
+            break;
+          } else {
+            a.oname = name;
+            a.name = arr[index+2];
+            a.steadyMpa = arr[index+3];
+            a.proportion = arr[index+4];
+            a.setMpa = arr[index+5];
+            a.steadyTime = arr[index+6];
+            const date = `${arr[index+7]}-${arr[index+8]}-${arr[index+9]}`;
+
+            a.startDate = new Date(`${date} ${arr[index+10]}:${arr[index+11]}:${arr[index+12]}`);
+            a.endDate = new Date(`${date} ${arr[index+13]}:${arr[index+14]}:${arr[index+15]}`);
+          }
+          arrData.push(a);
+        }
+        // 根据 age 分组
+        example = from(arrData).pipe(
+          groupBy(person => person.oname),
+          // 为每个分组返回一个数组
+          mergeMap(group => group.pipe(toArray()))
+        );
+        console.log('1234679', arrData, example);
+        const gs = []
+        example.subscribe(r => {
+          const g: any = {name: r[0].oname}
+          const holes = [];
+          r.map(m => {
+            delete m.oname;
+            holes.push(m);
+          })
+          g.groups = holes;
+          gs.push(g)
+        })
+
         console.log(this.taskData.project);
         if (this.taskData.project.length === 1) {
           this.taskData.sp = this.taskData.project[0].key;
           this.getGroutingTemplate();
         }
-        this.inHMIcsvData = data.data;
-        console.log('处理好的HMI数据', this.inHMIcsvData);
+        this.inHMIcsvData = gs;
+        console.log('处理好的HMI数据', this.inHMIcsvData, gs);
         this.inData.state = false;
         this.cdr.detectChanges();
       } else {

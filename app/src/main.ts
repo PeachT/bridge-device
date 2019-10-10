@@ -332,39 +332,39 @@ ipcMain.on('inHMIcsv', async (event, data) => {
       if (err) {
         event.sender.send(data.channel, { success: false, mgs: '读取文件错误', error: err });
       } else {
-        const arrData = [];
+        // const arrData = [];
         if (arr.length > 0) {
-          // tslint:disable-next-line:prefer-for-of
-          for (let index = 16; index < arr.length; index+= 16 ) {
-            const a: any = {};
-            const name = `${arr[index]}${arr[index + 1]}`;
-            if (!name || name === 'undefined') {
-              break;
-            } else {
-              a.name = arr[index+2];
-              a.steadyMpa = arr[index+3];
-              a.proportion = arr[index+4];
-              a.setMpa = arr[index+5];
-              a.steadyTime = arr[index+6];
-              const date = `${arr[index+7]}-${arr[index+8]}-${arr[index+9]}`;
+          // // tslint:disable-next-line:prefer-for-of
+          // for (let index = 16; index < arr.length; index += 16 ) {
+          //   const a: any = {};
+          //   const name = `${arr[index]}${arr[index + 1]}`;
+          //   if (!name || name === 'undefined') {
+          //     break;
+          //   } else {
+          //     a.name = arr[index+2];
+          //     a.steadyMpa = arr[index+3];
+          //     a.proportion = arr[index+4];
+          //     a.setMpa = arr[index+5];
+          //     a.steadyTime = arr[index+6];
+          //     const date = `${arr[index+7]}-${arr[index+8]}-${arr[index+9]}`;
 
-              a.startDate = new Date(`${date} ${arr[index+10]}:${arr[index+11]}:${arr[index+12]}`);
-              a.endDate = new Date(`${date} ${arr[index+13]}:${arr[index+14]}:${arr[index+15]}`);
-            }
-            if (arrData.length > 0) {
-              // tslint:disable-next-line:prefer-for-of
-              for (let i = 0; i < arrData.length; i++) {
-                if (arrData[i].name === name) {
-                  arrData[i].groups.push(a);
-                } else {
-                  arrData.push({name, id: index, groups: [a]});
-                }
-              }
-            } else {
-              arrData.push({name, id: index, groups: [a]});
-            }
-          }
-          event.sender.send(data.channel, { success: true, data: arrData });
+          //     a.startDate = new Date(`${date} ${arr[index+10]}:${arr[index+11]}:${arr[index+12]}`);
+          //     a.endDate = new Date(`${date} ${arr[index+13]}:${arr[index+14]}:${arr[index+15]}`);
+          //   }
+          //   if (arrData.length > 0) {
+          //     // tslint:disable-next-line:prefer-for-of
+          //     for (let i = 0; i < arrData.length; i++) {
+          //       if (arrData[i].name === name) {
+          //         arrData[i].groups.push(a);
+          //       } else {
+          //         arrData.push({name, id: index, groups: [a]});
+          //       }
+          //     }
+          //   } else {
+          //     arrData.push({name, id: index, groups: [a]});
+          //   }
+          // }
+          event.sender.send(data.channel, { success: true, data: arr});
         } else {
           event.sender.send(data.channel, { success: false, mgs: '没有数据' });
         }
