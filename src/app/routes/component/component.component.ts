@@ -3,7 +3,7 @@ import {
   FormGroup, FormControl, FormBuilder, Validators, AsyncValidatorFn,
   AbstractControl, ValidationErrors, FormArray, ValidatorFn
 } from '@angular/forms';
-import { DB, DbService, tableName } from 'src/app/services/db.service';
+import { DB, DbService, DbEnum } from 'src/app/services/db.service';
 import { NzMessageService, NzModalService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
 import { Router } from '@angular/router';

@@ -35,7 +35,7 @@ export class GroutingMianComponent implements OnInit, OnChanges {
     && o1.component === o2.component && o1.project === o2.project && o1.id !== o2.id
 
   constructor(
-    public odb: DbService,
+    public db: DbService,
     public appS: AppService,
     public GPLCS: GroutingService
   ) { }
@@ -53,7 +53,7 @@ export class GroutingMianComponent implements OnInit, OnChanges {
   }
   /** 获取构建菜单 */
   getComponent() {
-    this.componentMneu$ = from(this.odb.db.comp.toArray()).pipe(
+    this.componentMneu$ = from(this.db.db.comp.toArray()).pipe(
       map(comps => {
         const arr = [];
         this.componentHoles = [];

@@ -18,7 +18,7 @@ import { Project } from 'src/app/models/project';
 })
 export class TaskMenuComponent implements OnInit {
   @ViewChild('bridgeScroll', null) bridgeScrollDom: ElementRef;
-  @Input() dbNmae = 'task';
+  @Input() dbNmae: 'task' | 'grouting';
   project = {
     select: null,
     menu: null,

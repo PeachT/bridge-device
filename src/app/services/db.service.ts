@@ -14,6 +14,7 @@ import { keyGroupBy } from '../Function/groupBy';
 import { AppService } from './app.service';
 import { IBase } from '../models/base';
 import { GroutingIndex, GroutingTask } from '../models/grouting';
+import { Menu$ } from '../models/app';
 
 @Injectable({ providedIn: 'root' })
 export class DbService {
@@ -308,6 +309,48 @@ export class DbService {
     }
     return {menus: r, count};
   }
+
+  /**
+   * 分页获取菜单数据
+   *
+   * @template T 菜单对象model
+   * @param {string} dbName 数据库名称
+   * @param {(o1: T) => boolean} f 获取数据过滤
+   * @param {number} [pageSize=0] 分页页码
+   * @param {number} [pageIndex=0] 每页条数 =0获取所有数据
+   * @param {{label: string, value: string, state?: (o1: T) => any}} [keys=null] 筛选字段
+   * @returns {(Promise<Observable<{
+   *       data: Array<T> | Array<Menu$>;
+   *       count: number;
+   *     }>>)}
+   * @memberof DbService
+   */
+  public async pageData<T>(dbName: string, f: (o1: T) => boolean,
+    keys: {label: string, value: string, state?: (o1: T) => any} = { label: 'name', value: 'id' },
+    pageSize: number = 0, pageIndex: number = 0
+  )
+    : Promise<Observable<Menu$>> {
+    const count = await this.db[dbName].filter(o1 => f(o1)).count();
+    return from(this.db[dbName].filter(o1 => f(o1))
+    .reverse() // 按id 反序获取
+    .offset(pageSize) // 第几条开始
+    .limit(pageIndex || count) // 获取几条
+    .toArray()).pipe(
+      map((g: Array<T>) => {
+        if (keys) {
+          return {data: g.map(item =>{
+            if (keys.state) {
+              return {label: item[keys.label], value: item[keys.value], state: keys.state(item)}
+            } else {
+              return {label: item[keys.label], value: item[keys.value]}
+            }
+          }), count};
+        } else {
+          return {data: g, count};
+        }
+      })
+    )
+  }
   /** 任务数据导出菜单 */
   public async getTaskDataTreatingProject() {
     const r = [];
@@ -379,7 +422,7 @@ export class DB extends Dexie {
   }
 }
 
-export enum tableName {
+export enum DbEnum {
   users = 'users',
   task = 'task',
   jack = 'jack',

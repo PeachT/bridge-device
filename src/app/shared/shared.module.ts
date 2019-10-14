@@ -22,6 +22,7 @@ import { TaskMenuComponent } from './task-menu/task-menu.component';
 import { GroutingTemplateComponent } from './grouting-template/grouting-template.component';
 import { FormItemComponent } from './form-item/form-item.component';
 import { DynamicLineGroutingComponent } from './echarts/dynamic-line-grouting/dynamic-line-grouting.component';
+import { DataInOutComponent } from './data-treating/data-in-out/data-in-out.component';
 
 
 // pipe
@@ -60,6 +61,7 @@ const PIPE = [
   declarations: [
     ...COMPONENTS,
     ...PIPE,
+    DataInOutComponent,
   ],
   imports: [
     ...MODULES,

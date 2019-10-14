@@ -44,6 +44,7 @@
     "date-fns": "^2.3.0",
     "dexie": "^2.0.4",
     "echarts": "^4.2.1",
+    "lz-string": "^1.4.4",
     "ng-zorro-antd": "^8.0.0",
     "ngx-electron": "^2.1.1",
     "rxjs": "~6.5.2",

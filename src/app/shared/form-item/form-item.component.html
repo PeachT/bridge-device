@@ -10,6 +10,6 @@
     <ng-content select="nz-input-group"></ng-content>
     <ng-content select="nz-checkbox-wrapper"></ng-content>
 
-    <div class="tip">{{errors | ValidatorError: errorMsg}}</div>
+    <div class="tip" *ngIf="errorShow">{{errors | ValidatorError: errorMsg}}</div>
   </nz-form-control>
 </div>

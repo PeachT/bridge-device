@@ -1,0 +1,61 @@
+[nz-button] {
+  margin-right: 3px;
+}
+.path-operation {
+  display: flex;
+  flex-wrap: wrap;
+  .btn-path {
+    display: flex;
+    align-items: center;
+  }
+}
+.checkbox {
+  // padding: 5px 10px;
+  // border-bottom: 2px solid;
+  // border-radius: 10px;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+  p {
+    margin: 0;
+    padding-left: 5px;
+  }
+  input {
+    position: absolute;
+    clip: rect(0, 0, 0, 0)
+  }
+  &::before {
+    content: '\a0';
+    display: inline-block;
+    border: 1px solid silver;
+    text-align: center;
+    width: 20px;
+    height: 20px;
+    font-weight: bold;
+    line-height: 18px;
+    flex: none;
+    margin-right: 8px;
+  }
+  &.check::before {
+    content: '\2713';
+    color: white;
+    background: #1890ff;
+    border: 1px solid #1890ff;
+  }
+}
+
+.ok {
+  .progress{
+    display: flex;
+    margin: 14px 0;
+    align-items: center;
+  }
+}
+.export-info {
+  display: flex;
+  flex-wrap: wrap;
+  nz-alert {
+    margin-right: 5px;
+  }
+}

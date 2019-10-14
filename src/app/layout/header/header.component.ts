@@ -7,7 +7,7 @@ import {
 import { Router, NavigationEnd } from "@angular/router";
 import { AppService } from "src/app/services/app.service";
 import { ElectronService } from "ngx-electron";
-import { DbService, tableName } from "src/app/services/db.service";
+import { DbService, DbEnum } from "src/app/services/db.service";
 import { map } from "rxjs/operators";
 import { Observable } from "rxjs";
 import { Store } from '@ngrx/store';

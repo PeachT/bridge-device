@@ -1,0 +1,129 @@
+<!-- <h2>{{bridge$ | async | json}}</h2> -->
+<app-form-item label="操作" row="true" [errorShow]="false">
+  <nz-radio-group [(ngModel)]="operation" (ngModelChange)="selectOperation(true)">
+    <label nz-radio nzValue="outExcel">导出表格</label>
+    <label nz-radio nzValue="outData">导出数据</label>
+    <label nz-radio nzValue="inData">导入数据</label>
+    <label nz-radio nzValue="inHMI">导入HMI数据</label>
+  </nz-radio-group>
+</app-form-item>
+<div *ngIf="operation !== 'outData'">
+  <nz-divider nzText="操作路径"></nz-divider>
+  <div class="path-operation" *ngIf="operation === 'outExcel'">
+    <div class="btn-path" style="margin-right: 15px;" >
+      <button nz-button nzType="primary" (click)="selectTempPath()">选择导出模板</button>
+      <nz-alert nzType="success" [nzMessage]="'模板路径：' + tempPath"></nz-alert>
+    </div>
+    <div class="btn-path">
+      <button nz-button nzType="primary" (click)="selectSavePath()">选择保存位置</button>
+      <nz-alert nzType="info" [nzMessage]="'模板路径：' + savePath"></nz-alert>
+    </div>
+  </div>
+  <div class="path-operation" *ngIf="operation === 'inData' || operation === 'inHMI'">
+    <div class="btn-path">
+      <div class="btn-file">
+        <button nz-button nzShape="round" nzType="primary" (click)="selectInFilePath()">
+          <i nz-icon nzType="upload" nzTheme="outline"></i>选择导入文件</button>
+        <input type="file"
+        [attr.accept]="operation === 'inHMI' ? '.csv' : '.yjdb'"
+        (change)="selectInFilePath($event)">
+      </div>
+      <nz-alert nzType="success" [nzMessage]="'导入文件路径：' + inFilePath"></nz-alert>
+    </div>
+  </div>
+</div>
+
+<div>
+  <nz-divider nzText="项目 | 模板选择"></nz-divider>
+  <div style="flex-wrap: wrap; display: flex;">
+    <app-form-item label="项目" row="true" [errorShow]="false">
+      <nz-radio-group [(ngModel)]="projectId" (ngModelChange)="selectProject()">
+        <label nz-radio [nzValue]="item.value" *ngFor="let item of (projects$ | async)?.data">{{item.label}}</label>
+      </nz-radio-group>
+    </app-form-item>
+
+    <app-form-item label="模板" row="true" [errorShow]="false" *ngIf="operation === 'inHMI'">
+      <nz-radio-group [(ngModel)]="tempId">
+        <label nz-radio [nzValue]="item.value" *ngFor="let item of (templates$ | async)?.data">{{item.label}}</label>
+      </nz-radio-group>
+    </app-form-item>
+    <app-form-item label="构建" row="true" [errorShow]="false" *ngIf="operation === 'outExcel' || operation === 'outData'">
+      <nz-radio-group [(ngModel)]="componentName" (ngModelChange)="selectComponent()">
+        <label nz-radio [nzValue]="item.value" *ngFor="let item of (component$ | async)?.data">{{item.label}}</label>
+      </nz-radio-group>
+    </app-form-item>
+
+  </div>
+</div>
+
+<nz-divider nzText="操作数据"></nz-divider>
+<table class="gridtable border-top">
+  <thead>
+    <tr>
+      <th style="min-width: 120px;">梁号</th>
+      <th>压浆孔道<nz-tag nzColor="#87d068">已完成</nz-tag>
+        <nz-tag nzColor="#b2bbbe">未完成</nz-tag>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of (bridge$ | async)?.data; index as i">
+      <td>
+        <label class="checkbox" [ngClass]="{'check': bridges.indexOf(item.value) > -1}">
+          <input type="checkbox" [checked]="bridges.indexOf(item.value) > -1" (click)="selectBridge(item.value)"
+            [value]="item.value" />
+          {{item.label}}
+        </label>
+      </td>
+      <td>
+        <div>
+          <nz-tag [nzColor]="hole.state === 2 ? '#87d068' : '#b2bbbe' " *ngFor="let hole of item.state">{{hole.name}}
+          </nz-tag>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="ok">
+  <div class="progress">
+    <button nz-button nzType="primary" (click)="ok()"
+    [disabled]="!(bridges.length
+      && (
+        (operation === 'outExcel' && tempPath && savePath)
+        || (operation === 'outData')
+        || (operation === 'inData' && projectId)
+        || (operation === 'inHMI' && inFilePath && tempId)
+      )
+    )"
+    *ngIf="!exportData.success"
+    [nzLoading]="exportData.state">确定</button>
+    <nz-alert nzType="success" nzMessage="完成" *ngIf="exportData.success" nzShowIcon></nz-alert>
+    <button nz-button nzType="primary" (click)="reset()" *ngIf="exportData.success">继续操作</button>
+    <div style="flex: 1; display: flex;">
+      <nz-progress [nzPercent]="exportData.percentage || 0" style="flex: 1; margin-left: 15px;">
+      </nz-progress>
+      <span>{{bridges.length}} / {{exportData.num}}</span>
+    </div>
+  </div>
+  <div *ngIf="operation === 'inHMI' || operation === 'inData'">
+    <div>
+      添加：{{exportData.add.length}}条
+      <div class="export-info">
+        <nz-alert nzType="success" [nzMessage]="item" *ngFor="let item of exportData.add"></nz-alert>
+      </div>
+    </div>
+    <div class="export-info">
+      覆盖：{{exportData.merge.length}}条
+      <div style="display: flex; flex-wrap: wrap;">
+        <nz-alert nzType="warning" [nzMessage]="item" *ngFor="let item of exportData.merge"></nz-alert>
+      </div>
+    </div>
+    <div class="export-info">
+      跳过：{{exportData.jump.length}}条
+      <div style="display: flex; flex-wrap: wrap;">
+        <nz-alert nzType="info" [nzMessage]="item" *ngFor="let item of exportData.jump"></nz-alert>
+      </div>
+    </div>
+  </div>
+</div>
