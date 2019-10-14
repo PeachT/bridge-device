@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import Dexie from 'dexie';
 import { User, userIndex } from '../models/user.models';
-import { TensionTask, TaskIndex, TaskBase } from '../models/task.models';
+import { TensionTask, TaskIndex } from '../models/task.models';
 import { Jack, JackIndex } from '../models/jack';
 import { Project, projectIndex } from '../models/project';
 import { Observable, from, empty } from 'rxjs';
@@ -12,7 +12,7 @@ import { Comp, compIndex } from '../models/component';
 import { Menu } from '../models/menu';
 import { keyGroupBy } from '../Function/groupBy';
 import { AppService } from './app.service';
-import { IBase } from '../models/base';
+import { IBase, TaskBase } from '../models/base';
 import { GroutingIndex, GroutingTask } from '../models/grouting';
 import { Menu$ } from '../models/app';
 
@@ -85,12 +85,6 @@ export class DbService {
       if (tName === 'task') {
         const d: TensionTask = await this.getFirstId('task', data.id);
         const t = data as TensionTask;
-        d.groups.map((g, i) => {
-          if ('record' in g) {
-            t.groups[i].record = g.record;
-          }
-        });
-        t.jack = d.jack;
         data = t;
       }
       if (tName === 'grouting' && !uploading) {
@@ -257,21 +251,21 @@ export class DbService {
               d: false,
               e: false,
             };
-            for (const g of v.groups) {
-              if (g.record) {
-                if (g.record.state === 2) {
-                  cls.a = true;
-                } else if (g.record.state === 1) {
-                  cls.b = true;
-                } else if (g.record.state === 3) {
-                  cls.c = true;
-                } else if (g.record.state === 4) {
-                  cls.d = true;
-                }
-              } else {
-                cls.e = true;
-              }
-            }
+            // for (const g of v.groups) {
+            //   if (g.record) {
+            //     if (g.record.state === 2) {
+            //       cls.a = true;
+            //     } else if (g.record.state === 1) {
+            //       cls.b = true;
+            //     } else if (g.record.state === 3) {
+            //       cls.c = true;
+            //     } else if (g.record.state === 4) {
+            //       cls.d = true;
+            //     }
+            //   } else {
+            //     cls.e = true;
+            //   }
+            // }
             r.push({ name: v.name, id: v.id, cls });
           }
         });

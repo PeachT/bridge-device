@@ -1,22 +1,10 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import {
-  FormGroup, FormControl, FormBuilder, Validators, AsyncValidatorFn,
-  AbstractControl, ValidationErrors, FormArray, ValidatorFn
-} from '@angular/forms';
-import { DB, DbService, DbEnum } from 'src/app/services/db.service';
-import { NzMessageService, NzModalService } from 'ng-zorro-antd';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { DbService } from 'src/app/services/db.service';
 import { AppService } from 'src/app/services/app.service';
-import { Router } from '@angular/router';
-import { Observable, from } from 'rxjs';
-import { PLCService } from 'src/app/services/PLC.service';
-import { map } from 'rxjs/operators';
 import { Comp } from 'src/app/models/component';
-import { copyAny } from 'src/app/models/base';
 import { LeftMenuComponent } from 'src/app/shared/left-menu/left-menu.component';
 import { nameRepetition } from 'src/app/Validator/async.validator';
-import { PLC_D } from 'src/app/models/IPCChannel';
-import { deviceGroupModeDev } from 'src/app/models/jack';
-import { arrayValidator } from 'src/app/Validator/repetition.validator';
 
 @Component({
   selector: 'app-component',
@@ -42,9 +30,7 @@ export class ComponentComponent implements OnInit {
 
   constructor(
     private db: DbService,
-    private message: NzMessageService,
     public appS: AppService,
-    private cdr: ChangeDetectorRef,
   ) {
   }
 
@@ -104,15 +90,7 @@ export class ComponentComponent implements OnInit {
   }
   /** 删除 */
   async delete() {
-    const id = this.appS.leftMenu;
-    const count = await this.db.db.task.filter(t => t.device[0] === id).count();
-    if (count === 0) {
-      this.deleteShow = true;
-      this.cdr.markForCheck();
-      console.log('删除', id, '任务', count, this.deleteShow);
-    } else {
-      this.message.error(`有 ${count} 条任务在该项目下，不允许删除！`);
-    }
+    this.deleteOk();
   }
   async deleteOk(state = false) {
     if (state) {

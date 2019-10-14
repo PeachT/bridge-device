@@ -5,10 +5,10 @@ import {
 import { DbService } from 'src/app/services/db.service';
 import { AppService } from 'src/app/services/app.service';
 import { NzMessageService } from 'ng-zorro-antd';
-import { TaskBase } from 'src/app/models/task.models';
 import { ActivatedRoute } from '@angular/router';
 import { lastDayOfWeek, lastDayOfMonth, startOfWeek, startOfMonth, getTime} from 'date-fns';
 import { Project } from 'src/app/models/project';
+import { TaskBase } from 'src/app/models/base';
 
 @Component({
   // tslint:disable-next-line:component-selector

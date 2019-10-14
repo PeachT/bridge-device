@@ -1,5 +1,5 @@
 import { OtherInfo } from './common';
-import { TaskBase } from './task.models';
+import { TaskBase } from './base';
 
 export interface GroutingTask extends TaskBase {
   /** 梁长度 */
@@ -15,7 +15,7 @@ export interface GroutingTask extends TaskBase {
   /** 是否作为模板 */
   template: boolean;
   /** 其他数据信息 */
-  otherInfo: Array<OtherInfo>;
+  // otherInfo: Array<OtherInfo>;
   /** 施工员 */
   operator: string;
   /** 监理员 */

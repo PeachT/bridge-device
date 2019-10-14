@@ -5,10 +5,6 @@ import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
 import { User } from 'src/app/models/user.models';
 import { Router } from '@angular/router';
-import { randomWord } from 'src/app/Function/randomWord';
-import { PLCService } from 'src/app/services/PLC.service';
-import { PLC_D, PLC_M } from 'src/app/models/IPCChannel';
-import { decodeLock } from 'src/app/Function/lock';
 import { ElectronService } from 'ngx-electron';
 
 const menus = [
@@ -47,7 +43,6 @@ export class LoginComponent implements OnInit {
     private odb: DbService,
     private message: NzMessageService,
     private router: Router,
-    private cdr: ChangeDetectorRef,
   ) {
     this.db = this.odb.db;
   }

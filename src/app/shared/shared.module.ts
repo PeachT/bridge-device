@@ -6,7 +6,6 @@ import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { LeftComponent } from './left/left.component';
-import { DynamicLineComponent } from './echarts/dynamic-line/dynamic-line.component';
 import { ProjectComponent } from './project/project.component';
 import { ValidatorErrorPipe } from '../pipes/error.pipe';
 import { ToFixedrPipe } from '../pipes/toFixed.pipe';
@@ -17,7 +16,6 @@ import { AddOtherComponent } from './add-other/add-other.component';
 import { TimeSecComponent } from './time-sec/time-sec.component';
 import { DataTreatingComponent } from './data-treating/data-treating.component';
 import { DeleteModalComponent } from './delete-modal/delete-modal.component';
-import { NameConvertPipe } from '../pipes/name-convert.pipe';
 import { TaskMenuComponent } from './task-menu/task-menu.component';
 import { GroutingTemplateComponent } from './grouting-template/grouting-template.component';
 import { FormItemComponent } from './form-item/form-item.component';
@@ -37,7 +35,6 @@ const MODULES = [
 
 const COMPONENTS = [
   LeftComponent,
-  DynamicLineComponent,
   ProjectComponent,
   LeftMenuComponent,
   OperatComponent,
@@ -54,7 +51,6 @@ const PIPE = [
   ToFixedrPipe,
   ValidatorErrorPipe,
   GetPathNamePipe,
-  NameConvertPipe,
 ];
 
 @NgModule({

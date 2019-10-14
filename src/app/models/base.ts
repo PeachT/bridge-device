@@ -1,5 +1,6 @@
 import { groutingInfoBase, groutingHoleitemBase, mixingInfoBase, groutingTaskBase } from './groutingBase';
 import { projectBase } from './projectBase';
+import { OtherInfo } from './common';
 
 export interface IBase {
   /** Id */
@@ -12,6 +13,15 @@ export interface IBase {
   modificationDate?: any;
   /** 创建用户 */
   user?: any;
+}
+export interface TaskBase extends IBase {
+  project: number;
+  component: any;
+  /** 开始时间 */
+  startDate: any;
+  /** 结束时间 */
+  endDate: any;
+  otherInfo?: Array<OtherInfo>;
 }
 
 const base = {

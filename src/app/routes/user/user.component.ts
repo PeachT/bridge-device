@@ -90,15 +90,7 @@ export class UserComponent implements OnInit {
   }
   /** 删除 */
   async delete() {
-    const id = this.appS.leftMenu;
-    const count = await this.db.db.task.filter(t => t.device[0] === id).count();
-    if (count === 0) {
-      this.deleteShow = true;
-      this.cdr.markForCheck();
-      console.log('删除', id, '任务', count, this.deleteShow);
-    } else {
-      this.message.error(`有 ${count} 条任务在该项目下，不允许删除！`);
-    }
+    this.deleteOk();
   }
   async deleteOk(state = false) {
     if (state) {

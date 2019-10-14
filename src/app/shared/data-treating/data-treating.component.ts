@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AppService } from 'src/app/services/app.service';
 
 @Component({
   selector: 'app-data-treating',
@@ -7,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DataTreatingComponent implements OnInit {
 
-  constructor() { }
+  constructor( public apps: AppService,) { }
 
   ngOnInit() {
 

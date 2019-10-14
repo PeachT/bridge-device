@@ -1,4 +1,4 @@
-<nz-modal [nzVisible]="true" nzTitle="数据处理" (nzOnCancel)="dataHandleCancel()" (nzOnOk)="dataHandleOk()" nzWidth="85%"
+<nz-modal [nzVisible]="true" nzTitle="数据处理" (nzOnCancel)="apps.dataTreatingShow = false;" (nzOnOk)="apps.dataTreatingShow = false;" nzWidth="85%"
   [nzMaskClosable]="false" [nzFooter]="null">
 
   <app-data-in-out></app-data-in-out>
