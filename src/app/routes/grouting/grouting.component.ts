@@ -1,23 +1,15 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef, OnDestroy, TemplateRef } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
-import { NzMessageService, NzModalService } from 'ng-zorro-antd';
+import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
-import { ElectronService } from 'ngx-electron';
-import { copyAny, getModelBase, baseEnum } from 'src/app/models/base';
-import { GroutingRecordComponent } from './components/grouting-record/grouting-record.component';
-import { ProportionComponent } from './components/proportion/proportion.component';
+import { getModelBase, baseEnum } from 'src/app/models/base';
 import { TaskMenuComponent } from 'src/app/shared/task-menu/task-menu.component';
-import { Subscription, forkJoin } from 'rxjs';
 import { GroutingService } from 'src/app/services/grouting.service';
-import { PLC_D } from 'src/app/models/IPCChannel';
 import { Project } from 'src/app/models/project';
 import { HttpService } from 'src/app/services/http.service';
 import { uploadingData } from 'src/app/Function/uploading';
-import { GroutingTask, GroutingInfo, GroutingHoleItem } from 'src/app/models/grouting';
-import { GroutingMianComponent } from './components/mian/mian.component';
-import { MixingInfoComponent } from './components/mixing-info/mixing-info.component';
-import { createForm } from './createForm';
+import { GroutingTask, GroutingHoleItem } from 'src/app/models/grouting';
 import { nameRepetition } from 'src/app/Validator/async.validator';
 
 @Component({
@@ -28,11 +20,6 @@ import { nameRepetition } from 'src/app/Validator/async.validator';
 export class GroutingComponent implements OnInit, OnDestroy {
   dbName = 'grouting';
   @ViewChild('taskmenu', null) taskMenuDom: TaskMenuComponent;
-  @ViewChild('groutingMian', { read: GroutingMianComponent, static: true }) groutingDom: GroutingMianComponent;
-  @ViewChild('proportionInfo', { read: ProportionComponent, static: true }) proportionDom: ProportionComponent;
-  @ViewChild('mixing', { read: MixingInfoComponent, static: true }) mixingDom: MixingInfoComponent;
-  @ViewChild('groutingRecord', { read: GroutingRecordComponent, static: true }) groutingRecordDom: GroutingRecordComponent;
-  @ViewChild('tplTitle', null) tplTitle: TemplateRef<{}>;
 
 
   // @Input() taskMenu: TaskMenuComponent;
@@ -384,13 +371,10 @@ export class GroutingComponent implements OnInit, OnDestroy {
     && o1.component === o2.component && o1.project === o2.project && o1.id !== o2.id
 
   constructor(
-    private fb: FormBuilder,
     public odb: DbService,
     private message: NzMessageService,
     public appS: AppService,
     public GPLCS: GroutingService,
-    private e: ElectronService,
-    private cdr: ChangeDetectorRef,
     private http: HttpService
   ) {
 
@@ -587,7 +571,6 @@ export class GroutingComponent implements OnInit, OnDestroy {
         break;
     }
     console.log(data);
-    const i = 0;
     const ups = [];
     data.map(g => {
       this.http.post(url, { Data: g }).subscribe(r => {

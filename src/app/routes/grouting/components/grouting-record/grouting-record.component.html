@@ -16,8 +16,8 @@
       <ng-container *ngFor="let item of groutingInfoFormArray.controls; index as i" [formArrayName]="i" >
         <div style="display: flex;flex-direction: column;" [hidden]="!(item.value.name === groupItem?.name)">
           <div>
-            <app-form-item label="梁号">
-              <input type="text" nz-input placeholder="请输入梁号" formControlName="name">
+            <app-form-item label="孔号">
+              <input type="text" nz-input placeholder="请输入孔号" formControlName="name">
             </app-form-item>
             <app-form-item label="孔道内径">
               <input type="number" nz-input placeholder="请输入孔道内径" formControlName="holeDiameter">
@@ -26,7 +26,7 @@
               <input type="number" nz-input placeholder="请输入孔道长度" formControlName="holeLength">
             </app-form-item>
             <app-form-item label="钢绞线数量">
-              <input type="text" nz-input placeholder="请输入钢绞线数量" formControlName="steelStrandNum">
+              <input type="number" nz-input placeholder="请输入钢绞线数量" formControlName="steelStrandNum">
             </app-form-item>
           </div>
           <div>

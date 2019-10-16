@@ -29,14 +29,14 @@ const routes: Routes = [
     path: "",
     component: HeaderComponent,
     children: [
-      // {
-      //   path: "task",
-      //   // component: TaskComponent,
-      //   loadChildren: () =>
-      //     import("./routes/task/task.module").then(m => m.TaskModule),
-      //   data: { title: "张拉" },
-      //   canDeactivate: [GlobalEditGuard]
-      // },
+      {
+        path: "tension",
+        // component: TaskComponent,
+        loadChildren: () =>
+          import("./routes/tension/tension.module").then(m => m.TensionModule),
+        data: { title: "张拉" },
+        canDeactivate: [GlobalEditGuard]
+      },
       {
         path: "grouting",
         // component: GroutingComponent,
@@ -67,14 +67,14 @@ const routes: Routes = [
           ),
         data: { title: "压浆设置" }
       },
-      // {
-      //   path: "jack",
-      //   // component: JackComponent,
-      //   loadChildren: () =>
-      //     import("./routes/jack/jack.module").then(m => m.JackModule),
-      //   data: { title: "千斤顶" },
-      //   canDeactivate: [GlobalEditGuard]
-      // },
+      {
+        path: "jack",
+        // component: JackComponent,
+        loadChildren: () =>
+          import("./routes/jack/jack.module").then(m => m.JackModule),
+        data: { title: "千斤顶" },
+        canDeactivate: [GlobalEditGuard]
+      },
       {
         path: "project",
         // component: ProjectComponent,
@@ -90,7 +90,7 @@ const routes: Routes = [
           import("./routes/component/component.module").then(
             m => m.ComponentModule
           ),
-        // data: { title: "构建" },
+        data: { title: "构建" },
         canDeactivate: [GlobalEditGuard]
       },
       {

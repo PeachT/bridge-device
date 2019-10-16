@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import Dexie from 'dexie';
 import { User, userIndex } from '../models/user.models';
-import { TensionTask, TaskIndex } from '../models/task.models';
-import { Jack, JackIndex } from '../models/jack';
+import { TensionTask, TensionTaskIndex } from '../models/tension';
+import { JackIndex, TensionDevice } from '../models/jack';
 import { Project, projectIndex } from '../models/project';
 import { Observable, from, empty } from 'rxjs';
 import { filter, map, every } from 'rxjs/operators';
@@ -104,33 +104,7 @@ export class DbService {
       return { success: false, msg: error };
     }
   }
-  /** 导入主句查询 */
-  public async inRepetitionAsync(filterFunction: (o1: TensionTask) => boolean): Promise<TensionTask> {
-    const task = await this.db.task.filter(filterFunction).first();
-    return task;
-  }
-  /** 导入数据添加 */
-  public async inAddTaskAsync(data: TensionTask) {
-    try {
-      const r = await this.db.task.add(data);
-      console.log('保存结果', r);
-      return { success: true, id: r };
-    } catch (error) {
-      console.log('错误', error);
-      return { success: false, msg: error };
-    }
-  }
-  public async inUpdateAsync(data: TensionTask) {
-    try {
-      // data.modificationDate = new Date().getTime();
-      const r = await this.db.task.update(data.id, data);
-      console.log('保存结果', r);
-      return { success: true, id: data.id };
-    } catch (error) {
-      console.log('错误', error);
-      return { success: false, msg: error };
-    }
-  }
+
 
   /** 判断数据是否存在 */
   // tslint:disable-next-line:max-line-length
@@ -167,18 +141,6 @@ export class DbService {
     );
   }
 
-  public getAllAsync(name: string): Promise<any> {
-    return new Promise(async (resolve, reject) => {
-      const r = [];
-      const s = await this.db.task.each(v => {
-        r.push({ label: v.name, value: v.id, checked: false });
-      });
-      console.log(r, s);
-      resolve(r);
-    });
-    // const ss = await this.db[name].toArray();
-    // console.log(ss);
-  }
   /**
    * * 获取菜单数据
    *
@@ -359,14 +321,6 @@ export class DbService {
     return r;
   }
   /** 任务数据导出菜单 */
-  public async getTaskDataTreatingBredge(f: (o1: TensionTask) => boolean) {
-    const r = [];
-    await this.db.task.filter(t => f(t)).each(t => {
-      r.push({ title: t.name, key: t.id });
-    });
-    return r;
-  }
-  /** 任务数据导出菜单 */
   public async getTaskDataTreatingComponent(f: (o1: TensionTask) => boolean, key) {
     const data = await this.getTaskComponentMenuData('task', f);
     const r = [];
@@ -395,8 +349,8 @@ export class DbService {
 
 export class DB extends Dexie {
   users!: Dexie.Table<User, number>; // id is number in this case
-  task!: Dexie.Table<TensionTask, number>; // id is number in this case
-  jack!: Dexie.Table<Jack, number>; // id is number in this case
+  tension!: Dexie.Table<TensionTask, number>; // id is number in this case
+  jack!: Dexie.Table<TensionDevice, number>; // id is number in this case
   project!: Dexie.Table<Project, number>; // id is number in this case
   comp!: Dexie.Table<Comp, number>; // id is number in this case
   grouting!: Dexie.Table<GroutingTask, number>; // id is number in this case
@@ -406,7 +360,15 @@ export class DB extends Dexie {
     super('APPDB');
     this.version(1).stores({
       users: userIndex,
-      task: TaskIndex,
+      // task: TensionTaskIndex,
+      jack: JackIndex,
+      project: projectIndex,
+      comp: compIndex,
+      grouting: GroutingIndex,
+    });
+    this.version(2).stores({
+      users: userIndex,
+      tension: TensionTaskIndex,
       jack: JackIndex,
       project: projectIndex,
       comp: compIndex,
@@ -418,7 +380,7 @@ export class DB extends Dexie {
 
 export enum DbEnum {
   users = 'users',
-  task = 'task',
+  tension = 'tension',
   jack = 'jack',
   project = 'project',
   comp = 'comp',

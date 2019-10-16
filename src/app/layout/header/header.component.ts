@@ -1,14 +1,6 @@
-import {
-  Component,
-  OnInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef
-} from "@angular/core";
-import { Router, NavigationEnd } from "@angular/router";
+import { Component, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
 import { AppService } from "src/app/services/app.service";
-import { ElectronService } from "ngx-electron";
-import { DbService, DbEnum } from "src/app/services/db.service";
-import { map } from "rxjs/operators";
 import { Observable } from "rxjs";
 import { Store } from '@ngrx/store';
 import { RouterInfo } from 'src/app/models/app';
@@ -27,10 +19,8 @@ export class HeaderComponent implements OnInit {
   constructor(
     private router: Router,
     public appS: AppService,
-    private db: DbService,
-    private changeDetectorRef: ChangeDetectorRef,
     private store$: Store<NgrxState>,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.store$.dispatch(goRouter(null))
@@ -40,7 +30,7 @@ export class HeaderComponent implements OnInit {
   goUrl(url) {
     this.router.navigate([url]);
   }
-  ifUrl(url) {
+  ifUrl() {
     // return this.appS.nowUrl.indexOf(url) > -1;
     // return this.appS.nowUrl === url;
     return this.store$.subscribe()

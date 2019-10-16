@@ -14,8 +14,11 @@ export class FormItemComponent implements OnInit {
   @Input() colnzXXl =  6;
   @Input() row = false;
   @Input() label: string;
+  /** 验证错误信息 */
   @Input() errors: any;
+  /** 自定义作为验证消息 */
   @Input() errorMsg: any = null;
+  /** 显示隐藏验证消息 */
   @Input() errorShow = true;
   constructor() { }
 

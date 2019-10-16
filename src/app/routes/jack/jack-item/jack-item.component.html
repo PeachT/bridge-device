@@ -1,0 +1,22 @@
+<nz-divider style="min-width: auto;" [nzText]="jackName" nzOrientation="left"></nz-divider>
+<form nz-form [formGroup]="formGroup" *ngIf="jackItemForm">
+  <div [formGroupName]="jackName">
+    <app-form-item label="千斤顶编号">
+      <input placeholder="输入千斤顶编号" nz-input formControlName="jackNo" />
+    </app-form-item>
+    <app-form-item label="油泵编号">
+      <input placeholder="输入油泵编号" nz-input formControlName="pumpNo" />
+    </app-form-item>
+    <app-form-item label="标定日期" [errors]="jackItemForm.get('date').errors">
+      <nz-date-picker formControlName="date" placeholder="标定日期"></nz-date-picker>
+    </app-form-item>
+    <div>
+      <app-form-item label="标定参数a" [errors]="jackItemForm.get('a').errors">
+        <input type="number" placeholder="输入标定参数a" nz-input formControlName="a" />
+      </app-form-item>
+      <app-form-item label="标定参数b" [errors]="jackItemForm.get('b').errors">
+        <input type="number" placeholder="输入标定参数b" nz-input formControlName="b" />
+      </app-form-item>
+    </div>
+  </div>
+</form>

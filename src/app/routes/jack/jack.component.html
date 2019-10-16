@@ -1,0 +1,40 @@
+<app-left>
+  <div class="sider sider-menu">
+    <app-left-menu [dbName]="dbName" (menuChange)="onMneu($event)" #leftMenu></app-left-menu>
+  </div>
+  <div class="main scroll-y">
+    <app-operat [dbName]="dbName" [formData]="formData" (outEdit)="edit($event)" (outEditOk)="editOk($event)">
+    </app-operat>
+
+    <div class="scroll-content">
+      <form nz-form [ngClass]="{'form-edit': !appS.edit}" [formGroup]="formData">
+        <app-form-item label="顶名称" [row]="true" [errors]="formData.get('name').errors">
+          <input placeholder="例：150T 或 204Q" nz-input formControlName="name"/>
+        </app-form-item>
+        <app-form-item label="回归方程" [row]="true">
+          <nz-radio-group formControlName="equation">
+            <label nz-radio [nzValue]="true">P=aF+b F张拉控制应力KN</label>
+            <label nz-radio [nzValue]="false">F=aP+b P张拉控制应力MPa</label>
+          </nz-radio-group>
+        </app-form-item>
+        <div>
+          <app-form-item label="千斤顶型号" >
+            <input placeholder="例：150T 或 204Q" nz-input formControlName="jackModel"/>
+          </app-form-item>
+          <app-form-item label="油泵型号">
+            <input placeholder="例：CZB2X3-500" nz-input formControlName="pumpModel"/>
+          </app-form-item>
+        </div>
+
+        <div>
+          <jack-item [formGroup]="formData" [jackName]="'A1'" [data]="data.A1"></jack-item>
+          <jack-item [formGroup]="formData" [jackName]="'A2'" [data]="data.A2"></jack-item>
+          <jack-item [formGroup]="formData" [jackName]="'B1'" [data]="data.B1"></jack-item>
+          <jack-item [formGroup]="formData" [jackName]="'B2'" [data]="data.B2"></jack-item>
+        </div>
+        <div class="edit" [ngClass]="{'edit-on': appS.edit}"></div>
+      </form>
+    </div>
+  </div>
+</app-left>
+<app-delete-modal *ngIf="deleteShow" (outDelete)="deleteOk($event)"></app-delete-modal>

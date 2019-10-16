@@ -8,16 +8,16 @@ import { Router } from '@angular/router';
 import { ElectronService } from 'ngx-electron';
 
 const menus = [
-  // { platform: 'tension,windows', jurisdiction: 0, url: '/task', icon: 'swap', name: '张拉' },
+  { platform: 'tension,windows', jurisdiction: 0, url: '/tension', icon: 'swap', name: '张拉' },
+  { platform: 'tension,windows', jurisdiction: 1, url: '/jack', icon: 'usb', name: '千斤顶' },
   { platform: 'grouting,windows', jurisdiction: 0, url: '/grouting', icon: 'experiment', name: '压浆' },
-  // { platform: 'tension,windows', jurisdiction: 1, url: '/jack', icon: 'usb', name: '千斤顶' },
+  { platform: 'grouting,windows', jurisdiction: 1, url: '/grouting-setting', icon: 'setting', name: '压浆设置' },
+  { platform: 'grouting,windows', jurisdiction: 0, url: '/live-grouting', icon: 'fund', name: '压浆监控' },
   { platform: 'all', jurisdiction: 1, url: '/project', icon: 'appstore', name: '项目' },
   { platform: 'all', jurisdiction: 1, url: '/component', icon: 'deployment-unit', name: '构建' },
   { platform: 'all', jurisdiction: 1, url: '/user', icon: 'user', name: '用户' },
   // { platform: 'tension', jurisdiction: 0, url: '/manual', icon: 'deployment-unit', name: '手动' },
   // { platform: 'tension', jurisdiction: 1, url: '/setting', icon: 'setting', name: '张拉设置' },
-  { platform: 'grouting,windows', jurisdiction: 1, url: '/grouting-setting', icon: 'setting', name: '压浆设置' },
-  { platform: 'grouting,windows', jurisdiction: 0, url: '/live-grouting', icon: 'fund', name: '压浆监控' },
   // { platform: 'tension', jurisdiction: 8, url: '/auto', icon: 'box-plot', name: '自动' },
   { platform: 'all', jurisdiction: 0, url: '/help', icon: 'question', name: '帮助'},
   { platform: 'all', jurisdiction: 0, url: '/help', icon: 'question', name: 'LINUX', linux: true},

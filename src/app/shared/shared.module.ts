@@ -21,6 +21,7 @@ import { GroutingTemplateComponent } from './grouting-template/grouting-template
 import { FormItemComponent } from './form-item/form-item.component';
 import { DynamicLineGroutingComponent } from './echarts/dynamic-line-grouting/dynamic-line-grouting.component';
 import { DataInOutComponent } from './data-treating/data-in-out/data-in-out.component';
+import { Kn2mpaPipe, Mpa2knPipe, HoleNamePipe } from '../pipes/tension.pipe';
 
 
 // pipe
@@ -51,6 +52,9 @@ const PIPE = [
   ToFixedrPipe,
   ValidatorErrorPipe,
   GetPathNamePipe,
+  Kn2mpaPipe,
+  Mpa2knPipe,
+  HoleNamePipe
 ];
 
 @NgModule({

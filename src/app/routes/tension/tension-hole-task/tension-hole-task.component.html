@@ -1,0 +1,49 @@
+<div *ngIf="tasks && tasks.length > 0">
+  <form nz-form [formGroup]="formData">
+    <!-- <ng-container formArrayName="tensionHoleInfos">
+      <ng-container [formArrayName]="index"> -->
+        <ng-container formArrayName="tasks">
+          <ng-container *ngFor="let item of TaskFormArray.controls; index as i" [formArrayName]="i">
+            <div>
+              <app-form-item label="二次张拉">
+                <nz-switch (ngModelChange)="stage.twiceChange($event)" formControlName="twice" nzCheckedChildren="二次张拉" nzUnCheckedChildren="无"></nz-switch>
+              </app-form-item>
+              <app-form-item label="超张拉">
+                <nz-switch (ngModelChange)="stage.superStage($event, '超张拉')" formControlName="super" nzCheckedChildren="超张拉" nzUnCheckedChildren="无"></nz-switch>
+              </app-form-item>
+              <app-form-item label="补张拉">
+                <nz-switch (ngModelChange)="stage.superStage($event, '补张拉')" formControlName="mend" nzCheckedChildren="补张拉" nzUnCheckedChildren="无"></nz-switch>
+              </app-form-item>
+
+              <app-form-item label="设置张拉应力">
+                <input type="number" nz-input placeholder="请输入设置张拉应力" formControlName="tensionKn">
+              </app-form-item>
+              <app-form-item label="张拉设备">
+                <input nz-input placeholder="张拉设备" [value]="item.get('device').value.name">
+              </app-form-item>
+              <app-form-item label="张拉模式">
+                <nz-select style="width: 100%;" formControlName="mode" (ngModelChange)="stage.selectMode($event)" >
+                  <nz-option [nzDisabled]="!(holeNameLength === 2)" [nzValue]="42" nzLabel="4顶两端" ></nz-option>
+                  <nz-option [nzDisabled]="!(holeNameLength === 4)" [nzValue]="41" nzLabel="4顶单端"></nz-option>
+                  <nz-option [nzDisabled]="!(holeNameLength === 2)" [nzValue]="21" nzLabel="A1|A2单端"></nz-option>
+                  <nz-option [nzDisabled]="!(holeNameLength === 1)" [nzValue]="23" nzLabel="A1|A2两端"></nz-option>
+                  <nz-option [nzDisabled]="!(holeNameLength === 1)" [nzValue]="24" nzLabel="B1|B2两端"></nz-option>
+                  <nz-option [nzDisabled]="!(holeNameLength === 2)" [nzValue]="22" nzLabel="A1|B1单端"></nz-option>
+                  <nz-option [nzDisabled]="!(holeNameLength === 1)" [nzValue]="25" nzLabel="A1|B1两端"></nz-option>
+                  <nz-option [nzDisabled]="!(holeNameLength === 1)" [nzValue]="11" nzLabel="A1单端"></nz-option>
+                  <nz-option [nzDisabled]="!(holeNameLength === 1)" [nzValue]="12" nzLabel="B1单端"></nz-option>
+                </nz-select>
+              </app-form-item>
+            </div>
+            <div>
+              <app-add-other [formGroup]="item" [data]="tasks[i].otherInfo"></app-add-other>
+            </div>
+            <div>
+              <tension-hole-task-stage [formData]="item" [data]="tasks[i]" [holeName]="data.name" #stage></tension-hole-task-stage>
+            </div>
+          </ng-container>
+        </ng-container>
+      <!-- </ng-container>
+    </ng-container> -->
+  </form>
+</div>

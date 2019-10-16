@@ -1,0 +1,96 @@
+<div style="display: flex; flex-direction: column;">
+  <div>
+    <app-form-item label="修改张拉段数">
+      <nz-select style="width: 100%;" [(ngModel)]="stageNumber" (ngModelChange)="stageChange()">
+        <nz-option [nzValue]="3" nzLabel="3段" [nzDisabled]="twice"></nz-option>
+        <nz-option [nzValue]="4" nzLabel="4段"></nz-option>
+        <nz-option [nzValue]="5" nzLabel="5端"></nz-option>
+      </nz-select>
+    </app-form-item>
+  </div>
+  <form nz-form [formGroup]="formData" *ngIf="msgFormArray">
+    <div formArrayName="stage">
+      <table class="gridtable">
+        <thead>
+          <tr>
+            <th colSpan="2">张拉任务</th>
+            <ng-container *ngFor="let item of msgFormArray.getRawValue(); index as i" formArrayName="msg">
+              <th [ngClass]="{'twice': item === '阶段二' && twice, 'super': superState && item === '超张拉',
+              'mend': mend && item === '补张拉'}">
+                {{item}}
+              </th>
+            </ng-container>
+            <th>卸荷</th>
+            <th>工作长度mm</th>
+            <th>理论申长量mm</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td width="80">孔号</td>
+            <td width="100">张拉阶段%</td>
+            <td *ngFor="let item of knPercentageFormArray.controls; index as i" formArrayName="knPercentage">
+              <div>
+                <app-form-item [row]="true" [errors]="item.errors" [errorShow]="false">
+                  <input type="number" nz-input [formControlName]="i" [readonly]="i === 1" (input)="inputStage($event, i)" >
+                </app-form-item>
+              </div>
+            </td>
+            <td>
+              <div>
+                <app-form-item [row]="true" [errorShow]="false">
+                  <input nz-input formControlName="uploadPercentage">
+                </app-form-item>
+              </div>
+            </td>
+          </tr>
+          <tr *ngFor="let item of strMode; index as keyi">
+            <td [attr.rowspan]="holeNames.span" *ngIf="(holeNames.span === 2 && item.indexOf('1') > -1) || holeNames.span === 1">{{holeNames[item]}}</td>
+            <td>{{item}}</td>
+            <td *ngFor="let stage of knPercentageFormArray.value">
+              <div>{{(tensionKn * (stage / 100)) | ToFixedr}}<sub>kn</sub> </div>
+              <div>{{(tensionKn * (stage / 100)) | kn2mpa: data.device: item}}<sub>mpa</sub> </div>
+            </td>
+            <td>
+              <div>{{(tensionKn * (stageGroup.get('uploadPercentage').value / 100)) | ToFixedr}}<sub>kn</sub> </div>
+              <div>{{(tensionKn * (stageGroup.get('uploadPercentage').value / 100)) | kn2mpa: data.device: item}}<sub>mpa</sub> </div>
+            </td>
+            <ng-container [formGroupName]="item">
+              <td>
+                <div>
+                  <app-form-item [row]="true" [errorShow]="false">
+                    <input type="number" nz-input formControlName="wordMm" (input)="inputWordmm($event, keyi, 'wordMm')">
+                  </app-form-item>
+                </div>
+              </td>
+              <td [attr.rowspan]="holeNames.span" *ngIf="(holeNames.span === 2 && item.indexOf('1') > -1) || holeNames.span === 1">
+                <div>
+                  <app-form-item [row]="true" [errorShow]="false">
+                    <input type="number" nz-input formControlName="theoryMm" (input)="inputWordmm($event, keyi, 'theoryMm')">
+                  </app-form-item>
+                </div>
+              </td>
+            </ng-container>
+          </tr>
+          <tr>
+            <td colSpan="2">保压时间s</td>
+            <td *ngFor="let item of timeFormArray.controls; index as i" formArrayName="time">
+              <div>
+                <app-form-item [row]="true" [errorShow]="false">
+                  <input type="number" nz-input [formControlName]="i">
+                </app-form-item>
+              </div>
+            </td>
+            <td>
+              <div>
+                <app-form-item [row]="true" [errorShow]="false">
+                  <input type="number" nz-input formControlName="uploadDelay">
+                </app-form-item>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </form>
+</div>

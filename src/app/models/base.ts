@@ -1,6 +1,7 @@
 import { groutingInfoBase, groutingHoleitemBase, mixingInfoBase, groutingTaskBase } from './groutingBase';
 import { projectBase } from './projectBase';
 import { OtherInfo } from './common';
+import { JackItem } from './jack';
 
 export interface IBase {
   /** Id */
@@ -23,7 +24,20 @@ export interface TaskBase extends IBase {
   endDate: any;
   otherInfo?: Array<OtherInfo>;
 }
-
+function jackItem(): {[props: string]: JackItem} {
+  const jackitems: any = {}
+  const arr = ['A1','A2', 'B1','B2']
+  arr.map(key => {
+    jackitems[key] = {
+      jackNo: key,
+      pumpNo: 'LQ0001',
+      a: 1,
+      b: 0,
+      date: null,
+    }
+  })
+  return jackitems;
+}
 const base = {
   project: projectBase,
   comp: {
@@ -36,98 +50,11 @@ const base = {
     ],
   },
   jack: {
-    id: null,
-    createdDate: null,
-    modificationDate: null,
-    user: null,
-    name: null,
-    jackMode: 2,
+    name: '150T',
     equation: false,
-    jackModel: null,
-    pumpModel: null,
-    saveGroup: null,
-    state: true,
-    link: true,
-    zA: {
-      jackNumber: 'zA',
-      pumpNumber: 'Z',
-      upper: 180,
-      floot: 105,
-      a: 1,
-      b: 0,
-      date: null,
-      mm: [1, 1, 1, 1, 1, 1],
-    },
-    zB: {
-      jackNumber: 'zB',
-      pumpNumber: 'Z',
-      upper: 180,
-      floot: 105,
-      a: 1,
-      b: 0,
-      date: null,
-      mm: [1, 1, 1, 1, 1, 1],
-    },
-    zC: {
-      jackNumber: 'zC',
-      pumpNumber: 'Z',
-      upper: 180,
-      floot: 105,
-      a: 1,
-      b: 0,
-      date: null,
-      mm: [1, 1, 1, 1, 1, 1],
-    },
-    zD: {
-      jackNumber: 'zD',
-      pumpNumber: 'Z',
-      upper: 180,
-      floot: 105,
-      a: 1,
-      b: 0,
-      date: null,
-      mm: [1, 1, 1, 1, 1, 1],
-    },
-    cA: {
-      jackNumber: 'cA',
-      pumpNumber: 'C',
-      upper: 180,
-      floot: 105,
-      a: 1,
-      b: 0,
-      date: null,
-      mm: [1, 1, 1, 1, 1, 1],
-    },
-    cB: {
-      jackNumber: 'cB',
-      pumpNumber: 'C',
-      upper: 180,
-      floot: 105,
-      a: 1,
-      b: 0,
-      date: null,
-      mm: [1, 1, 1, 1, 1, 1],
-    },
-    cC: {
-      jackNumber: 'cC',
-      pumpNumber: 'C',
-      upper: 180,
-      floot: 105,
-      a: 1,
-      b: 0,
-      date: null,
-      mm: [1, 1, 1, 1, 1, 1],
-    },
-    cD: {
-      jackNumber: 'cD',
-      pumpNumber: 'C',
-      upper: 180,
-      floot: 105,
-      a: 1,
-      b: 0,
-      date: null,
-      mm: [1, 1, 1, 1, 1, 1],
-    },
+    jackModel: '150T',
+    pumpModel: 'CZB2X3-500',
+    ...jackItem()
   },
   users: {
     name: null,
@@ -135,21 +62,45 @@ const base = {
     jurisdiction: 0,
     operation: []
   },
-  task: {
+  tension: {
+    /** Id */
     id: null,
-    createdDate: null,
-    modificationDate: null,
-    user: null,
+    /** 名称 */
     name: null,
+    /** 创建日期 */
+    // createdDate: any;
+    /** 修改日期 */
+    // modificationDate: any;
+    /** 创建用户 */
+    // user: any;
     project: null,
-    device: null,
+    /** 构建 */
     component: null,
-    steelStrand: null,
-    otherInfo: [{ key: '浇筑日期', value: null }],
-    holeRadio: null,
+    /** 开始时间 */
     startDate: null,
+    /** 结束时间 */
     endDate: null,
-    groups: [],
+    otherInfo: [],
+    /** 梁长度 */
+    beamLength: null,
+    /** 张拉日期 */
+    tensinDate: null,
+    /** 浇筑日期 */
+    castingDate: null,
+    /** 张拉顺序 */
+    sort: null,
+    /** 设备编号 */
+    deviceNo: null,
+    /** 是否作为模板 */
+    template: false,
+    /** 施工员 */
+    operator: null,
+    /** 监理 */
+    supervisors: null,
+    /** 自检员 */
+    qualityInspector: null,
+    /** 张拉孔数据 */
+    tensionHoleInfos: []
   },
   groutingTask: groutingTaskBase,
   groutingInfo: groutingInfoBase,

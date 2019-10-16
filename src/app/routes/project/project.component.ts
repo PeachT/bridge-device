@@ -149,7 +149,7 @@ export class ProjectComponent implements OnInit, OnChanges {
   /** 删除 */
   async delete() {
     const id = this.appS.leftMenu;
-    const count = await this.db.db.task.filter(t => t.project === id).count();
+    const count = await this.db.db.tension.filter(t => t.project === id).count();
     if (count === 0) {
       this.deleteShow = true;
       this.cdr.markForCheck();

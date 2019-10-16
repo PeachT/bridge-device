@@ -1,0 +1,72 @@
+<nz-modal [nzMaskClosable]="false" [nzVisible]="true" nzTitle="手动张拉分组" [nzWidth]="'90%'" (nzOnCancel)="cancel()"
+  (nzOnOk)="Ok()">
+  <div style="display: flex; flex-direction: column;">
+    <div>
+      <app-form-item label="设备选择" [errorShow]="false">
+        <nz-select style="width: 100%;" nzPlaceHolder="请选择构建" [(ngModel)]="selectJack">
+          <nz-option [nzValue]="item.value" [nzLabel]="item.label" *ngFor="let item of jackMneu$ | async">
+          </nz-option>
+        </nz-select>
+      </app-form-item>
+
+      <app-form-item label="张拉模式" [errorShow]="false">
+        <nz-select style="width: 100%;" [(ngModel)]="selectMode" (ngModelChange)="modeChange()">
+          <nz-option [nzDisabled]="!(residueNumber >= 2)" [nzValue]="42" nzLabel="4顶两端"></nz-option>
+          <nz-option [nzDisabled]="!(residueNumber >= 4)" [nzValue]="41" nzLabel="4顶单端"></nz-option>
+          <nz-option [nzDisabled]="!(residueNumber >= 2)" [nzValue]="21" nzLabel="A1|A2单端"></nz-option>
+          <nz-option [nzDisabled]="!(residueNumber >= 1)" [nzValue]="23" nzLabel="A1|A2两端"></nz-option>
+          <nz-option [nzDisabled]="!(residueNumber >= 1)" [nzValue]="24" nzLabel="B1|B2两端"></nz-option>
+          <nz-option [nzDisabled]="!(residueNumber >= 2)" [nzValue]="22" nzLabel="A1|B1单端"></nz-option>
+          <nz-option [nzDisabled]="!(residueNumber >= 1)" [nzValue]="25" nzLabel="A1|B1两端"></nz-option>
+          <nz-option [nzDisabled]="!(residueNumber >= 1)" [nzValue]="11" nzLabel="A1单端"></nz-option>
+          <nz-option [nzDisabled]="!(residueNumber >= 1)" [nzValue]="12" nzLabel="B1单端"></nz-option>
+        </nz-select>
+      </app-form-item>
+    </div>
+    <div class="manual-group">
+      <div class="item" style="margin-right: 25px;">
+        <nz-divider style="min-width: auto;" nzText="孔号选择" nzOrientation="left"></nz-divider>
+        <nz-alert nzType="success" nzMessage="分组完成" *ngIf="residueNumber === 0"></nz-alert>
+        <ng-container *ngIf="selectMode">
+          <ng-container *ngFor="let item of strMode">
+
+            <app-form-item [label]="item + '孔号'" [row]="true" [errorShow]="false">
+              <nz-select style="width: 100%;" nzPlaceHolder="请选择孔号" [(ngModel)]="groupKey[item]"
+                (ngModelChange)="holeChange($event)">
+                <nz-option [nzValue]="item" [nzLabel]="item" *ngFor="let item of residue">
+                </nz-option>
+              </nz-select>
+            </app-form-item>
+          </ng-container>
+        </ng-container>
+
+      </div>
+      <div class="item" style="margin-left: 25px;">
+        <nz-divider style="min-width: auto;" nzText="张拉组|张拉顺序" nzOrientation="left"></nz-divider>
+        <div cdkDropList class="example-list" (cdkDropListDropped)="drop($event)">
+          <div style="margin-bottom: 5px;" *ngFor="let tag of groupOk; index as i">
+            <div cdkDrag>
+              <nz-input-group class="tension-group" [nzAddOnAfter]="suffixButton" [nzAddOnBefore]="BeforeButton">
+                <input type="text" nz-input readonly [value]="tag.hole.join('/')" style="text-align: center;" />
+              </nz-input-group>
+            </div>
+            <ng-template #suffixButton>
+              <button nz-button nzType="danger" (click)="delGroupItem(i)">删除</button>
+            </ng-template>
+            <ng-template #BeforeButton>
+              <nz-button-group>
+                <button nz-button nzType="dashed" (click)="groupMove(i, true)" [disabled]="i === 0"><i nz-icon
+                    nzType="arrow-up" nzTheme="outline"></i>上移</button>
+                <button nz-button nzType="dashed" (click)="groupMove(i, false)"
+                  [disabled]="i === groupOk.length - 1 ">下移<i nz-icon nzType="arrow-down" nzTheme="outline"></i></button>
+              </nz-button-group>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <button nz-button nzType="primary" (click)="groupSave()" *ngIf="residueNumber > 0">确定分组</button>
+    </div>
+  </div>
+</nz-modal>
