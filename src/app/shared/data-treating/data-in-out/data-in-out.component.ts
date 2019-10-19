@@ -298,7 +298,7 @@ export class DataInOutComponent implements OnInit {
       const bridge: GroutingTask = {
         ...tempdata,
         name: g.name,
-        tensinDate: null,
+        tensionDate: null,
         castingDate: null,
         template: false,
         mixingInfo: [],

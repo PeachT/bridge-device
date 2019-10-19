@@ -8,7 +8,7 @@ import { copyAny } from 'src/app/models/base';
 import { ElectronService } from 'ngx-electron';
 import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
-import { waterBinderRatio } from 'src/app/Function/unit';
+import { waterBinderRatio, getDatetimeS } from 'src/app/Function/unit';
 
 const groutingHoleItemBase: GroutingHoleItem = {
   /** 压浆方向 */
@@ -43,7 +43,7 @@ const groutingHoleItemBase: GroutingHoleItem = {
   remarks: null,
   /** 压浆过程数据 */
   processDatas: {
-    date: [],
+    hz: 1,
     intoPulpPressure: [],
     outPulpPressure: [],
     intoPulpvolume: [],
@@ -69,7 +69,9 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
     /** 用量 */
     dosage: [0, 0, 0, 0, 0, 0, 0],
     /** 开始时间 */
-    startTime: null,
+    startDate: null,
+    /** 完成时间 */
+    endDate: null,
     /** 搅拌时间 */
     mixingTime: null,
     /** 泌水率 */
@@ -291,7 +293,9 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
               /** 用量 */
               dosage: this.mixingData.dosage,
               /** 开始时间 */
-              startTime: this.mixingDataNow.date,
+              startDate: this.mixingDataNow.date,
+              /** 完成时间 */
+              endDate: getDatetimeS(),
               /** 搅拌时间 */
               mixingTime: this.mixingDataNow.time,
               /** 泌水率 */
@@ -346,7 +350,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
       //   clearInterval(this.tt)
       // }
       // console.log(this.groutingHoleItem);
-      this.groutingHoleItem.processDatas.date.push(new Date().getTime());
+      // this.groutingHoleItem.processDatas.date.push(new Date().getTime());
       this.groutingHoleItem.processDatas.intoPulpPressure.push(this.groutingHoleItem.intoPulpPressure);
       if (this.stop && this.tt) {
         clearInterval(this.tt);
@@ -435,7 +439,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
       const gdata: GroutingTask = copyAny(this.templateData);
       delete gdata.id;
       gdata.name = this.now.name;
-      gdata.tensinDate = null;
+      gdata.tensionDate = null;
       gdata.castingDate = null;
       gdata.template = false;
       gdata.operator = this.appS.userInfo.name;

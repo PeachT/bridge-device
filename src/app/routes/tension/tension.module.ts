@@ -9,10 +9,11 @@ import { TensionHoleRecordComponent } from './tension-hole-record/tension-hole-r
 import { TensionHoleTaskStageComponent } from './tension-hole-task-stage/tension-hole-task-stage.component';
 import { TensionManualGroupComponent } from './tension-manual-group/tension-manual-group.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { TensionRecordComponent } from './tension-record/tension-record.component';
 
 
 @NgModule({
-  declarations: [TensionComponent, TensionHolesComponent, TensionHoleTaskComponent, TensionHoleRecordComponent, TensionHoleTaskStageComponent, TensionManualGroupComponent],
+  declarations: [TensionComponent, TensionHolesComponent, TensionHoleTaskComponent, TensionHoleRecordComponent, TensionHoleTaskStageComponent, TensionManualGroupComponent, TensionRecordComponent],
   imports: [
     SharedModule,
     TensionRoutingModule,

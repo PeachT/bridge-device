@@ -76,7 +76,12 @@
                   <app-add-other [formGroup]="item" [data]="data[i].otherInfo"></app-add-other>
                 </div>
                 <div>
-                  <echarts-dynamic-line-grouting [width]="(container.offsetWidth || 720) - 220" *ngIf="data && data[i]?.processDatas" [data]="data[i]?.processDatas"></echarts-dynamic-line-grouting>
+                  <echarts-dynamic-line-grouting
+                  [width]="(container.offsetWidth || 720) - 220"
+                  *ngIf="data && data[i]?.processDatas"
+                  [data]="data[i]?.processDatas"
+                  [satrtDate]="data[i].startDate"
+                  ></echarts-dynamic-line-grouting>
                 </div>
               </div>
             </td>

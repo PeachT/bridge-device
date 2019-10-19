@@ -12,7 +12,7 @@ export const groutingTaskBase: GroutingTask = {
   /** 梁长度 */
   beamLength: null,
   /** 张拉日期 */
-  tensinDate: null,
+  tensionDate: null,
   /** 浇筑日期 */
   castingDate: null,
   /** 压浆顺序 */
@@ -131,7 +131,9 @@ export const mixingInfoBase: MixingInfo =
   /** 用量 */
   dosage: [0, 0, 0],
   /** 开始时间 */
-  startTime: null,
+  startDate: null,
+  /** 开始时间 */
+  endDate: null,
   /** 搅拌时间 */
   mixingTime: null,
   /** 泌水率 */

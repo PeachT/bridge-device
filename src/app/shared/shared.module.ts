@@ -22,6 +22,9 @@ import { FormItemComponent } from './form-item/form-item.component';
 import { DynamicLineGroutingComponent } from './echarts/dynamic-line-grouting/dynamic-line-grouting.component';
 import { DataInOutComponent } from './data-treating/data-in-out/data-in-out.component';
 import { Kn2mpaPipe, Mpa2knPipe, HoleNamePipe } from '../pipes/tension.pipe';
+import { ScrollMenuComponent } from './scroll-menu/scroll-menu.component';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { DynamicLineTensionComponent } from './echarts/dynamic-line-tension/dynamic-line-tension.component';
 
 
 // pipe
@@ -32,6 +35,7 @@ const MODULES = [
   FormsModule,
   ReactiveFormsModule,
   CommonModule,
+  ScrollingModule,
 ];
 
 const COMPONENTS = [
@@ -46,7 +50,10 @@ const COMPONENTS = [
   TaskMenuComponent,
   GroutingTemplateComponent,
   DynamicLineGroutingComponent,
+  DynamicLineTensionComponent,
   FormItemComponent,
+  DataInOutComponent,
+  ScrollMenuComponent,
 ];
 const PIPE = [
   ToFixedrPipe,
@@ -61,7 +68,6 @@ const PIPE = [
   declarations: [
     ...COMPONENTS,
     ...PIPE,
-    DataInOutComponent,
   ],
   imports: [
     ...MODULES,

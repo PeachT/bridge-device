@@ -36,7 +36,7 @@ export interface JackItem {
   /** 标定系数b */
   b: number;
   /** 标定日期 */
-  date: Date | string;
+  date: Date | string | number;
 }
 
 /** 用户索引 */

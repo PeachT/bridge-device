@@ -1,6 +1,7 @@
 <app-left>
   <div class="sider sider-menu">
-    <task-menu style="overflow: hidden;" [dbNmae]="dbName" (menuChange)="onBridge($event)" #taskmenu></task-menu>
+    <task-menu hidden style="overflow: hidden;" [dbNmae]="dbName" (menuChange)="onBridge($event)" #taskmenu></task-menu>
+    <app-scroll-menu style="flex: 1;"></app-scroll-menu>
   </div>
   <div class="main" style="width: 100%;">
     <div *ngIf="data?.template" class="template">

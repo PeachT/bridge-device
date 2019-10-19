@@ -24,8 +24,8 @@ function xaljData(data: GroutingTask) {
   return data.groutingInfo.map(g => {
     console.log(g);
     let datas = [];
-    if (g.groups[0].processDatas && g.groups[0].processDatas.date && g.groups[0].processDatas.date.length > 0) {
-      datas = g.groups[0].processDatas.date.map((item, i) => {
+    if (g.groups[0].processDatas && g.groups[0].processDatas.intoPulpPressure && g.groups[0].processDatas.intoPulpPressure.length > 0) {
+      datas = g.groups[0].processDatas.intoPulpPressure.map((item, i) => {
         return {
           timeSeconds: `${i}`,
           state: '',
@@ -75,7 +75,7 @@ function xaljData(data: GroutingTask) {
       /** 压浆模式 */
       groutingModel: data.otherInfo && data.otherInfo.length >= 5 ? data.otherInfo[4].value : '',
       /** 张拉日期 yyyy-MM dd */
-      stretchDrawDate: format(new Date(data.tensinDate), 'yyyy-MM-dd') || '',
+      stretchDrawDate: format(new Date(data.tensionDate), 'yyyy-MM-dd') || '',
       /** 钢绞线股数 */
       SteelStrandNum: g.steelStrandNum || '',
       /** 孔道内径 */

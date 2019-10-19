@@ -15,6 +15,8 @@ import { AppService } from './app.service';
 import { IBase, TaskBase } from '../models/base';
 import { GroutingIndex, GroutingTask } from '../models/grouting';
 import { Menu$ } from '../models/app';
+import { getDatetimeS } from '../Function/unit';
+import { gouringDate2Number } from '../Function/grouting';
 
 @Injectable({ providedIn: 'root' })
 export class DbService {
@@ -56,8 +58,9 @@ export class DbService {
     }
     try {
       delete data.id;
-      data.createdDate = new Date().getTime();
-      data.modificationDate = new Date().getTime();
+      // tslint:disable-next-line:radix
+      data.createdDate = getDatetimeS();
+      data.modificationDate = getDatetimeS();
       data.user = this.appS.userInfo.name || 'sys';
       const r = await this.db[tName].add(data);
       console.log('保存结果', r);
@@ -88,14 +91,15 @@ export class DbService {
         data = t;
       }
       if (tName === 'grouting' && !uploading) {
-        const gdata: GroutingTask = data as GroutingTask;
+        let gdata: GroutingTask = data as GroutingTask;
+        gdata = gouringDate2Number(gdata);
         gdata.groutingInfo.map(g => {
           g.uploading = false;
         });
         data = gdata;
       }
       console.log('处理', data);
-      data.modificationDate = new Date().getTime();
+      data.modificationDate = getDatetimeS();
       const r = await this.db[tName].update(data.id, data);
       console.log('保存结果', r);
       return { success: true, id: data.id };

@@ -6,7 +6,9 @@
     *ngIf="(appS.platform === 'grouting' || appS.platform === 'debug') && !GPLCS.linkMsg.link && appS.userInfo"
     (click)="GPLCS.linkSocket()">压浆链接</button>
 </div>
-<router-outlet></router-outlet>
+<div style="height: 100%; width: 100%;" [@routeAnimation]="routerStateCode">
+  <router-outlet></router-outlet>
+</div>
 <nz-modal [nzVisible]="appS.powerState" nzTitle="" [nzFooter]="null" [nzMaskClosable]="!appS.powerDelayT" nzClosable="false" (nzOnCancel)="appS.powerState = false">
   <div class="power-btn">
     <ng-container *ngIf="!appS.powerDelayT">

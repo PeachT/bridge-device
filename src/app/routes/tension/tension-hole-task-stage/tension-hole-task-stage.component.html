@@ -20,15 +20,15 @@
                 {{item}}
               </th>
             </ng-container>
-            <th>卸荷</th>
-            <th>工作长度mm</th>
-            <th>理论申长量mm</th>
+            <th width="100">卸荷</th>
+            <th width="100">工作长度mm</th>
+            <th width="100">理论申长量mm</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td width="80">孔号</td>
-            <td width="100">张拉阶段%</td>
+            <td width="65">孔号</td>
+            <td width="65">阶段%</td>
             <td *ngFor="let item of knPercentageFormArray.controls; index as i" formArrayName="knPercentage">
               <div>
                 <app-form-item [row]="true" [errors]="item.errors" [errorShow]="false">

@@ -106,7 +106,13 @@
           </table>
           <div>
             <br>
-            <echarts-dynamic-line-grouting [width]="container.offsetWidth" [height]="appS.groutingDevicesInfo.svgHeight" [live]="groutingHoleItem?.processDatas?.date.length" [data]="groutingHoleItem?.processDatas?.date.length > 0 ? groutingHoleItem?.processDatas : null"></echarts-dynamic-line-grouting>
+            <echarts-dynamic-line-grouting
+              [width]="container.offsetWidth"
+              [height]="appS.groutingDevicesInfo.svgHeight"
+              [live]="groutingHoleItem?.processDatas?.intoPulpPressure.length"
+              [data]="groutingHoleItem?.processDatas?.intoPulpPressure.length > 0 ? groutingHoleItem?.processDatas : null"
+              [satrtDate]="mixingDataNow.date"
+              ></echarts-dynamic-line-grouting>
           </div>
         </div>
     </div>

@@ -1,16 +1,12 @@
 import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, SimpleChanges } from '@angular/core';
 import { ECharts } from 'echarts';
 import { format } from 'date-fns';
+import { ProcessData } from 'src/app/models/grouting';
 // 引入 ECharts 主模块
 const echarts = require('echarts');
 
-const data = {
-  date: [
-    '1570254841000', '1570254841000', '1570254842000', '1570254843000', '1570254844000',
-    '1570254845000', '1570254846000', '1570254847000', '1570254848000', '1570254849000',
-    '1570254850000', '1570254851000', '1570254852000', '1570254853000', '1570254854000',
-    '1570254855000', '1570254856000', '1570254857000', '1570254858000', '1570254859000',
-  ],
+const data: ProcessData = {
+  hz: 1,
   intoPulpPressure: [
     0, 0.2, 0.3, 0.28, 0.3,
     0.4, 0.38, 0.41, 0.44, 0.45,
@@ -46,15 +42,13 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges {
   @ViewChild('svg', { read: ElementRef, static: true }) svgDom: ElementRef;
   @Input() devs = [];
   @Input() live = 0;
-  @Input() data;
+  @Input() data : ProcessData;
   @Input() width: number | string = 'auto';
   @Input() height: number | string = '300';
-  @Input()
-  index: null;
-  @Input()
-  name: null;
-  @Input()
-  show: boolean;
+  @Input() index: null;
+  @Input() name: null;
+  @Input() show: boolean;
+  @Input() satrtDate: number;
   // /** 时间戳 */
   // date: string;
   // /** 进浆压力 */
@@ -119,7 +113,7 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges {
         title: {
           text: '压力 | 流量曲线',
           // textAlign: 'center',
-          x: 'center',
+          // x: 'center',
         },
         grid: {
           x: 40, // 默认是80px
@@ -144,7 +138,7 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges {
         },
         legend: {
           data: ['进浆压力', '回浆压力', '进浆量', '回浆量'],
-          x: 'left'
+          x: 'center'
         },
         // dataZoom: [
         //   {
@@ -165,10 +159,10 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges {
             type: 'category',
             boundaryGap: false,
             axisLine: { onZero: false },
-            data: this.data.date.map((str) => {
-              console.log(format(new Date(1570248732000), 'HH:mm:ss'));
-
-              return format(new Date(Number(str)), 'HH:mm:ss');
+            data: this.data.intoPulpPressure.map((str, i) => {
+              console.log(this.satrtDate);
+              const date = new Date(this.satrtDate).getTime() + (i * (1000 / this.data.hz))
+              return format(new Date(date), 'HH:mm:ss');
             })
           }
         ],
@@ -176,12 +170,12 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges {
           {
             name: '压力(MPa)',
             type: 'value',
-            max: 1.5
+            max: Math.max(...this.data.intoPulpPressure, ...this.data.outPulpPressure)
           },
           {
             name: '流量(m³/s)',
-            max: 100,
             type: 'value',
+            max: Math.max(...this.data.intoPulpvolume, ...this.data.outPulpvolume)
           }
         ],
         series: [

@@ -2,20 +2,28 @@ import { OtherInfo } from './common';
 import { TaskBase } from './base';
 
 export interface GroutingTask extends TaskBase {
+  // /** 项目ID */
+  // project: number;
+  // /** 构建名称（T梁/20米5孔） */
+  // component: any;
+  // /** 开始时间 */
+  // startDate: any;
+  // /** 结束时间 */
+  // endDate: any;
+  // /** 其他数据信息 */
+  // otherInfo?: Array<OtherInfo>;
   /** 梁长度 */
   beamLength: number;
   /** 张拉日期 */
-  tensinDate: Date | string;
+  tensionDate: Date | string | number;
   /** 浇筑日期 */
-  castingDate: Date | string;
+  castingDate: Date | string | number;
   /** 压浆顺序 */
   sort: string;
   /** 设备编号 */
   deviceNo: number;
   /** 是否作为模板 */
   template: boolean;
-  /** 其他数据信息 */
-  // otherInfo: Array<OtherInfo>;
   /** 施工员 */
   operator: string;
   /** 监理员 */
@@ -59,9 +67,9 @@ export interface GroutingHoleItem {
   /** 浆液温度 */
   slurryTemperature?: number;
   /** 开始时间 */
-  startDate: Date | string;
+  startDate: Date | string | number;
   /** 完成时间 */
-  endDate: Date | string;
+  endDate: Date | string | number;
   /** 进浆压力 */
   intoPulpPressure?: number;
   /** 回浆压力 */
@@ -91,7 +99,9 @@ export interface GroutingHoleItem {
 /** 压浆过程数据 */
 export interface ProcessData {
   /** 时间戳 */
-  date: Array<number | string>;
+  // date: Array<number | string>;
+  /** 采集频率 */
+  hz: number,
   /** 进浆压力 */
   intoPulpPressure: Array<number>;
   /** 回浆压力 */
@@ -107,7 +117,7 @@ export interface ProcessData {
 /** 压浆过程数据 */
 export interface VacuumPumpProcessDatas {
   /** 时间戳 */
-  date: string;
+  date: string | number;
   /** 真空压力 */
   vacuumPumpPressure: number;
   /** 说明 */
@@ -138,12 +148,14 @@ export interface MixingInfo {
   /** 用量 */
   dosage: Array<number>;
   /** 开始时间 */
-  startTime: Date;
+  startDate: Date | string | number;
+  /** 开始时间 */
+  endDate: Date | string | number;
   /** 搅拌时间 */
   mixingTime: number;
   /** 泌水率 */
   bleedingRate: number;
-  /** 流动度 */
+  /** 泌水率 */
   fluidity: number;
   /** 初始流动度 */
   initFluidity?: number;

@@ -69,7 +69,10 @@ export class TensionHoleTaskComponent implements OnInit, OnChanges {
       stage: this.fb.group([]),
       otherInfo: this.fb.array([]),
       /** 张拉记录 */
-      record: this.fb.group([]),
+      record: this.fb.group({
+        state: [],
+        groups: this.fb.array([])
+      }),
     });
   }
 

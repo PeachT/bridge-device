@@ -19,9 +19,9 @@ export interface TaskBase extends IBase {
   project: number;
   component: any;
   /** 开始时间 */
-  startDate: any;
+  startDate?: any;
   /** 结束时间 */
-  endDate: any;
+  endDate?: any;
   otherInfo?: Array<OtherInfo>;
 }
 function jackItem(): {[props: string]: JackItem} {

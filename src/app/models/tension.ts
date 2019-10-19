@@ -55,6 +55,7 @@ export interface TensionHoleInfo {
   state: number;
   /** 上传状态 */
   uploading?: boolean;
+  /** 其它数据 */
   otherInfo?: Array<OtherInfo>;
   /** task */
   tasks: Array<TensionHoleTask>;
@@ -75,6 +76,7 @@ export interface TensionHoleTask {
   device: TensionDevice;
   /** 张拉模式  =42为4顶两端 =41为4顶单端  =21为2顶A1A2单端 =22为2顶A1B1单端 =23为2顶A1A2两端  =24为2顶B1B2两端 =25为2顶A1B1两端  =11为1顶A1单端  =12为1顶B1单端 =13为A1A2B1单端 */
   mode: number;
+  /** 其它数据 */
   otherInfo?: Array<OtherInfo>;
   /** 张拉记录 */
   record?: TensionRecord;
@@ -107,40 +109,46 @@ export interface CalculateInfo {
 }
 /** 记录 */
 export interface TensionRecord {
-  /** 二次张拉 */
-  twice: boolean;
-  /** 超张拉 */
-  super: boolean;
-  /** 补张拉 */
-  mend: boolean;
   /** 张拉状态 =1一次张拉完成   =2 已张拉 */
   state: number;
-  groups: Array<{
-    /** 阶段记录 */
-    A1: TensionRecordStage;
-    A2: TensionRecordStage;
-    B1: TensionRecordStage;
-    B2: TensionRecordStage;
-    /** 张拉过程数据 */
-    datas: Process;
-  }>
+  /** 过程记录 */
+  groups: Array<OnceRecord>
+}
+/** 每次张拉记录 */
+export interface OnceRecord {
+  /** 张拉阶段应力百分比 */
+  knPercentage: Array<number>;
+  /** 阶段名称 */
+  msg: Array<string>;
+  /** 阶段保压时间 */
+  time: Array<number>;
+  /** 卸荷比例 */
+  uploadPercentage: number;
+  /** 卸荷延时 */
+  uploadDelay: number;
+  /** 阶段记录 */
+  A1: TensionRecordStage;
+  A2: TensionRecordStage;
+  B1: TensionRecordStage;
+  B2: TensionRecordStage;
+  /** 张拉过程数据 */
+  datas: Process;
 }
 /** 张拉阶段记录 */
 export interface TensionRecordStage {
   /** 阶段压力 */
-  mpa: Array<string>;
+  mpa: Array<number>;
   /** 阶段位移 */
-  mm: Array<string>;
-  /** 阶段保压时间 */
-  time: Array<number>;
-  /** 回油 */
+  mm: Array<number>;
+  /** 回油压力 */
   initMpa: number;
+  /** 回油位移 */
   initMm: number;
 }
 /** 张拉过程数据 */
 export interface Process {
-  /** 时间戳 */
-  date: Array<number | string>;
+  /** 采集频率 */
+  hz: number;
   A1?: JackProcess;
   A2?: JackProcess;
   B1?: JackProcess;
@@ -167,30 +175,34 @@ export interface JackProcess {
 export const TensionTaskIndex = '++id, name, component, project';
 
 
-// 张拉模式  =42为4顶两端 =41为4顶单端  =21为2顶A1A2单端 =22为2顶A1B1单端 =23为2顶A1A2两端
-// =24为2顶B1B2两端 =25为2顶A1B1两端  =11为1顶A1单端  =12为1顶B1单端 =13为A1A2B1单端
-
-export function getModeStr(i: number) {
-  switch (i) {
-    case 42: // 4顶两端
-      return ['A1', 'A2', 'B1', 'B2']
-    case 41: // 4顶单端
-      return ['A1', 'B1', 'A2', 'B2']
-    case 21: // A1|A2单端
-    case 23: // A1|A2两端
-      return ['A1', 'A2']
-    case 24: // B1|B2两端
-      return ['B1', 'B2']
-    case 22: // A1|B1单端
-    case 25: // A1|B1两端
-      return ['A1', 'B1']
-    case 11: // A1单端
-      return ['A1']
-    case 12: // B1单端
-      return ['B1']
-    default:
-      break;
-  }
+/** 张拉记录结果计算 */
+export interface RecordCompute {
+  stage?: Array<{
+    A1?: {
+      LZ: number;
+      DR: number;
+      Sn: number;
+    },
+    A2?: {
+      LZ: number;
+      DR: number;
+      Sn: number;
+    },
+    B1?: {
+      LZ: number;
+      DR: number;
+      Sn: number;
+    },
+    B2?: {
+      LZ: number;
+      DR: number;
+      Sn: number;
+    },
+  }>;
+  A1LZ?: number;
+  A1DR?: number;
+  B1LZ?: number;
+  B1DR?: number;
 }
 
 export interface ManualGroup {

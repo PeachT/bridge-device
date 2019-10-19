@@ -41,8 +41,10 @@ export class MixingInfoComponent implements OnInit, OnChanges {
     return this.fb.group({
       /** 用量 */
       dosage: this.fb.array(mixingInfo.dosage),
-      /** 开始时间 */
-      startTime: [mixingInfo.startTime],
+      /** 搅拌开始时间 */
+      startDate: [mixingInfo.startDate],
+      /** 搅拌完成时间 */
+      endDate: [mixingInfo.startDate],
       /** 搅拌时间s */
       mixingTime: [mixingInfo.mixingTime],
       /** 泌水率 */

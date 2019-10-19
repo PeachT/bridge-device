@@ -11,11 +11,24 @@ import { GroutingService } from "./services/grouting.service";
 import { interval } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { format } from 'date-fns';
+import { trigger, transition, style, query, animateChild, animate, group } from '@angular/animations';
 
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.less"]
+  styleUrls: ["./app.component.less"],
+  animations: [
+    trigger('routeAnimation', [
+      transition('* => *', [
+        query(':leave', style({ transform: 'translateX(0)', width: '100%'}), { optional: true }),
+        query(':enter', style({ transform: 'translateX(50%)', width: '0%'}), { optional: true }),
+        group([
+          query(':leave', animate('.5s ease-in-out', style({transform: 'translateX(50%)', width: '0%'})), { optional: true }),
+          query(':enter', animate('.5s ease-in-out', style({transform: 'translateX(0)', width: '100%'})), { optional: true })
+        ])
+      ])
+    ])
+  ]
 })
 export class AppComponent implements OnInit {
   time$ = interval(1000).pipe(
@@ -26,7 +39,9 @@ export class AppComponent implements OnInit {
   s2 = null;
   db: DB;
   keyboardState = true;
-
+  // router跳转动画所需参数
+  routerState = true;
+  routerStateCode = 'active';
   constructor(
     public e: ElectronService,
     private odb: DbService,
@@ -34,7 +49,7 @@ export class AppComponent implements OnInit {
     private message: NzMessageService,
     private router: Router,
     // public PLCS: PLCService,
-    public GPLCS: GroutingService
+    public GPLCS: GroutingService,
   ) {
     // const args = process;
     // console.log(args);
@@ -68,6 +83,9 @@ export class AppComponent implements OnInit {
         }
         console.log(event);
         this.appS.nowUrl = event.url;
+        // 每次路由跳转改变状态
+        this.routerState = !this.routerState;
+        this.routerStateCode = this.routerState ? 'active' : 'inactive';
       }
     });
   }

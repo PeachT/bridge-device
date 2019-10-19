@@ -14,7 +14,7 @@ export function createForm(data: GroutingTask): FormGroup {
     /** 梁长度 */
     beamLength: [data.beamLength, [Validators.required]],
     /** 张拉日期 */
-    tensinDate: [data.tensinDate, [Validators.required]],
+    tensinDate: [data.tensionDate, [Validators.required]],
     /** 浇筑日期 */
     castingDate: [data.castingDate, [Validators.required]],
     /** 压浆顺序 */

@@ -11,6 +11,7 @@ import { HttpService } from 'src/app/services/http.service';
 import { uploadingData } from 'src/app/Function/uploading';
 import { GroutingTask, GroutingHoleItem } from 'src/app/models/grouting';
 import { nameRepetition } from 'src/app/Validator/async.validator';
+import { gouringOther2Date } from 'src/app/Function/grouting';
 
 @Component({
   selector: 'app-grouting',
@@ -52,7 +53,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
     /** 梁长度 */
     beamLength: null,
     /** 张拉日期 */
-    tensinDate: null,
+    tensionDate: null,
     /** 浇筑日期 */
     castingDate: null,
     /** 压浆顺序 */
@@ -121,12 +122,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
             /** 其他说明 */
             remarks: null,
             processDatas: {
-              date: [
-                '1570254841000', '1570254841000', '1570254842000', '1570254843000', '1570254844000',
-                '1570254845000', '1570254846000', '1570254847000', '1570254848000', '1570254849000',
-                '1570254850000', '1570254851000', '1570254852000', '1570254853000', '1570254854000',
-                '1570254855000', '1570254856000', '1570254857000', '1570254858000', '1570254859000',
-              ],
+              hz: 1,
               intoPulpPressure: [
                 0, 0.2, 0.3, 0.28, 0.3,
                 0.4, 0.38, 0.41, 0.44, 0.45,
@@ -202,12 +198,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
             /** 其他说明 */
             remarks: null,
             processDatas: {
-              date: [
-                '1570254841000', '1570254841000', '1570254842000', '1570254843000', '1570254844000',
-                '1570254845000', '1570254846000', '1570254847000', '1570254848000', '1570254849000',
-                '1570254850000', '1570254851000', '1570254852000', '1570254853000', '1570254854000',
-                '1570254855000', '1570254856000', '1570254857000', '1570254858000', '1570254859000',
-              ],
+              hz: 1,
               intoPulpPressure: [
                 0, 0.2, 0.3, 0.28, 0.3,
                 0.4, 0.38, 0.41, 0.44, 0.45,
@@ -266,12 +257,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
             /** 其他说明 */
             remarks: null,
             processDatas: {
-              date: [
-                '1570254841000', '1570254841000', '1570254842000', '1570254843000', '1570254844000',
-                '1570254845000', '1570254846000', '1570254847000', '1570254848000', '1570254849000',
-                '1570254850000', '1570254851000', '1570254852000', '1570254853000', '1570254854000',
-                '1570254855000', '1570254856000', '1570254857000', '1570254858000', '1570254859000',
-              ],
+              hz: 1,
               intoPulpPressure: [
                 0, 0.2, 0.3, 0.28, 0.3,
                 0.4, 0.38, 0.41, 0.44, 0.45,
@@ -317,7 +303,8 @@ export class GroutingComponent implements OnInit, OnDestroy {
         /** 用量 */
         dosage: [30, 100, 10],
         /** 开始时间 */
-        startTime: new Date(),
+        startDate: new Date(),
+        endDate: new Date(),
         /** 搅拌时间 */
         mixingTime: 20,
         /** 泌水率 */
@@ -337,7 +324,8 @@ export class GroutingComponent implements OnInit, OnDestroy {
         /** 用量 */
         dosage: [300, 1000, 100],
         /** 开始时间 */
-        startTime: new Date(),
+        startDate: new Date(),
+        endDate: new Date(),
         /** 搅拌时间 */
         mixingTime: 100,
         /** 泌水率 */
@@ -382,6 +370,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.formInit(this.data);
+    console.log(JSON.stringify(this.data));
   }
   /** 初始化数据 */
   formInit(data: GroutingTask) {
@@ -396,7 +385,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
       /** 梁长度 */
       beamLength: [data.beamLength, [Validators.required]],
       /** 张拉日期 */
-      tensinDate: [data.tensinDate, [Validators.required]],
+      tensinDate: [data.tensionDate, [Validators.required]],
       /** 浇筑日期 */
       castingDate: [data.castingDate, [Validators.required]],
       /** 压浆顺序 */
@@ -480,6 +469,12 @@ export class GroutingComponent implements OnInit, OnDestroy {
     if (!data) {
       return;
     }
+    console.log('12356897987130000000', JSON.stringify(data));
+    data.mixingInfo.map(m => {
+      if ('startTime' in data) {
+        m.startDate = (m as any).startTime;
+      }
+    })
     this.data = data;
     this.uploading = false;
     this.data.groutingInfo.map(g => {
@@ -487,6 +482,9 @@ export class GroutingComponent implements OnInit, OnDestroy {
         this.uploading = true;
       }
     });
+
+    this.data = gouringOther2Date(this.data);
+
     this.formInit(this.data);
     console.log('梁梁梁梁', this.data, this.uploading);
   }
@@ -499,7 +497,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
     if (!data) {
       data = { ...this.data };
       data.id = null;
-      data.tensinDate = null;
+      data.tensionDate = null;
       data.castingDate = null;
       data.template = false;
       delete data.mixingInfo;

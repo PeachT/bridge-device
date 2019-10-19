@@ -1,8 +1,8 @@
 import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, AbstractControl, ValidatorFn, Validators, FormControl } from '@angular/forms';
-import { TensionStage, getModeStr, TensionHoleTask } from 'src/app/models/tension';
+import { TensionStage, TensionHoleTask } from 'src/app/models/tension';
 import { Subscription } from 'rxjs';
-import { holeNameShow } from 'src/app/Function/tension';
+import { holeNameShow, getModeStr } from 'src/app/Function/tension';
 import { copyAny } from 'src/app/models/base';
 
 @Component({
@@ -49,10 +49,10 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
   get tensionKn(): number {
     return this.formData.controls.tensionKn.value;
   }
-  get twice(): number {
+  get twice(): boolean {
     return this.formData.controls.twice.value;
   }
-  get superState(): number {
+  get superState(): boolean {
     return this.formData.controls.super.value;
   }
   get mend(): number {

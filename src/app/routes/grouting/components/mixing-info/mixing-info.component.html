@@ -5,8 +5,8 @@
       <thead>
         <tr>
           <th >名称/用量(kg)</th>
-          <th>开始时间</th>
-          <th>搅拌时间(s)</th>
+          <th>起止时间</th>
+          <th>搅拌用时(s)</th>
           <th>水胶比</th>
           <th>水/环境温度(℃)</th>
           <th>初始流动度/流动度(s)</th>
@@ -27,7 +27,12 @@
               </ng-container>
             </td>
             <td>
-              <nz-date-picker nzShowTime formControlName="startTime" [nzAllowClear]="false"></nz-date-picker>
+              <div class="row">
+                起&nbsp;<nz-date-picker nzShowTime formControlName="startDate" [nzAllowClear]="false"></nz-date-picker>
+              </div>
+              <div class="row">
+                止&nbsp;<nz-date-picker nzShowTime formControlName="endDate" [nzAllowClear]="false"></nz-date-picker>
+              </div>
             </td>
             <td><input type="number" nz-input placeholder="搅拌时间" formControlName="mixingTime" ></td>
             <td><input type="number" nz-input placeholder="水胶比" formControlName="waterBinderRatio"></td>
@@ -38,7 +43,7 @@
               <div class="row">
                 环&nbsp;<input type="number" nz-input placeholder="环境温度" formControlName="envTemperature">
               </div>
-              </td>
+            </td>
             <td>
               <div class="row">
                 初&nbsp;<input type="number" nz-input placeholder="初始流动度" formControlName="initFluidity">
