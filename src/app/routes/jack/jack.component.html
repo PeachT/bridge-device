@@ -3,11 +3,16 @@
     <app-left-menu [dbName]="dbName" (menuChange)="onMneu($event)" #leftMenu></app-left-menu>
   </div>
   <div class="main scroll-y">
-    <app-operat [dbName]="dbName" [formData]="formData" (outEdit)="edit($event)" (outEditOk)="editOk($event)">
-    </app-operat>
+    <app-operat
+      [dbName]="dbName"
+      [formData]="formData"
+      (outEdit)="edit($event)"
+      (outEditOk)="editOk($event)"
+      [valid]="formData.valid"
+      ></app-operat>
 
     <div class="scroll-content">
-      <form nz-form [ngClass]="{'form-edit': !appS.edit}" [formGroup]="formData">
+      <form nz-form class="form-edit" [ngClass]="{'edit-on': appS.edit}" [formGroup]="formData">
         <app-form-item label="顶名称" [row]="true" [errors]="formData.get('name').errors">
           <input placeholder="例：150T 或 204Q" nz-input formControlName="name"/>
         </app-form-item>
@@ -32,7 +37,7 @@
           <jack-item [formGroup]="formData" [jackName]="'B1'" [data]="data.B1"></jack-item>
           <jack-item [formGroup]="formData" [jackName]="'B2'" [data]="data.B2"></jack-item>
         </div>
-        <div class="edit" [ngClass]="{'edit-on': appS.edit}"></div>
+        <div class="edit" *ngIf="!appS.edit"></div>
       </form>
     </div>
   </div>

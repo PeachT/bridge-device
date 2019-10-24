@@ -36,7 +36,7 @@
               </app-form-item>
             </div>
             <div>
-              <app-add-other [formGroup]="item" [data]="tasks[i].otherInfo"></app-add-other>
+              <app-add-other [formGroup]="item" [data]="tasks[i]?.otherInfo || []"></app-add-other>
             </div>
             <div>
               <tension-hole-task-stage [formData]="item" [data]="tasks[i]" [holeName]="data.name" #stage></tension-hole-task-stage>

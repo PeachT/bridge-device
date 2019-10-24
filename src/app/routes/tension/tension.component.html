@@ -1,18 +1,17 @@
 <app-left>
   <div class="sider sider-menu">
-    <task-menu hidden style="overflow: hidden;" [dbNmae]="dbName" (menuChange)="onBridge($event)" #taskmenu></task-menu>
-    <app-scroll-menu style="flex: 1;"></app-scroll-menu>
+    <app-scroll-menu style="flex: 1;" [dbName]="dbName" [stateFunc]="menuStateFunc" #menu (menuChange)="selectBridge($event)"></app-scroll-menu>
   </div>
   <div class="main" style="width: 100%;">
     <div *ngIf="data?.template" class="template">
       <div class="text">模板</div>
     </div>
-    <nz-tabset class="task-tabset" (nzSelectChange)="changeTabs($event)">
+    <nz-tabset class="task-tabset" (nzSelectChange)="changeTabs($event)" [nzShowPagination]="false">
       <nz-tab nzTitle="基础信息">
         <div class="form-edit">
-          <form nz-form [formGroup]="formData" [hidden]="!formData">
+          <form nz-form [ngClass]="{'edit-on': appS.edit}" [formGroup]="formData" [hidden]="!formData">
             <div>
-              <app-form-item [row]="true" label="模板" [hidden]="!edit">
+              <app-form-item [row]="true" label="模板" [hidden]="!appS.edit">
                 <nz-switch formControlName="template" nzCheckedChildren="是" nzUnCheckedChildren="否"></nz-switch>
               </app-form-item>
               <app-form-item label="梁号" [errors]="formData.get('name').errors">
@@ -20,7 +19,8 @@
               </app-form-item>
               <app-form-item label="构建" [errors]="formData.get('component').errors">
                 <nz-input-group class="tension-group" [nzAddOnAfter]="suffixButton">
-                  <nz-select style="width: 100%;" nzPlaceHolder="请选择构建" formControlName="component">
+                  <nz-select style="width: 100%;" nzPlaceHolder="请选择构建" formControlName="component"
+                  (ngModelChange)="conponentChange($event)">
                     <nz-option [nzValue]="item.value" [nzLabel]="item.label"
                       *ngFor="let item of componentMneu$ | async">
                     </nz-option>
@@ -36,8 +36,8 @@
               <app-form-item label="浇筑日期" [errors]="formData.get('castingDate').errors">
                 <nz-date-picker formControlName="castingDate" placeholder="浇筑日期"></nz-date-picker>
               </app-form-item>
-              <app-form-item label="张拉日期" [errors]="formData.get('tensinDate').errors">
-                <nz-date-picker formControlName="tensinDate" placeholder="张拉日期"></nz-date-picker>
+              <app-form-item label="张拉日期" [errors]="formData.get('tensionDate').errors">
+                <nz-date-picker formControlName="tensionDate" placeholder="张拉日期"></nz-date-picker>
               </app-form-item>
 
               <app-form-item label="施工员">
@@ -51,7 +51,7 @@
               </app-form-item>
             </div>
             <div>
-              <app-add-other [formGroup]="formData" [data]="data.otherInfo"></app-add-other>
+              <app-add-other [formGroup]="formData" [data]="data?.otherInfo || []"></app-add-other>
             </div>
             <div>
               <tension-holes [data]="data" [formData]="formData" #holes></tension-holes>
@@ -63,12 +63,22 @@
               <grouting-record [formData]="formData" [data]="groutingTask"></grouting-record>
             </div> -->
           </form>
-          <!-- <div class="edit" [ngClass]="{'edit-on': appS.edit}" *ngIf="!appS.edit"></div> -->
+          <div class="edit" *ngIf="!appS.edit"></div>
         </div>
 
-        <div class="operation" *ngIf="taskmenu?.project?.select">
-          <app-operat [dbName]="dbName" [formData]="formData" (outEdit)="onEdit($event)" (outEditOk)="editOk($event)"
-            (outDelete)="delete()" [addFilterFun]="addFilterFun" [updateFilterFun]="updateFilterFun" [coprState]="true">
+        <div class="operation" *ngIf="menu?.projectId">
+          <app-operat
+            [dbName]="dbName"
+            [formData]="formData"
+            [addFilterFun]="addFilterFun"
+            [updateFilterFun]="updateFilterFun"
+            [coprState]="true"
+            [valid]="formData.valid"
+            (outEdit)="onEdit($event)"
+            (outEditOk)="editOk($event)"
+            (outDelete)="delete()"
+            (outModification)="onEdit(null, true)"
+            >
             <button nz-button nzType="primary" (click)="upload()"
               [disabled]="!(data?.groutingInfo?.length > 0) || !uploading"><i nz-icon nzType="cloud-upload"
                 nzTheme="outline"></i>上传</button>

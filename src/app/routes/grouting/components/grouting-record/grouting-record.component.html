@@ -30,7 +30,7 @@
             </app-form-item>
           </div>
           <div>
-            <app-add-other [formGroup]="item" [data]="groutingInfo[i].otherInfo"></app-add-other>
+            <app-add-other [formGroup]="item" [data]="groutingInfo[i]?.otherInfo || []"></app-add-other>
           </div>
           <div >
             <grouting-record-item [formData]="formData" [index]="i" [data]="groutingInfo[i].groups"></grouting-record-item>

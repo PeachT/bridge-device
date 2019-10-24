@@ -60,8 +60,6 @@ export interface GroutingInfo {
 export interface GroutingHoleItem {
   /** 压浆方向 */
   direction: string;
-  /** 设置压浆压力 */
-  setGroutingPressure: number;
   /** 环境温度 */
   envTemperature?: number;
   /** 浆液温度 */
@@ -70,18 +68,26 @@ export interface GroutingHoleItem {
   startDate: Date | string | number;
   /** 完成时间 */
   endDate: Date | string | number;
+  /** 设置压浆压力 */
+  setGroutingPressure: number;
   /** 进浆压力 */
   intoPulpPressure?: number;
   /** 回浆压力 */
   outPulpPressure?: number;
+  /** 稳压时间 */
+  steadyTime: number;
+  /** 设计浆量 */
+  setPulpvolume?:number;
   /** 进浆量 (L) */
   intoPulpvolume?: number;
   /** 回浆量 (L) */
   outPulpvolume?: number;
-  /** 真空泵压力 */
+  /** 设置真空压力 */
+  setVacuumPumpPressure?: number;
+  /** 真空压力 */
   vacuumPumpPressure?: number;
-  /** 稳压时间 */
-  steadyTime: number;
+  /** 真空循环时间 */
+  cycletime?: number;
   /** 通过情况 */
   passMsg?: string;
   /** 冒浆情况 */

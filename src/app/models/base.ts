@@ -4,6 +4,8 @@ import { OtherInfo } from './common';
 import { JackItem } from './jack';
 
 export interface IBase {
+  /** 唯一编号 */
+  uuid?: string;
   /** Id */
   id?: any;
   /** 名称 */
@@ -113,7 +115,7 @@ export enum baseEnum {
   comp = 'comp',
   jack = 'jack',
   users = 'users',
-  task = 'task',
+  tension = 'tension',
   groutingTask = 'groutingTask',
   groutingInfo = 'groutingInfo',
   groutingHoleitem = 'groutingHoleitem',

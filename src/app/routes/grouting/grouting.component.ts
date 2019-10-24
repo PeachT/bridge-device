@@ -11,7 +11,8 @@ import { HttpService } from 'src/app/services/http.service';
 import { uploadingData } from 'src/app/Function/uploading';
 import { GroutingTask, GroutingHoleItem } from 'src/app/models/grouting';
 import { nameRepetition } from 'src/app/Validator/async.validator';
-import { gouringOther2Date } from 'src/app/Function/grouting';
+import { upFormData } from 'src/app/Function/uploadingOther';
+import { ScrollMenuComponent } from 'src/app/shared/scroll-menu/scroll-menu.component';
 
 @Component({
   selector: 'app-grouting',
@@ -20,26 +21,25 @@ import { gouringOther2Date } from 'src/app/Function/grouting';
 })
 export class GroutingComponent implements OnInit, OnDestroy {
   dbName = 'grouting';
-  @ViewChild('taskmenu', null) taskMenuDom: TaskMenuComponent;
-
+  @ViewChild('menu', null) menuDom: ScrollMenuComponent;
 
   // @Input() taskMenu: TaskMenuComponent;
-  set proportionsForm(formArray: FormArray) {
-    (this.formData.controls.proportionInfo as FormGroup).controls.proportions = formArray;
-  }
+  // set proportionsForm(formArray: FormArray) {
+  //   (this.formData.controls.proportionInfo as FormGroup).controls.proportions = formArray;
+  // }
 
-  get mixingInfoForm(): FormArray {
-    return this.formData.controls.mixingInfo as FormArray;
-  }
-  set mixingInfoForm(formArray: FormArray) {
-    this.formData.controls.mixingInfo = formArray;
-  }
-  get groutingInfoForm(): FormArray {
-    return this.formData.controls.groutingInfo as FormArray;
-  }
-  set groutingInfoForm(formArray: FormArray) {
-    this.formData.controls.groutingInfo = formArray;
-  }
+  // get mixingInfoForm(): FormArray {
+  //   return this.formData.controls.mixingInfo as FormArray;
+  // }
+  // set mixingInfoForm(formArray: FormArray) {
+  //   this.formData.controls.mixingInfo = formArray;
+  // }
+  // get groutingInfoForm(): FormArray {
+  //   return this.formData.controls.groutingInfo as FormArray;
+  // }
+  // set groutingInfoForm(formArray: FormArray) {
+  //   this.formData.controls.groutingInfo = formArray;
+  // }
 
 
   data: GroutingTask = {
@@ -351,12 +351,21 @@ export class GroutingComponent implements OnInit, OnDestroy {
   tabsetShow = 0;
   /** 上传 */
   uploading = false;
+  /** 其他数据禁止删除key */
+  otherUnDel = [];
   /** 添加数据判断 */
   addFilterFun = (o1: any, o2: any) => o1.name === o2.name
     && o1.component === o2.component && o1.project === o2.project
   /** 修改数据判断 */
   updateFilterFun = (o1: GroutingTask, o2: GroutingTask) => o1.name === o2.name
     && o1.component === o2.component && o1.project === o2.project && o1.id !== o2.id
+  /** 菜单梁状态 */
+  menuStateFunc = (g: GroutingTask) => {
+    console.log(g);
+    return g.groutingInfo.map(item => {
+      return item.state
+    })
+  }
 
   constructor(
     public odb: DbService,
@@ -370,7 +379,9 @@ export class GroutingComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.formInit(this.data);
-    console.log(JSON.stringify(this.data));
+  }
+  async getPorject(): Promise<Project> {
+    return await this.odb.getOneAsync('project', (p: Project) => p.id === this.menuDom.projectId);
   }
   /** 初始化数据 */
   formInit(data: GroutingTask) {
@@ -417,11 +428,6 @@ export class GroutingComponent implements OnInit, OnDestroy {
     this.formData.controls.name.setAsyncValidators([nameRepetition(this.odb, this.dbName, this.updateFilterFun)]);
       setTimeout(() => {
         this.formData.controls.name.updateValueAndValidity();
-        // tslint:disable-next-line:forin
-        // for (const i in this.formData.controls) {
-        //   this.formData.controls[i].markAsDirty();
-        //   this.formData.controls[i].updateValueAndValidity();
-        // }
       }, 1);
   }
 
@@ -451,8 +457,6 @@ export class GroutingComponent implements OnInit, OnDestroy {
     console.log(this.formData,
       this.formData.getRawValue(),
       this.formData.valid
-      // this.mixingInfoForm.value,
-      // this.groutingInfoForm.value,
     );
   }
   ngOnDestroy() {
@@ -460,16 +464,14 @@ export class GroutingComponent implements OnInit, OnDestroy {
   }
   /** 切换显示项 */
   changeTabs(value) {
-    console.log(value.index);
     this.tabsetShow = value.index;
   }
 
   /** 选择梁 */
-  async onBridge(data: GroutingTask) {
+  async selectBridge(data: GroutingTask) {
     if (!data) {
       return;
     }
-    console.log('12356897987130000000', JSON.stringify(data));
     data.mixingInfo.map(m => {
       if ('startTime' in data) {
         m.startDate = (m as any).startTime;
@@ -482,57 +484,72 @@ export class GroutingComponent implements OnInit, OnDestroy {
         this.uploading = true;
       }
     });
-
-    this.data = gouringOther2Date(this.data);
-
     this.formInit(this.data);
-    console.log('梁梁梁梁', this.data, this.uploading);
   }
 
   /**
    * *编辑/添加
    */
-  onEdit(data: GroutingTask) {
-    /** 复制 */
-    if (!data) {
-      data = { ...this.data };
-      data.id = null;
-      data.tensionDate = null;
-      data.castingDate = null;
-      data.template = false;
-      delete data.mixingInfo;
-      for (const g of data.groutingInfo) {
-        g.state = 0;
-        const groups: Array<GroutingHoleItem> = [];
-        for (const item of g.groups) {
-          // tslint:disable-next-line:max-line-length
-          groups.push({ ...getModelBase(baseEnum.groutingHoleitem), direction: item.direction, setGroutingPressure: item.setGroutingPressure });
+  async onEdit(data: GroutingTask, modification = false) {
+    const project = await this.getPorject();
+    if (!modification) {
+      /** 复制 */
+      if (!data) {
+        data = { ...this.data };
+        data.id = null;
+        data.tensionDate = null;
+        data.castingDate = null;
+        data.template = false;
+        delete data.mixingInfo;
+        for (const g of data.groutingInfo) {
+          g.state = 0;
+          const groups: Array<GroutingHoleItem> = [];
+          for (const item of g.groups) {
+            // tslint:disable-next-line:max-line-length
+            groups.push({ ...getModelBase(baseEnum.groutingHoleitem), direction: item.direction, setGroutingPressure: item.setGroutingPressure });
+          }
+          g.groups = groups;
+          console.log(g);
         }
-        g.groups = groups;
-        console.log(g);
-      }
-      console.log(data);
+        console.log(data);
 
-      this.data = data;
-      /** 添加 */
-    } else {
-      this.data = getModelBase(baseEnum.groutingTask);
-      this.data.project = this.taskMenuDom.project.select.id;
+        this.data = data;
+        /** 添加 */
+      } else {
+        this.data = getModelBase(baseEnum.groutingTask);
+        this.data.project = this.menuDom.projectId;
+      }
     }
-    console.log('添加', this.data);
+    const other = this.projectAddOther(project);
+    if (other) {
+      this.otherUnDel = other.unDel;
+      this.data.otherInfo = other.other;
+    }
+    console.log('添加', this.data, project, this.otherUnDel);
     this.formInit(this.data);
+  }
+  /** 处理项目其他数据添加 */
+  projectAddOther(project: Project) {
+    try {
+      return upFormData[`${project.uploadingName}Other`](this.data.otherInfo, 'grouting');
+    } catch (error) {
+      return null;
+    }
   }
   /**
    * *编辑完成
    */
-  editOk(id: number) {
-    console.log();
-    if (id) {
-      // this.leftMenu.getMenuData(id);
-      this.taskMenuDom.res({ component: this.data.component, selectBridge: id });
+  editOk(data) {
+    console.log(data, this.menuDom.bridgeId);
+    if (data.bridgeId && data.bridgeId !== this.menuDom.bridgeId) {
+
+      this.menuDom.reset({
+        projectId: data.projectId,
+        componentName: data.componentName,
+        bridgeId: data.bridgeId
+      });
     } else {
-      // this.leftMenu.onClick();
-      this.taskMenuDom.onMneu();
+      this.menuDom.selectBridge(data.bridgeId);
     }
   }
   /** 删除 */
@@ -546,62 +563,100 @@ export class GroutingComponent implements OnInit, OnDestroy {
       const msg = await this.odb.db.grouting.delete(this.appS.leftMenu);
       console.log('删除了', msg);
       this.appS.leftMenu = null;
-      this.taskMenuDom.getBridge();
+      this.menuDom.getBridgeMenu();
     }
     this.deleteShow = false;
   }
 
   /** 上传 */
   async upload() {
-    const proj = await this.odb.getOneAsync('project', (p: Project) => p.id === this.taskMenuDom.project.select.id);
+    const proj = await this.odb.getOneAsync('project', (p: Project) => p.id === this.menuDom.projectId);
+    const ups = [];
     console.log(this.data, proj);
+    if (!proj.uploadingName) {
+      this.message.warning(`未设置数据上传平台，请先设置好链接平台后重试！`);
+      return;
+    }
     let url = null;
     let data = null;
     switch (proj.uploadingName) {
       case 'weepal':
-
         break;
       case 'xalj':
         url = uploadingData.xalj(proj.uploadingLinkData);
         data = uploadingData.xaljData(this.data);
+        data.map(g => {
+          this.http.post(url, { Data: g }).subscribe(r => {
+          }, err => {
+            const result: any = decodeURI(err.error.text);
+            if (result.indexOf('压浆数据上传完成') !== -1) {
+              ups.push({success: true, name: g.holeNO});
+              this.message.success(`${g.holeNO}上传成功`);
+              if (data.length === ups.length) {
+                this.updataDB(ups);
+              }
+            } else {
+              ups.push({success: false, name: g.holeNO});
+              this.message.error(`${g.holeNO}上传失败 \n错误：${result}`);
+              if (data.length === ups.length) {
+                this.updataDB(ups);
+              }
+            }
+          });
+        });
+        break;
+      case 'hzxf':
+        if (proj.uploadingLinkData.serviceData) {
+          // http://47.98.39.16:8988/receive/zlyjaction!yajiangresult.action?TOKEN=
+          // tslint:disable-next-line:max-line-length
+          url = `${proj.uploadingLinkData.url}/zlyjaction!yajiangresult.action?TOKEN=${proj.uploadingLinkData.serviceData.TOKEN}&DATA=`;
+          data = uploadingData.hzxfDataYJ(this.data, proj);
+          data.map(g => {
+            const urld = `${url}${encodeURI(JSON.stringify(g))}`
+            console.log(urld);
+            this.http.post1(urld).subscribe(r => {
+              console.log(r);
+              if ('CODE' in r && r.CODE !== 1) {
+                ups.push({success: true, name: g.STEELBEAMNO});
+                this.message.success(`${g.STEELBEAMNO}上传成功`);
+              } else {
+                ups.push({success: false, name: g.STEELBEAMNO});
+                this.message.error(`${g.STEELBEAMNO}上传失败 \n错误：${JSON.stringify(r)}`);
+              }
+              if (data.length === ups.length) {
+                this.updataDB(ups);
+              }
+            }, err => {
+              ups.push({success: false, name: g.STEELBEAMNO});
+              this.message.error('上传错误！！！');
+              if (data.length === ups.length) {
+                this.updataDB(ups);
+              }
+            });
+          });
+        } else {
+          console.log(proj);
+          this.message.warning(`数据平台链接有误，请先正确链接平台后重试！`);
+          return;
+        }
         break;
       default:
         break;
     }
-    console.log(data);
-    const ups = [];
-    data.map(g => {
-      this.http.post(url, { Data: g }).subscribe(r => {
-        console.log(r);
-      }, err => {
-        const result: any = decodeURI(err.error.text);
-        ups.push({success: result, name: g.holeNO});
-        console.log(result, ups);
-        if (result.indexOf('压浆数据上传完成') !== -1) {
-          this.message.success(`${g.holeNO}上传成功`);
-        } else {
-          this.message.error(`${g.holeNO}上传失败 \n错误：${result}`);
-        }
-        if (ups.length === data.length) {
-          console.log('更新数据');
-
-          this.data.groutingInfo.map(hg => {
-            const up = ups.filter(f => f.name === hg.name);
-            console.log('123', up);
-            if (up.length > 0 && up[0].success.indexOf('压浆数据上传完成') !== -1) {
-              hg.uploading = true;
-            }
-          });
-          this.odb.updateAsync('grouting', this.data, (o: any) => this.updateFilterFun(o, this.data), true);
+  }
+  updataDB(ups) {
+    const upstate = false;
+    if (ups.length > 0) {
+      this.data.groutingInfo.map(hg => {
+        const up = ups.filter(f => f.name === hg.name);
+        if (up.length > 0 && up[0].success) {
+          hg.uploading = true;
+          console.log('更新数据', hg.name);
         }
       });
-    });
-    // const uphttp = data.map(g => this.http.post(url, { Data: g }));
-    // forkJoin(uphttp).subscribe(val => {
-    //     console.log('上传返回成功', val)
-    //   }, err => {
-    //     console.log('上传返回错误', err)
-    //   }
-    // );
+      if (upstate) {
+        this.odb.updateAsync('grouting', this.data, (o: any) => this.updateFilterFun(o, this.data), true);
+      }
+    }
   }
 }

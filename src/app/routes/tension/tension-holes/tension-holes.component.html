@@ -1,3 +1,4 @@
+<nz-alert nzType="error" nzMessage="请进行张拉分组分组" *ngIf="!(formData.get('tensionHoleInfos').valid)"></nz-alert>
 <div *ngIf="tensionHoleInfos && tensionHoleInfos.length > 0">
   <!-- <nz-divider style="min-width: auto;" nzText="压浆数据" nzOrientation="left"></nz-divider> -->
   <nz-form-item *ngIf="tensionHoleInfos" style="z-index: 2;">
@@ -31,7 +32,7 @@
             </app-form-item>
           </div>
           <div>
-            <app-add-other [formGroup]="item" [data]="tensionHoleInfos[i].otherInfo"></app-add-other>
+            <app-add-other [formGroup]="item" [data]="tensionHoleInfos[i]?.otherInfo || []"></app-add-other>
           </div>
           <div>
             <tension-hole-task [formData]="item" [data]="tensionHoleInfos[i]" [index]="i"></tension-hole-task>

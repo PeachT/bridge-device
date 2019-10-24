@@ -1,5 +1,6 @@
 import { TensionDevice } from '../models/jack';
-import { TensionHoleTask, RecordCompute } from '../models/tension';
+import { TensionHoleTask, RecordCompute, TensionTask } from '../models/tension';
+import { getDatetimeS, getJSDate } from './unit';
 // 张拉模式  =42为4顶两端 =41为4顶单端  =21为2顶A1A2单端 =22为2顶A1B1单端 =23为2顶A1A2两端
 // =24为2顶B1B2两端 =25为2顶A1B1两端  =11为1顶A1单端  =12为1顶B1单端 =13为A1A2B1单端
 /** 张拉模式转换顶名称 */
@@ -66,6 +67,7 @@ export function mpa2Kn(mpa: number, jack: TensionDevice, jackName: string) {
   }
 }
 
+/** 张拉结果数据计算 */
 export function recordCompute(data: TensionHoleTask) {
   const strMode = getModeStr(data.mode);
   // RecordCompute(this.data, key, index);
@@ -92,7 +94,7 @@ export function recordCompute(data: TensionHoleTask) {
 
       const LL = data.stage[name].theoryMm;
       const LQ = data.stage[name].wordMm;
-      const NS = 0;
+      const NS = data.stage[name].reboundMm;
       const LZ = Number((LK - (2 * L0) + L1 - LQ - NS).toFixed(2));
       const DR = Number(((LZ - LL) / LL).toFixed(2));
       const Sn = ((LK - LM) - (1 - σ0 / σk) * LQ).toFixed(2)	;
@@ -172,4 +174,28 @@ export function holeNameShow (name: string, mode: number) {
     default:
       break;
   }
+}
+
+
+/** 张拉时间转时间戳 */
+export function tensionDate2Number(data: TensionTask): TensionTask {
+  console.log(
+    data,
+    data.tensionDate,
+    data.castingDate,
+    data.createdDate,
+  );
+
+  data.tensionDate = getDatetimeS(data.tensionDate);
+  data.castingDate = getDatetimeS(data.castingDate);
+  // data.createdDate = getDatetimeS(data.createdDate);
+  return data;
+}
+/** 张拉时间转控件显示时间 */
+export function tensionOther2Date(data: TensionTask): TensionTask {
+  data.tensionDate = getJSDate(data.tensionDate);
+  data.castingDate = getJSDate(data.castingDate);
+  data.createdDate = getJSDate(data.createdDate);
+  data.modificationDate = getJSDate(data.modificationDate);
+  return data;
 }

@@ -7,9 +7,14 @@
     <app-operat
       *ngIf="appS.userInfo?.id === data.id || appS.userInfo?.jurisdiction > data.jurisdiction"
       [addState]="appS.userInfo?.jurisdiction"
-      [dbName]="dbName" [formData]="formData" (outEdit)="edit($event)" (outEditOk)="editOk($event)"></app-operat>
+      [dbName]="dbName"
+      [formData]="formData"
+      [valid]="formData.valid"
+      (outEdit)="edit($event)"
+      (outEditOk)="editOk($event)"
+      ></app-operat>
 
-    <form nz-form [ngClass]="{'form-edit': !appS.edit}" [formGroup]="formData">
+    <form nz-form class="form-edit" [ngClass]="{'edit-on': appS.edit}" [formGroup]="formData">
 
       <app-form-item label="名称" [errors]="formData.get('name').errors" [row]="true">
         <input type="text" nz-input placeholder="请输入名称" formControlName="name">
@@ -35,7 +40,7 @@
         </nz-checkbox-wrapper>
       </app-form-item>
 
-      <div class="edit" [ngClass]="{'edit-on': appS.edit}"></div>
+      <div class="edit" *ngIf="!appS.edit"></div>
     </form>
   </div>
 </app-left>

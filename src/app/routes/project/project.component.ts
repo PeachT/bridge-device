@@ -4,8 +4,11 @@ import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
 import { Project } from 'src/app/models/project';
 import { LeftMenuComponent } from 'src/app/shared/left-menu/left-menu.component';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { nameRepetition } from 'src/app/Validator/async.validator';
+import { AddOtherComponent } from 'src/app/shared/add-other/add-other.component';
+import { uploadingData } from 'src/app/Function/uploading';
+import { upFormData } from 'src/app/Function/uploadingOther';
 
 
 @Component({
@@ -17,6 +20,8 @@ import { nameRepetition } from 'src/app/Validator/async.validator';
 export class ProjectComponent implements OnInit, OnChanges {
   dbName = 'project';
   @ViewChild('leftMenu', null) leftMenu: LeftMenuComponent;
+  @ViewChild('other', null) otherDom: AddOtherComponent;
+
   formData: FormGroup;
   data: Project = {
     id: null,
@@ -61,6 +66,7 @@ export class ProjectComponent implements OnInit, OnChanges {
     }
   };
   deleteShow = false;
+  unDel = [];
 
 
   menuFilter = (o1: Project) => o1.jurisdiction !== 8;
@@ -107,12 +113,8 @@ export class ProjectComponent implements OnInit, OnChanges {
     this.formData.controls.name.setAsyncValidators([nameRepetition(this.db, this.dbName)]);
     setTimeout(() => {
       this.formData.controls.name.updateValueAndValidity();
-      // tslint:disable-next-line:forin
-      // for (const i in this.formData.controls) {
-      //   this.formData.controls[i].markAsDirty();
-      //   this.formData.controls[i].updateValueAndValidity();
-      // }
     }, 1);
+    this.selectUPloading(true);
   }
 
   onMneu(data: Project) {
@@ -166,5 +168,24 @@ export class ProjectComponent implements OnInit, OnChanges {
       this.leftMenu.getMenuData();
     }
     this.deleteShow = false;
+  }
+  /** 选择服务器创建必要项目数据 */
+  selectUPloading(state = false) {
+    try {
+      const name = this.formData.get('uploadingName').value;
+      console.log(name, upFormData.keys);
+      this.unDel = upFormData.keys[name].project;
+
+      if (state) {
+        return;
+      }
+      if (name === 'hzxf') {
+        const os = this.otherDom.otherInfoFormArr.value;
+        const r = upFormData.hzxfOther(os, 'project')
+        this.otherDom.initForm(r.other);
+      }
+    } catch (error) {
+      console.warn('获取项目其他添加值有误！')
+    }
   }
 }

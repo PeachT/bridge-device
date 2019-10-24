@@ -32,6 +32,19 @@ export class HttpService {
       catchError(this.handleError)
     );
   }
+  /**
+   * POST请求处理 'application/json;charset=UTF-8'
+   *
+   * @param {string} url url 后台接口api
+   * @returns {Observable<any>}
+   * @memberof HttpService
+   */
+  public post1(url: string): Observable<any> {
+    return this.http.post(`${url}`, null, httpOptions).pipe(
+      map(this.extractData),
+      catchError(this.handleError)
+    );
+  }
   public grt(url: string): Observable<any> {
     return this.http.get(`${url}`).pipe(
       map(this.extractData),

@@ -25,12 +25,11 @@
             <div class="hole-tag">
               <span *ngFor="let tag of item.value.holes; index as hi">
                 {{tag}}
-                <i nz-icon type="close" theme="outline" (click)="delHoleName(item, hi)"></i>
+                <i nz-icon nzType="close" theme="outline" (click)="delHoleName(item, hi)"></i>
               </span>
             </div>
             <div class="btn-close">
-              <button nz-button nzType="default" nzShape="circle" (click)="remove(i)"><i nz-icon
-                  type="close"></i></button>
+              <button nz-button nzType="default" nzShape="circle" (click)="remove(i)"><i nz-icon nzType="close"></i></button>
             </div>
           </div>
 

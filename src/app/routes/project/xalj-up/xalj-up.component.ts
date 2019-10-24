@@ -2,6 +2,7 @@ import { Component, OnInit, OnChanges, SimpleChanges, Input } from '@angular/cor
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { uploadingData } from 'src/app/Function/uploading';
 import { HttpService } from 'src/app/services/http.service';
+import { NzMessageService } from 'ng-zorro-antd';
 
 interface Mode {
   url: string;
@@ -30,6 +31,7 @@ export class XaljUpComponent implements OnInit, OnChanges {
   constructor(
     private http: HttpService,
     private fb: FormBuilder,
+    private message: NzMessageService,
   ) { }
 
   ngOnInit() {
@@ -48,9 +50,9 @@ export class XaljUpComponent implements OnInit, OnChanges {
     if (!this.data) {
       this.data  = {
         url: 'http://117.34.70.71:8092/DataService/YJDataUpload?',
-        user: null,
-        password: null,
-        deviceNo: null,
+        user: null, // lzqm
+        password: null, // qm123456
+        deviceNo: null, // test01
       };
     }
     console.log(this.formGroup.controls);
@@ -74,6 +76,7 @@ export class XaljUpComponent implements OnInit, OnChanges {
       this.uploadingState = false;
       if (err.status === 200) {
         this.serviceRetrun = decodeURI(err.error.text);
+        this.message.success(`测试成功${this.serviceRetrun}`);
       }
       console.log(err)
     });

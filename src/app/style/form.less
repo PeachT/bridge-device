@@ -1,3 +1,15 @@
+/** 编辑于禁止编辑*/
+.form-edit {
+  position: relative;
+  padding-bottom: 56px;
+  .edit {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    // background-color: rgba(255, 255, 255, .2);
+  }
+}
 form {
   display: flex;
   flex-direction: column;
@@ -9,5 +21,47 @@ form {
   input.error, input.error:focus, input.error:hover{
     border-color: #ff4d4f;
     border-right-width: 1px !important;
+    border-left: 5px solid #ff4d4f;
   }
 }
+.edit-on {
+  input[readonly] {
+    border-left: 5px solid #d9d9d9;
+    &:hover, &:focus {
+      border-color: #d9d9d9;
+      box-shadow: none;
+    }
+  }
+  .ant-input, .ant-calendar-picker-input.ant-input, .ant-select-selection,
+  .ant-calendar-picker-input.ant-input:focus {
+    border-left: 5px solid #1890ff;
+  }
+}
+
+
+.form-item {
+  display: flex;
+}
+nz-form-label {
+  min-width: 100px;
+}
+nz-form-control {
+  width: 100%;
+  .tip {
+    height: 24px;
+    line-height: 24px;
+  }
+  &.error{
+    .ant-input {
+      border-color: #ff4d4f !important;
+      border-right-width: 1px !important;
+    }
+    .tip {
+      color: #f5222d;
+    }
+  }
+}
+.ant-calendar-picker {
+  width: 100%;
+}
+

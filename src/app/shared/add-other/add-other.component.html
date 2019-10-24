@@ -9,14 +9,20 @@
         <div class="other-edit" *ngIf="appS.edit">
           <div class="edit-item">
             <app-form-item [errors]="item.get('key').errors">
-              <input placeholder="显示名称" nz-input formControlName="key" [nzAutocomplete]="auto" />
+              <input
+                [placeholder]="'显示名称' + (unDel && unDel.length > 0 && unDel.indexOf(item.get('key').value || '') > -1)"
+                nz-input
+                formControlName="key"
+                [nzAutocomplete]="auto"
+                [readonly]="unDel.length > 0 && unDel.indexOf(item.get('key').value) > -1"
+                />
               <nz-autocomplete [nzDataSource]="bridgeOtherKeySelect()" #auto> </nz-autocomplete>
             </app-form-item>
             <app-form-item [errors]="item.get('value').errors">
               <input type="text" nz-input placeholder="内容" formControlName="value">
             </app-form-item>
-            <div class="btn-close">
-              <button nz-button nzType="default" nzShape="circle" (click)="remove(i)"><i nz-icon type="close"></i></button>
+            <div class="btn-close" *ngIf="!unDel || unDel.indexOf(item.get('key').value || '') === -1">
+              <button nz-button nzType="default" nzShape="circle" (click)="remove(i)"><i nz-icon nzType="close"></i></button>
             </div>
           </div>
         </div>

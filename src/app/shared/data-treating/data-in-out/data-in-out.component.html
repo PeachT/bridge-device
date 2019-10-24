@@ -1,10 +1,10 @@
 <!-- <h2>{{bridge$ | async | json}}</h2> -->
 <app-form-item label="操作" row="true" [errorShow]="false">
   <nz-radio-group [(ngModel)]="operation" (ngModelChange)="selectOperation(true)">
-    <label nz-radio nzValue="outExcel">导出表格</label>
-    <label nz-radio nzValue="outData">导出数据</label>
-    <label nz-radio nzValue="inData">导入数据</label>
-    <label nz-radio nzValue="inHMI">导入HMI数据</label>
+    <label nz-radio [nzValue]="'outExcel'">导出表格</label>
+    <label nz-radio [nzValue]="'outData'">导出数据</label>
+    <label nz-radio [nzValue]="'inData'">导入数据</label>
+    <label nz-radio [nzValue]="'inHMI'">导入HMI数据</label>
   </nz-radio-group>
 </app-form-item>
 <div *ngIf="operation !== 'outData'">
@@ -22,10 +22,11 @@
   <div class="path-operation" *ngIf="operation === 'inData' || operation === 'inHMI'">
     <div class="btn-path">
       <div class="btn-file">
-        <button nz-button nzShape="round" nzType="primary" (click)="selectInFilePath()">
+        <button nz-button nzShape="round" nzType="primary">
           <i nz-icon nzType="upload" nzTheme="outline"></i>选择导入文件</button>
-        <input type="file"
-        [attr.accept]="operation === 'inHMI' ? '.csv' : '.yjdb'"
+        <input
+          type="file"
+          [attr.accept]=" operation === 'inData' ? '.yjdb' : '.csv'"
         (change)="selectInFilePath($event)">
       </div>
       <nz-alert nzType="success" [nzMessage]="'导入文件路径：' + inFilePath"></nz-alert>

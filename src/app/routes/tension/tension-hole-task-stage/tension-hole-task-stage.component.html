@@ -21,6 +21,7 @@
               </th>
             </ng-container>
             <th width="100">卸荷</th>
+            <th width="100">回缩量mm</th>
             <th width="100">工作长度mm</th>
             <th width="100">理论申长量mm</th>
           </tr>
@@ -56,6 +57,13 @@
               <div>{{(tensionKn * (stageGroup.get('uploadPercentage').value / 100)) | kn2mpa: data.device: item}}<sub>mpa</sub> </div>
             </td>
             <ng-container [formGroupName]="item">
+              <td>
+                <div>
+                  <app-form-item [row]="true" [errorShow]="false">
+                    <input type="number" nz-input formControlName="reboundMm" (input)="inputWordmm($event, keyi, 'reboundMm')">
+                  </app-form-item>
+                </div>
+              </td>
               <td>
                 <div>
                   <app-form-item [row]="true" [errorShow]="false">

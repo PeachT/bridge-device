@@ -157,7 +157,7 @@ export class DataInOutComponent implements OnInit {
     }
     this.reset();
     if (this.operation.indexOf('in') > -1) {
-      this.initBridge('in');
+      this.initBridge('in', state);
       if (this.operation === 'inHMI' && !this.tempId) {
         this.getTemplateMenu();
       }
@@ -169,9 +169,9 @@ export class DataInOutComponent implements OnInit {
     }
     // this.selectOperation();
   }
-  initBridge(start: string) {
+  initBridge(start: string, state = false) {
     console.log(this.operationMode);
-    if (start !== 'out') {
+    if (this.operationMode !== start || (start === 'in' && state)) {
       this.bridge$ = from([0]).pipe(
         map((item: any) => null),
       );
@@ -197,13 +197,19 @@ export class DataInOutComponent implements OnInit {
   /** 选择导入文件 */
   selectInFilePath(e) {
     const file = e.srcElement.files[0];
-    console.log(file);
+    e.target.value = '';
+    console.log(file, e);
     if (file) {
       const fr = new FileReader();
       fr.onload = () => {
         let itemMenus = [];
         if (this.operation === 'inHMI') {
+          // console.log(fr.result);
+          // console.log(new TextDecoder('utf-8').decode(fr.result as any));
+          // console.log(new TextDecoder('unicode').decode(fr.result as any));
+          // console.log(new TextDecoder('utf-16').decode(fr.result as any));
           const str = new TextDecoder('unicode').decode(fr.result as any);
+
           this.inHMIData = inHMIFile(str);
           itemMenus = this.inHMIData.map(item => {
             const state = item.groups.map(g => ({ name: `${g.name}${g.groups.length > 1 ? `^${g.groups.length}` : ''}`, state: 2 }));
@@ -285,6 +291,8 @@ export class DataInOutComponent implements OnInit {
             return {
               ...getModelBase(baseEnum.groutingHoleitem),
               direction: tempdata.groutingInfo[0].groups[0].direction,
+              setPulpvolume: tempdata.groutingInfo[0].groups[0].setPulpvolume,
+              setVacuumPumpPressure: tempdata.groutingInfo[0].groups[0].setVacuumPumpPressure,
               setGroutingPressure: hs.setMpa,
               startDate: hs.startDate,
               endDate: hs.endDate,

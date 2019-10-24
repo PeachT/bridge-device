@@ -1,6 +1,6 @@
-<form nz-form [formGroup]="formData" [hidden]="!formData">
+<form nz-form class="form-edit" [ngClass]="{'edit-on': appS.edit}"  [formGroup]="formData" [hidden]="!formData">
   <div>
-    <app-form-item [row]="true" label="模板" [hidden]="!edit">
+    <app-form-item [row]="true" label="模板" [hidden]="!appS.edit">
       <nz-switch formControlName="template" nzCheckedChildren="是" nzUnCheckedChildren="否"></nz-switch>
     </app-form-item>
     <app-form-item label="梁号" [errors]="formData.get('name').errors">
@@ -14,11 +14,16 @@
     <app-form-item label="梁长度" [errors]="formData.get('beamLength').errors">
       <input type="number" nz-input placeholder="请输入梁长度" formControlName="beamLength">
     </app-form-item>
+
     <app-form-item label="浇筑日期" [errors]="formData.get('castingDate').errors">
       <nz-date-picker formControlName="castingDate" placeholder="浇筑日期"></nz-date-picker>
     </app-form-item>
     <app-form-item label="张拉日期" [errors]="formData.get('tensinDate').errors">
       <nz-date-picker formControlName="tensinDate" placeholder="张拉日期"></nz-date-picker>
+    </app-form-item>
+
+    <app-form-item label="压浆顺序">
+      <input type="text" nz-input formControlName="sort">
     </app-form-item>
 
     <app-form-item label="施工员">
@@ -32,7 +37,7 @@
     </app-form-item>
   </div>
   <div>
-    <app-add-other [formGroup]="formData" [data]="groutingTask.otherInfo"></app-add-other>
+    <app-add-other [formGroup]="formData" [data]="groutingTask?.otherInfo || []" [unDel]="unDel"></app-add-other>
   </div>
   <div>
     <grouting-proportion [formGroup]="formData" [data]="groutingTask.proportionInfo"></grouting-proportion>
@@ -43,4 +48,5 @@
   <div>
     <grouting-record [formData]="formData" [data]="groutingTask"></grouting-record>
   </div>
+  <div class="edit" *ngIf="!appS.edit"></div>
 </form>

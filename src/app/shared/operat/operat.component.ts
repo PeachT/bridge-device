@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef, SimpleChanges, OnChanges } from '@angular/core';
 import { DbService } from 'src/app/services/db.service';
 import { Project } from 'src/app/models/project';
 import { NzMessageService, NzModalService } from 'ng-zorro-antd';
@@ -9,14 +9,16 @@ import { getModelBase } from 'src/app/models/base';
 @Component({
   selector: 'app-operat',
   templateUrl: './operat.component.html',
-  styleUrls: ['./operat.component.less']
+  styleUrls: ['./operat.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OperatComponent implements OnInit {
+export class OperatComponent implements OnInit, OnChanges {
   @Input() dbName: string;
   @Input() formData: FormGroup;
-  @Input() saveState = true;
+  // @Input() saveState = true;
   @Input() coprState = false;
   @Input() addState = true;
+  @Input() valid = false;
 
   @Output() outEditOk = new EventEmitter();
   @Output() outEdit = new EventEmitter();
@@ -33,14 +35,21 @@ export class OperatComponent implements OnInit {
     private db: DbService,
     public appS: AppService,
     private modalService: NzModalService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
   }
+  ngOnChanges(changes: SimpleChanges) {
+    this.cdr.detectChanges();
+  }
   /** 保存数据 */
   async save() {
+    if (!this.formData.valid) {
+      return ;
+    }
     const data = this.formData.getRawValue();
-    console.log('保存数据', data);
+    console.log('保存数据', data, this.formData.valid);
     let r = null;
     const msg = !data.id ? '添加' : '修改';
     // let state = true;
@@ -53,16 +62,22 @@ export class OperatComponent implements OnInit {
       r = await this.db.updateAsync(this.dbName, data, (o: any) => this.updateFilterFun(o, data));
     }
 
-    console.log(r);
+    console.log(data, r);
     if (r.success) {
       this.message.success(`${msg}成功🙂`);
       this.appS.edit = false;
-      this.outEditOk.emit(r.id);
+      this.outEditOk.emit(
+        {
+          projectId: data.project,
+          componentName: data.component,
+          bridgeId: r.id
+        }
+      );
     } else {
       this.message.error(`${msg}失败😔`);
       console.log(`${msg}失败😔`, r.msg);
     }
-
+    this.cdr.detectChanges();
   }
   /** 取消编辑 */
   cancelEdit() {
@@ -89,6 +104,7 @@ export class OperatComponent implements OnInit {
   }
   /** 修改 */
   modification() {
+    this.appS.edit = true;
     this.outModification.emit();
   }
   /** 删除 */
@@ -96,6 +112,7 @@ export class OperatComponent implements OnInit {
     this.outDelete.emit();
   }
   op(event) {
+    console.warn(this.appS.leftMenu);
     if (this.appS.userInfo) {
       if (this.appS.userInfo.jurisdiction > 0) {
         return true;

@@ -1,121 +1,186 @@
-<form nz-form [formGroup]="formData" *ngIf="groupsFormArray">
-    <ng-container  formArrayName="groups">
-      <ng-container *ngFor="let groupControl of groupsFormArray.controls; index as i" >
-        <table class="gridtable" [formArrayName]="i">
-          <thead>
-            <tr>
-              <th colSpan="2">张拉记录</th>
-              <ng-container *ngFor="let msg of groupControl.get('msg').value; index as msgi" formArrayName="msg">
-                <th [ngClass]="{'twice': msg === '阶段二' && twice, 'super': superState && msg === '超张拉',
+<!-- <form nz-form [formGroup]="formData" *ngIf="groupsFormArray">
+  <ng-container formArrayName="groups">
+    <ng-container *ngFor="let groupControl of groupsFormArray.controls; index as i">
+      <table class="gridtable" >
+        <thead>
+          <tr>
+            <th colSpan="2">张拉记录</th>
+            <ng-container *ngFor="let msg of data.record.groups[i].msg; index as msgi" >
+              <th [ngClass]="{'twice': msg === '阶段二' && twice, 'super': superState && msg === '超张拉',
+                'mend': mend && msg === '补张拉'}">
+                {{msg}}
+              </th>
+            </ng-container>
+            <th width="100">卸荷</th>
+            <th width="100">伸长量mm</th>
+            <th width="100">偏差率%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td width="65">孔号</td>
+            <td width="65">阶段%</td>
+            <td *ngFor="let kn of data.record.groups[i].knPercentage; index as kni" >
+              {{kn}}
+            </td>
+            <td>
+              {{data.record.groups[i].uploadPercentage}}
+            </td>
+          </tr>
+          <tr *ngFor="let jackName of strMode; index as keyi" >
+            <td [attr.rowspan]="holeNames.span"
+              *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
+              {{holeNames[jackName]}}</td>
+            <td>{{jackName}}</td>
+            <td *ngFor="let mpa of data.record.groups[i][jackName].mpa; index as mpai">
+              <div>{{mpa | mpa2kn: data.device: jackName}}<sub>kn</sub></div>
+              <div>{{mpa}}<sub>mpa</sub></div>
+              <div>{{data.record.groups[i][jackName].mm[mpai]}}<sub>mm</sub></div>
+            </td>
+            <td>
+              <div>{{data.record.groups[i][jackName].initMpa | mpa2kn: data.device: jackName}}<sub>kn</sub> </div>
+              <div>{{data.record.groups[i][jackName].initMpa}}<sub>mpa</sub></div>
+              <div>{{data.record.groups[i][jackName].initMm}}<sub>mm</sub></div>
+              <div><i>回：</i>{{recordCalculate.stage[i][jackName].Sn}}</div>
+
+            </td>
+            <td [attr.rowspan]="holeNames.span"
+              *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
+              {{holeNames.span === 2 ? recordCalculate[jackName + 'LZ'] : recordCalculate.stage[i][jackName].LZ}}
+            </td>
+            <td [attr.rowspan]="holeNames.span"
+              *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
+              {{holeNames.span === 2 ? recordCalculate[jackName + 'DR'] : recordCalculate.stage[i][jackName].DR}}
+            </td>
+          </tr>
+          <tr>
+            <td colSpan="2">保压时间s</td>
+            <td *ngFor="let time of groupControl.get('time').value; index as timei">
+              {{data.record.groups[i].time[timei]}}
+            </td>
+            <td>
+              {{data.record.groups[i].uploadDelay}}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <table *ngIf="false" class="gridtable" [formArrayName]="i">
+        <thead>
+          <tr>
+            <th colSpan="2">张拉记录</th>
+            <ng-container *ngFor="let msg of groupControl.get('msg').value; index as msgi" formArrayName="msg">
+              <th [ngClass]="{'twice': msg === '阶段二' && twice, 'super': superState && msg === '超张拉',
                 'mend': mend && msg === '补张拉'}">
                 {{data.record.groups[i].msg[msgi]}}
                 <div *ngIf="false">
                   <app-form-item [row]="true" [errors]="msg.errors" [errorShow]="false">
-                    <input nz-input [formControlName]="msgi"  >
+                    <input nz-input [formControlName]="msgi">
                   </app-form-item>
                 </div>
-                  <!-- {{item}} -->
-                </th>
-              </ng-container>
-              <th width="100">卸荷</th>
-              <th width="100">伸长量mm</th>
-              <th width="100">偏差率%</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td width="65">孔号</td>
-              <td width="65">阶段%</td>
-              <td *ngFor="let kn of groupControl.get('knPercentage').value; index as kni" formArrayName="knPercentage">
-                {{data.record.groups[i].knPercentage[kni]}}
-                <div *ngIf="false">
-                  <app-form-item [row]="true" [errors]="kn.errors" [errorShow]="false">
-                    <input type="number" nz-input [formControlName]="kni"  >
-                  </app-form-item>
-                </div>
-              </td>
-              <td>
-                  {{data.record.groups[i].uploadPercentage}}
-                <div *ngIf="false">
-                  <app-form-item [row]="true" [errorShow]="false">
-                    <input nz-input formControlName="uploadPercentage">
-                  </app-form-item>
-                </div>
-              </td>
-            </tr>
-            <tr *ngFor="let jackName of strMode; index as keyi" [formGroupName]="jackName">
-              <td [attr.rowspan]="holeNames.span" *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">{{holeNames[jackName]}}</td>
-              <td>{{jackName}}</td>
-              <td *ngFor="let mpa of data.record.groups[i][jackName].mpa; index as mpai" >
-               <div>{{mpa | mpa2kn: data.device: jackName}}<sub>kn</sub></div>
-               <div>{{mpa}}<sub>mpa</sub></div>
-               <div>{{data.record.groups[i][jackName].mm[mpai]}}<sub>mm</sub></div>
-                <div formArrayName="mpa" *ngIf="false">
-                  <app-form-item [row]="true" [errorShow]="false">
-                    <input type="number" nz-input [formControlName]="mpai">
-                  </app-form-item>
-                </div>
-                <div formArrayName="mm" *ngIf="false">
-                  <app-form-item [row]="true" [errorShow]="false">
-                    <input type="number" nz-input [formControlName]="mpai">
-                  </app-form-item>
-                </div>
-              </td>
-              <td>
-                <div>{{data.record.groups[i][jackName].initMpa | mpa2kn: data.device: jackName}}<sub>kn</sub> </div>
-                <div>{{data.record.groups[i][jackName].initMpa}}<sub>mpa</sub></div>
-                <div>{{data.record.groups[i][jackName].initMm}}<sub>mm</sub></div>
-                <div><i>回：</i>{{recordCalculate.stage[i][jackName].Sn}}</div>
-                <div *ngIf="false">
-                  <app-form-item [row]="true" [errorShow]="false">
-                    <input type="number" nz-input formControlName="initMpa">
-                  </app-form-item>
-                </div>
-                <div *ngIf="false">
-                  <app-form-item [row]="true" [errorShow]="false">
-                    <input type="number" nz-input formControlName="initMm">
-                  </app-form-item>
-                </div>
-              </td>
-              <td [attr.rowspan]="holeNames.span" *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
-                {{holeNames.span === 2 ? recordCalculate[jackName + 'LZ'] : recordCalculate.stage[i][jackName].LZ}}
-                <!-- {{recordCalculate.stage[i][jackName]['LZ'] | json}} -->
-              </td>
-              <td [attr.rowspan]="holeNames.span" *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
-                {{holeNames.span === 2 ? recordCalculate[jackName + 'DR'] : recordCalculate.stage[i][jackName].DR}}
-              </td>
-            </tr>
-            <tr>
-              <td colSpan="2">保压时间s</td>
-              <td *ngFor="let time of groupControl.get('time').value; index as timei" formArrayName="time">
-                <div>
-                  {{data.record.groups[i].time[timei]}}
-                  <app-form-item [row]="true" [errorShow]="false" *ngIf="false">
-                    <input type="number" nz-input [formControlName]="timei">
-                  </app-form-item>
-                </div>
-              </td>
-              <td>
-                {{data.record.groups[i].uploadDelay}}
-                <div *ngIf="false">
-                  <app-form-item [row]="true" [errorShow]="false">
-                    <input type="number" nz-input formControlName="uploadDelay">
-                  </app-form-item>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div>
-          <echarts-dynamic-line-tension
+              </th>
+            </ng-container>
+            <th width="100">卸荷</th>
+            <th width="100">伸长量mm</th>
+            <th width="100">偏差率%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td width="65">孔号</td>
+            <td width="65">阶段%</td>
+            <td *ngFor="let kn of groupControl.get('knPercentage').value; index as kni" formArrayName="knPercentage">
+              {{data.record.groups[i].knPercentage[kni]}}
+              <div *ngIf="false">
+                <app-form-item [row]="true" [errors]="kn.errors" [errorShow]="false">
+                  <input type="number" nz-input [formControlName]="kni">
+                </app-form-item>
+              </div>
+            </td>
+            <td>
+              {{data.record.groups[i].uploadPercentage}}
+              <div *ngIf="false">
+                <app-form-item [row]="true" [errorShow]="false">
+                  <input nz-input formControlName="uploadPercentage">
+                </app-form-item>
+              </div>
+            </td>
+          </tr>
+          <tr *ngFor="let jackName of strMode; index as keyi" [formGroupName]="jackName">
+            <td [attr.rowspan]="holeNames.span"
+              *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
+              {{holeNames[jackName]}}</td>
+            <td>{{jackName}}</td>
+            <td *ngFor="let mpa of data.record.groups[i][jackName].mpa; index as mpai">
+              <div>{{mpa | mpa2kn: data.device: jackName}}<sub>kn</sub></div>
+              <div>{{mpa}}<sub>mpa</sub></div>
+              <div>{{data.record.groups[i][jackName].mm[mpai]}}<sub>mm</sub></div>
+              <div formArrayName="mpa" *ngIf="false">
+                <app-form-item [row]="true" [errorShow]="false">
+                  <input type="number" nz-input [formControlName]="mpai">
+                </app-form-item>
+              </div>
+              <div formArrayName="mm" *ngIf="false">
+                <app-form-item [row]="true" [errorShow]="false">
+                  <input type="number" nz-input [formControlName]="mpai">
+                </app-form-item>
+              </div>
+            </td>
+            <td>
+              <div>{{data.record.groups[i][jackName].initMpa | mpa2kn: data.device: jackName}}<sub>kn</sub> </div>
+              <div>{{data.record.groups[i][jackName].initMpa}}<sub>mpa</sub></div>
+              <div>{{data.record.groups[i][jackName].initMm}}<sub>mm</sub></div>
+              <div><i>回：</i>{{recordCalculate.stage[i][jackName].Sn}}</div>
+              <div *ngIf="false">
+                <app-form-item [row]="true" [errorShow]="false">
+                  <input type="number" nz-input formControlName="initMpa">
+                </app-form-item>
+              </div>
+              <div *ngIf="false">
+                <app-form-item [row]="true" [errorShow]="false">
+                  <input type="number" nz-input formControlName="initMm">
+                </app-form-item>
+              </div>
+            </td>
+            <td [attr.rowspan]="holeNames.span"
+              *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
+              {{holeNames.span === 2 ? recordCalculate[jackName + 'LZ'] : recordCalculate.stage[i][jackName].LZ}}
+            </td>
+            <td [attr.rowspan]="holeNames.span"
+              *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
+              {{holeNames.span === 2 ? recordCalculate[jackName + 'DR'] : recordCalculate.stage[i][jackName].DR}}
+            </td>
+          </tr>
+          <tr>
+            <td colSpan="2">保压时间s</td>
+            <td *ngFor="let time of groupControl.get('time').value; index as timei" formArrayName="time">
+              <div>
+                {{data.record.groups[i].time[timei]}}
+                <app-form-item [row]="true" [errorShow]="false" *ngIf="false">
+                  <input type="number" nz-input [formControlName]="timei">
+                </app-form-item>
+              </div>
+            </td>
+            <td>
+              {{data.record.groups[i].uploadDelay}}
+              <div *ngIf="false">
+                <app-form-item [row]="true" [errorShow]="false">
+                  <input type="number" nz-input formControlName="uploadDelay">
+                </app-form-item>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div>
+        <echarts-dynamic-line-tension
           [key]="'mpa'"
           [text]="'压力'"
           [strMode]="strMode"
           [width]="(container.offsetWidth || 720) - 220"
           *ngIf="true"
-          [data]="data.record.groups[i].datas"
-          ></echarts-dynamic-line-tension>
-          <echarts-dynamic-line-tension
+          [data]="data.record.groups[i].datas">
+        </echarts-dynamic-line-tension>
+        <echarts-dynamic-line-tension
           [key]="'mm'"
           [text]="'位移'"
           [strMode]="strMode"
@@ -123,8 +188,84 @@
           *ngIf="true"
           [data]="data.record.groups[i].datas"
           ></echarts-dynamic-line-tension>
-        </div>
-      </ng-container>
+      </div>
     </ng-container>
-</form>
+  </ng-container>
+</form> -->
+<div *ngIf="data?.record?.groups && recordCalculate">
+  <ng-container *ngFor="let group of data.record.groups; index as i">
+    <table class="gridtable">
+      <thead>
+        <tr>
+          <th colSpan="2">张拉记录</th>
+          <ng-container *ngFor="let msg of group.msg; index as msgi">
+            <th [ngClass]="{'twice': msg === '阶段二' && twice, 'super': superState && msg === '超张拉',
+              'mend': mend && msg === '补张拉'}">
+              {{msg}}
+            </th>
+          </ng-container>
+          <th width="100">卸荷</th>
+          <th width="100">力筋回缩量</th>
+          <th width="100">伸长量mm</th>
+          <th width="100">偏差率%</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td width="65">孔号</td>
+          <td width="65">阶段%</td>
+          <td *ngFor="let kn of group.knPercentage; index as kni">
+            {{kn}}
+          </td>
+          <td>
+            {{group.uploadPercentage}}
+          </td>
+        </tr>
+        <tr *ngFor="let jackName of strMode; index as keyi">
+          <td [attr.rowspan]="holeNames.span"
+            *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
+            {{holeNames[jackName]}}</td>
+          <td>{{jackName}}</td>
+          <td *ngFor="let mpa of group[jackName].mpa; index as mpai">
+            <div>{{mpa | mpa2kn: data.device: jackName}}<sub>kn</sub></div>
+            <div>{{mpa}}<sub>mpa</sub></div>
+            <div>{{group[jackName].mm[mpai]}}<sub>mm</sub></div>
+          </td>
+          <td>
+            <div>{{group[jackName].initMpa | mpa2kn: data.device: jackName}}<sub>kn</sub> </div>
+            <div>{{group[jackName].initMpa}}<sub>mpa</sub></div>
+            <div>{{group[jackName].initMm}}<sub>mm</sub></div>
+          </td>
+          <td>
+            {{recordCalculate.stage[i][jackName].Sn}}
+          </td>
+          <td [attr.rowspan]="holeNames.span"
+            *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
+            {{holeNames.span === 2 ? recordCalculate[jackName + 'LZ'] : recordCalculate.stage[i][jackName].LZ}}
+          </td>
+          <td [attr.rowspan]="holeNames.span"
+            *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
+            {{holeNames.span === 2 ? recordCalculate[jackName + 'DR'] : recordCalculate.stage[i][jackName].DR}}
+          </td>
+        </tr>
+        <tr>
+          <td colSpan="2">保压时间s</td>
+          <td *ngFor="let time of group.time; index as timei">
+            {{time}}
+          </td>
+          <td>
+            {{group.uploadDelay}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div>
+      <echarts-dynamic-line-tension [key]="'mpa'" [text]="'压力'" [strMode]="strMode"
+        [width]="(container.offsetWidth || 720) - 220" *ngIf="true" [data]="group.datas">
+      </echarts-dynamic-line-tension>
+      <echarts-dynamic-line-tension [key]="'mm'" [text]="'位移'" [strMode]="strMode"
+        [width]="(container.offsetWidth || 720) - 220" *ngIf="true" [data]="group.datas"></echarts-dynamic-line-tension>
+    </div>
+  </ng-container>
+</div>
 <div style="position: fixed; width: 100%;" #container></div>

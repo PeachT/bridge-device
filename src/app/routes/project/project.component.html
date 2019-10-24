@@ -3,23 +3,29 @@
     <app-left-menu [dbName]="dbName" (menuChange)="onMneu($event)" [menuFilter]="menuFilter" #leftMenu></app-left-menu>
   </div>
   <div class="main scroll-y">
-    <app-operat [dbName]="dbName" [formData]="formData" (outEdit)="edit($event)" (outEditOk)="editOk($event)"
+    <app-operat
+      [dbName]="dbName"
+      [formData]="formData"
+      [valid]="formData.valid"
+      (outEdit)="edit($event)"
+      (outEditOk)="editOk($event)"
       (outDelete)="delete()"></app-operat>
 
-    <div class="scroll-content" class="form-edit">
-      <form nz-form [formGroup]="formData" [hidden]="!formData" >
+    <div class="form-edit scroll-content">
+      <form nz-form class="form-edit" [ngClass]="{'edit-on': appS.edit}" [formGroup]="formData" [hidden]="!formData" >
         <app-form-item label="项目名称" [errors]="formData.get('name').errors" [row]="true">
           <input type="text" nz-input placeholder="请输入项目名称" formControlName="name">
         </app-form-item>
         <div>
-          <app-add-other [formGroup]="formData" [data]="data.otherInfo || []"></app-add-other>
+          <app-add-other [formGroup]="formData" [data]="data?.otherInfo || []" #other [unDel]="unDel"></app-add-other>
         </div>
         <nz-divider style="min-width: auto;" nzText="上传服务器" nzOrientation="left"></nz-divider>
         <app-form-item label="上传服务器" [row]="true">
-          <nz-radio-group formControlName="uploadingName">
+          <nz-radio-group formControlName="uploadingName" (ngModelChange)="selectUPloading($event)">
             <label nz-radio nzValue="lzlq">柳州凌桥</label>
             <label nz-radio nzValue="weepal">广州市微柏</label>
             <label nz-radio nzValue="xalj">西安璐江</label>
+            <label nz-radio nzValue="hzxf">杭州西复</label>
           </nz-radio-group>
         </app-form-item>
         <app-form-item label="上传模式" [row]="true">
@@ -30,6 +36,7 @@
         </app-form-item>
         <div>
           <project-xalj-up *ngIf="formData.value.uploadingName === 'xalj'" [formData]="formData" [data]="data.uploadingLinkData"></project-xalj-up>
+          <hzxf-up *ngIf="formData.value.uploadingName === 'hzxf'" [formData]="formData" [data]="data.uploadingLinkData"></hzxf-up>
         </div>
         <div>
           <project-person-info [formGroup]="formData" formArrayName="supervisions" [data]="data.supervisions"
@@ -40,7 +47,7 @@
             dividerText="质检员"></project-person-info>
         </div>
       </form>
-      <div class="edit" [ngClass]="{'edit-on': appS.edit}" *ngIf="!appS.edit">jfljsl</div>
+      <div class="edit" *ngIf="!appS.edit"></div>
     </div>
   </div>
 </app-left>

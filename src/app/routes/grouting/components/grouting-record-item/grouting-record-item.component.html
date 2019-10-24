@@ -5,13 +5,13 @@
       <thead>
         <tr>
           <th>压浆方向</th>
-          <th>设置压浆压力(Mpa)</th>
           <th>起止时间</th>
-          <th>进浆/回浆压力(Mpa)</th>
+          <th>压浆压力(MPa)</th>
           <th>稳压时间(s)</th>
           <th>环境/浆液温度(℃)</th>
-          <th>进浆/回浆量(L)</th>
-          <th>真空压力(Mpa)</th>
+          <th>浆量(L)</th>
+          <th>真空压力(MPa)</th>
+          <th>真空循环时间(s)</th>
         </tr>
       </thead>
       <tbody formArrayName="groups">
@@ -21,7 +21,6 @@
           </tr>
           <tr>
             <td><input type="text" nz-input placeholder="压浆方向" formControlName="direction"></td>
-            <td><input type="number" nz-input placeholder="设置压浆压力" formControlName="setGroutingPressure"></td>
             <td>
               <div class="row">
                 起&nbsp;<nz-date-picker nzShowTime formControlName="startDate" [nzAllowClear]="false"></nz-date-picker>
@@ -32,6 +31,9 @@
             </td>
             <td>
               <div class="row">
+                设&nbsp;<input type="number" nz-input placeholder="设置压力" formControlName="setGroutingPressure">
+              </div>
+              <div class="row">
                 进&nbsp;<input type="number" nz-input placeholder="进浆压力" formControlName="intoPulpPressure">
               </div>
               <div class="row">
@@ -39,7 +41,6 @@
               </div>
             </td>
             <td><input type="number" nz-input placeholder="稳压时间(s)" formControlName="steadyTime"></td>
-
             <td>
               <div class="row">
                 环&nbsp;<input type="number" nz-input placeholder="环境温度" formControlName="envTemperature">
@@ -50,13 +51,24 @@
             </td>
             <td>
               <div class="row">
+                设&nbsp;<input type="number" nz-input placeholder="理论浆量" formControlName="setPulpvolume">
+              </div>
+              <div class="row">
                 进&nbsp;<input type="number" nz-input placeholder="进浆量" formControlName="intoPulpvolume">
               </div>
               <div class="row">
                 回&nbsp;<input type="number" nz-input placeholder="回浆量" formControlName="outPulpvolume">
               </div>
             </td>
-            <td><input type="number" nz-input placeholder="真空" formControlName="vacuumPumpPressure"></td>
+            <td>
+              <div class="row">
+                设&nbsp;<input type="number" nz-input placeholder="设置真空" formControlName="setVacuumPumpPressure">
+              </div>
+              <div class="row">
+                稳&nbsp;<input type="number" nz-input placeholder="真空稳压压力" formControlName="vacuumPumpPressure">
+              </div>
+            </td>
+            <td><input type="number" nz-input placeholder="真空循环时间(s)" formControlName="cycletime"></td>
           </tr>
           <tr>
             <td colspan="10">
@@ -73,7 +85,7 @@
                   </app-form-item>
                 </div>
                 <div>
-                  <app-add-other [formGroup]="item" [data]="data[i].otherInfo"></app-add-other>
+                  <app-add-other [formGroup]="item" [data]="data[i].otherInfo || []"></app-add-other>
                 </div>
                 <div>
                   <echarts-dynamic-line-grouting

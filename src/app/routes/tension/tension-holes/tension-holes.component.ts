@@ -49,8 +49,10 @@ export class TensionHolesComponent implements OnInit, OnChanges {
     this.initForm();
   }
   initForm() {
+
     console.log(this.data);
     console.log(this.tensionHoleInfos);
+    this.tensionHoleInfosFormArray.clear();
     this.createForm(this.tensionHoleInfos).map(si => {
       this.tensionHoleInfosFormArray.push(si);
     })
@@ -70,6 +72,10 @@ export class TensionHolesComponent implements OnInit, OnChanges {
       length: [data.length],
       /** 钢绞线数据 */
       steelStrandNum: [data.steelStrandNum],
+      /** 张拉状态 */
+      state: [data.state],
+      /** 上传状态 */
+      uploading: [data.uploading],
       /** 其他数据 */
       otherInfo: this.fb.array([]),
       tasks: this.fb.array([]),

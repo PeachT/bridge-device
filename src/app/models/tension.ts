@@ -23,9 +23,9 @@ export interface TensionTask extends TaskBase {
   /** 梁长度 */
   beamLength: number;
   /** 张拉日期 */
-  tensinDate: Date | string;
+  tensionDate: Date | string | number;
   /** 浇筑日期 */
-  castingDate: Date | string;
+  castingDate: Date | string | number;
   /** 张拉顺序 */
   sort?: string;
   /** 设备编号 */
@@ -44,7 +44,6 @@ export interface TensionTask extends TaskBase {
 export interface TensionHoleInfo {
   /** 孔号 */
   name: string;
-
   /** 张拉工艺(先张，后张，分级张拉第一级，分级张拉第二级等) */
   stretchDrawProcess: string;
   /** 张拉长度 */
@@ -80,7 +79,6 @@ export interface TensionHoleTask {
   otherInfo?: Array<OtherInfo>;
   /** 张拉记录 */
   record?: TensionRecord;
-
 }
 /** 张拉阶段 */
 export interface TensionStage {
@@ -102,6 +100,8 @@ export interface TensionStage {
 
 /** 计算数据 */
 export interface CalculateInfo {
+  /** 回缩量 */
+  reboundMm: number;
   /** 工作长度 */
   wordMm: number;
   /** 理论申长量 */

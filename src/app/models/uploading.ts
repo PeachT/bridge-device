@@ -18,3 +18,18 @@ export interface XALJ {
   /** 分配序列号 */
   deviceNo: string;
 }
+
+export interface HZXF {
+  url: string;
+  VENDORNO: string;
+  DEVICENOZL: string;
+  DEVICENOYJ: string;
+  debug?: boolean;
+  serviceData?: {
+    TOKEN: any;
+    PROJECTID: any;
+    PLATFORMDEVICEID: any;
+    VENDORNO: any;
+    DEVICENO: any;
+  };
+}

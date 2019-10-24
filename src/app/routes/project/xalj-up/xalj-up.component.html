@@ -15,8 +15,8 @@
     </app-form-item>
   </div>
   <div style="display: flex; align-items: center;">
-    <button nz-button nzType="primary" [nzLoading]="uploadingState" (click)="funcUploadingTask()" [disabled]="!formGroup.valid" style="z-index: 1;"><i nz-icon
-      nzType="login" nzTheme="outline"></i>登录测试</button>
+    <button nz-button nzType="primary" [nzLoading]="uploadingState" (click)="funcUploadingTask()" [disabled]="!formGroup.valid" style="z-index: 1;">
+      <i nz-icon nzType="login" nzTheme="outline"></i>登录测试</button>
       <nz-alert nzType="info" [nzMessage]="serviceRetrun" *ngIf="serviceRetrun"></nz-alert>
   </div>
 </form>

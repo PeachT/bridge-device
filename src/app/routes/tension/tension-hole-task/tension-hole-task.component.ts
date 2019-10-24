@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { TensionHoleTask, TensionHoleInfo } from 'src/app/models/tension';
 import { Subscription } from 'rxjs';
@@ -8,7 +8,8 @@ import { TensionHoleTaskStageComponent } from '../tension-hole-task-stage/tensio
   // tslint:disable-next-line:component-selector
   selector: 'tension-hole-task',
   templateUrl: './tension-hole-task.component.html',
-  styleUrls: ['./tension-hole-task.component.less']
+  styleUrls: ['./tension-hole-task.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TensionHoleTaskComponent implements OnInit, OnChanges {
   @ViewChild('stage', null) stageDom: TensionHoleTaskStageComponent;
@@ -35,17 +36,23 @@ export class TensionHoleTaskComponent implements OnInit, OnChanges {
 
   constructor(
     private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
-    this.holeNameLength = this.data.name.split('/').length;
     console.log(this.formData, this.data, this.TaskFormArray, this.tasks);
+    if (this.data && this.data.name) {
+      this.holeNameLength = this.data.name.split('/').length;
+    }
   }
   ngOnChanges(changes: SimpleChanges) {
     console.log('sdfsdaaasdfsdd', this.formData, this.TaskFormArray, this.tasks);
-    this.createForm(this.tasks).map(si => {
-      this.TaskFormArray.push(si);
-    })
+    if (this.tasks) {
+      this.createForm(this.tasks).map(si => {
+        this.TaskFormArray.push(si);
+      });
+      this.cdr.detectChanges();
+    }
   }
   createForm(arrData: Array<TensionHoleTask> = []): FormGroup[] {
     return arrData.map(d => {

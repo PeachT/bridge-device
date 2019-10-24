@@ -16,8 +16,7 @@
             <td ><input [ngClass]="{'error': item.get('value').errors}" type="number" nz-input placeholder="配比量" formControlName="value" (input)="proportionCalculate()"></td>
             <td>
               <div style="display: flex; justify-content: center;" *ngIf="i > 2">
-                <button nz-button nzType="default" nzShape="circle" (click)="del(i)"><i nz-icon
-                    nzType="close"></i></button>
+                <button nz-button nzType="default" nzShape="circle" (click)="del(i)"><i nz-icon nzType="close"></i></button>
               </div>
             </td>
           </tr>

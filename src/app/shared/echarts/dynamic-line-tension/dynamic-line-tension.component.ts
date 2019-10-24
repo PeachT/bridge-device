@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, SimpleChanges, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { ECharts } from 'echarts';
 import { format } from 'date-fns';
 import { Process } from 'src/app/models/tension';
@@ -28,9 +28,10 @@ const data: Process = {
   // tslint:disable-next-line:component-selector
   selector: 'echarts-dynamic-line-tension',
   templateUrl: './dynamic-line-tension.component.html',
-  styleUrls: ['./dynamic-line-tension.component.less']
+  styleUrls: ['./dynamic-line-tension.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DynamicLineTensionComponent implements OnInit, OnChanges {
+export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterViewInit {
   @ViewChild('svg', { read: ElementRef, static: true }) svgDom: ElementRef;
   @Input() devs = [];
   @Input() live = 0;
@@ -75,7 +76,9 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges {
   oldWidth;
   maxs: any[] = [];
 
-  constructor() { }
+  constructor(
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit() {
     this.carterSvg();
@@ -108,6 +111,10 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges {
       this.carterSvg();
     }
     // this.update();
+    this.cdr.detectChanges();
+  }
+  ngAfterViewInit() {
+    this.cdr.detectChanges();
   }
   carterSvg() {
     if (!this.data) {
@@ -176,7 +183,7 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges {
         ],
         yAxis: [
           {
-            name: `${this.text}(MPa)`,
+            name: `${this.text}(${this.text === '压力' ? 'MPa': 'mm'})`,
             type: 'value',
             max: Math.max(...this.maxs)
           },

@@ -69,8 +69,10 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
 
   }
   ngOnChanges(changes: SimpleChanges) {
-    console.log(this.strMode);
-    this.createForm(this.data.stage, this.data.mode);
+    console.warn('任务阶段数据', this.strMode, this.data);
+    if (this.data && 'stage' in this.data) {
+      this.createForm(this.data.stage, this.data.mode);
+    }
   }
 
   /** 阶段验证 */
@@ -116,6 +118,7 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
       this.stageGroup.addControl(key,
         this.fb.group(
           {
+            reboundMm: [d[key].reboundMm, Validators.required],
             wordMm: [d[key].wordMm, Validators.required],
             theoryMm: [d[key].theoryMm, Validators.required]
           }
@@ -156,6 +159,7 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
     this.createStageForm(kn, msg, time)
     this.superStage(this.formData.value.super, '超张拉');
   }
+  /** 超张拉补张拉选择 */
   superStage(event, msg) {
     console.log(event);
     if (event) {

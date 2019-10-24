@@ -1,0 +1,32 @@
+<!-- 杭州西复线 -->
+<form nz-form [formGroup]="formData" *ngIf="formGroup.controls">
+  <div formArrayName="uploadingLinkData">
+    <app-form-item label="链接地址" [errors]="formGroup.get('url').errors" [row]="true">
+      <input type="text" nz-input placeholder="请输入链接地址" formControlName="url">
+    </app-form-item>
+    <app-form-item label="厂家编码" [errors]="formGroup.get('VENDORNO').errors">
+      <input type="text" nz-input placeholder="请输入厂家编码" formControlName="VENDORNO">
+    </app-form-item>
+    <app-form-item label="张拉设备编号" [errors]="formGroup.get('DEVICENOZL').errors">
+      <input type="text" nz-input placeholder="请输入张拉设备编号" formControlName="DEVICENOZL">
+    </app-form-item>
+    <app-form-item label="压浆设备编号" [errors]="formGroup.get('DEVICENOYJ').errors">
+      <input type="text" nz-input placeholder="请输入压浆设备编号" formControlName="DEVICENOYJ">
+    </app-form-item>
+    <app-form-item label="测试">
+      <nz-switch formControlName="debug" nzCheckedChildren="测试" nzUnCheckedChildren="关" (ngModelChange)="onDebug($event)"></nz-switch>
+    </app-form-item>
+  </div>
+  <div style="display: flex; align-items: center;">
+    <button *ngIf="!formGroup.get('debug').value" nz-button nzType="primary" [nzLoading]="uploadingState" (click)="uploadingTeat('ZL')" [disabled]="!formGroup.valid" style="z-index: 1;">
+      <i nz-icon nzType="login" nzTheme="outline"></i>测试链接</button>
+      <div style="display: flex; flex-wrap: wrap;" *ngIf="formGroup.get('serviceData').value">
+        <nz-alert nzType="info" [nzMessage]="formGroup.get('serviceData').value.TOKEN"></nz-alert>
+        <nz-alert nzType="info" [nzMessage]="formGroup.get('serviceData').value.PROJECTID"></nz-alert>
+        <nz-alert nzType="info" [nzMessage]="formGroup.get('serviceData').value.PLATFORMDEVICEID"></nz-alert>
+        <nz-alert nzType="info" [nzMessage]="formGroup.get('serviceData').value.VENDORNO"></nz-alert>
+        <nz-alert nzType="info" [nzMessage]="formGroup.get('serviceData').value.DEVICENO"></nz-alert>
+      </div>
+  </div>
+</form>
+

@@ -15,8 +15,9 @@ import { AppService } from './app.service';
 import { IBase, TaskBase } from '../models/base';
 import { GroutingIndex, GroutingTask } from '../models/grouting';
 import { Menu$ } from '../models/app';
-import { getDatetimeS } from '../Function/unit';
-import { gouringDate2Number } from '../Function/grouting';
+import { getDatetimeS, uuid } from '../Function/unit';
+import { gouringDate2Number, gouringOther2Date } from '../Function/grouting';
+import { tensionDate2Number, tensionOther2Date } from '../Function/tension';
 
 @Injectable({ providedIn: 'root' })
 export class DbService {
@@ -61,6 +62,7 @@ export class DbService {
       // tslint:disable-next-line:radix
       data.createdDate = getDatetimeS();
       data.modificationDate = getDatetimeS();
+      data.uuid = uuid();
       data.user = this.appS.userInfo.name || 'sys';
       const r = await this.db[tName].add(data);
       console.log('保存结果', r);
@@ -85,10 +87,10 @@ export class DbService {
       return { success: false, msg: '已存在' };
     }
     try {
-      if (tName === 'task') {
-        const d: TensionTask = await this.getFirstId('task', data.id);
-        const t = data as TensionTask;
-        data = t;
+      if (tName === 'tension') {
+        let gdata: TensionTask = data as TensionTask;
+        gdata = tensionDate2Number(gdata);
+        data = gdata;
       }
       if (tName === 'grouting' && !uploading) {
         let gdata: GroutingTask = data as GroutingTask;
@@ -337,13 +339,24 @@ export class DbService {
    * *通过ID获取一个数据
    *
    * @template T 类型
-   * @param {string} name 数据库名称
+   * @param {string} tName 数据库名称
    * @param {*} id id
    * @returns {Promise<T>}
    * @memberof DbService
    */
-  public async getFirstId<T>(name: string, id: any): Promise<T> {
-    return await this.db[name].filter(a => a.id === id).first();
+  public async getFirstId<T>(tName: string, id: any): Promise<T> {
+    let data = await this.db[tName].filter(a => a.id === id).first();
+    if (tName === 'tension') {
+      let gdata: TensionTask = data as TensionTask;
+      gdata = tensionOther2Date(gdata);
+      data = gdata;
+    }
+    if (tName === 'grouting') {
+      let gdata: GroutingTask = data as GroutingTask;
+      gdata = gouringOther2Date(gdata);
+      data = gdata;
+    }
+    return data;
   }
   /** 删除 */
   delete(id) {

@@ -3,10 +3,16 @@
     <app-left-menu [dbName]="dbName" (menuChange)="onMneu($event)" #leftMenu></app-left-menu>
   </div>
   <div class="main scroll-y">
-      <app-operat [dbName]="dbName" [formData]="formData" (outEdit)="edit($event)" (outEditOk)="editOk($event)"></app-operat>
+      <app-operat
+        [dbName]="dbName"
+        [formData]="formData"
+        [valid]="formData.valid"
+        (outEdit)="edit($event)"
+        (outEditOk)="editOk($event)"
+        ></app-operat>
 
     <div class="scroll-content">
-      <form nz-form [ngClass]="{'form-edit': !appS.edit}" [formGroup]="formData">
+      <form nz-form class="form-edit" [ngClass]="{'edit-on': appS.edit}" [formGroup]="formData">
         <app-form-item label="构建名称" [row]="true" [errors]="formData.get('name').errors">
           <input placeholder="例：T梁 或 预制箱梁" nz-input formControlName="name" [nzAutocomplete]="auto" />
           <nz-autocomplete [nzDataSource]="bridgeOtherKeySelect()" #auto> </nz-autocomplete>
@@ -14,7 +20,7 @@
         <div>
           <component-birdge-model [formGroup]="formData" [data]="data.hole"></component-birdge-model>
         </div>
-        <div class="edit" [ngClass]="{'edit-on': appS.edit}"></div>
+        <div class="edit" *ngIf="!appS.edit"></div>
       </form>
     </div>
   </div>

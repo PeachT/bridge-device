@@ -43,8 +43,6 @@ export class GroutingRecordItemComponent implements OnInit, OnChanges {
     return this.fb.group({
       /** 压浆方向 */
       direction: [data.direction],
-      /** 设置压浆压力 */
-      setGroutingPressure: [data.setGroutingPressure],
       /** 环境温度 */
       envTemperature: [data.envTemperature],
       /** 浆液温度 */
@@ -53,18 +51,31 @@ export class GroutingRecordItemComponent implements OnInit, OnChanges {
       startDate: [data.startDate],
       /** 完成时间 */
       endDate: [data.endDate],
+
+      /** 设置压浆压力 */
+      setGroutingPressure: [data.setGroutingPressure],
       /** 进浆压力 */
       intoPulpPressure: [data.intoPulpPressure],
       /** 回浆压力 */
       outPulpPressure: [data.outPulpPressure],
+      /** 稳压时间 */
+      steadyTime: [data.steadyTime],
+
+      /** 设置浆量 */
+      setPulpvolume: [data.setPulpvolume],
       /** 进浆量 (L) */
       intoPulpvolume: [data.intoPulpvolume],
       /** 回浆量 (L) */
       outPulpvolume: [data.outPulpvolume],
+
+      /** 设置真空泵压力 */
+      setVacuumPumpPressure: [data.setVacuumPumpPressure],
       /** 真空泵压力 */
       vacuumPumpPressure: [data.vacuumPumpPressure],
-      /** 稳压时间 */
-      steadyTime: [data.steadyTime],
+      /** 真空循环时间 */
+      cycletime: [data.cycletime],
+
+
       /** 通过情况 */
       passMsg: [data.passMsg],
       /** 冒浆情况 */

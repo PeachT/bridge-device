@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, SimpleChanges, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { ECharts } from 'echarts';
 import { format } from 'date-fns';
 import { ProcessData } from 'src/app/models/grouting';
@@ -36,9 +36,10 @@ const data: ProcessData = {
   // tslint:disable-next-line:component-selector
   selector: 'echarts-dynamic-line-grouting',
   templateUrl: './dynamic-line-grouting.component.html',
-  styleUrls: ['./dynamic-line-grouting.component.less']
+  styleUrls: ['./dynamic-line-grouting.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DynamicLineGroutingComponent implements OnInit, OnChanges {
+export class DynamicLineGroutingComponent implements OnInit, OnChanges, AfterViewInit {
   @ViewChild('svg', { read: ElementRef, static: true }) svgDom: ElementRef;
   @Input() devs = [];
   @Input() live = 0;
@@ -77,7 +78,9 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges {
   myChart: ECharts = null;
   oldWidth;
 
-  constructor() { }
+  constructor(
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit() {
     this.carterSvg();
@@ -99,7 +102,11 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges {
       console.log('data变更', this.data);
       this.carterSvg();
     }
+    this.cdr.detectChanges();
     // this.update();
+  }
+  ngAfterViewInit() {
+    this.cdr.detectChanges();
   }
   carterSvg() {
     if (!this.data) {
@@ -160,7 +167,6 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges {
             boundaryGap: false,
             axisLine: { onZero: false },
             data: this.data.intoPulpPressure.map((str, i) => {
-              console.log(this.satrtDate);
               const date = new Date(this.satrtDate).getTime() + (i * (1000 / this.data.hz))
               return format(new Date(date), 'HH:mm:ss');
             })

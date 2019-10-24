@@ -16,12 +16,10 @@ export class AddOtherComponent implements OnInit, OnChanges {
   @Input() edit = false;
   @Input() data: Array<OtherInfo> = [];
   @Input() nameKey = null;
+  @Input() unDel = [];
 
   get otherInfoFormArr(): FormArray {
     return this.formGroup.controls.otherInfo as FormArray;
-  }
-  set otherInfoFormArr(formArray: FormArray) {
-    this.formGroup.controls.otherInfo = formArray;
   }
 
   constructor(
@@ -33,9 +31,15 @@ export class AddOtherComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.createForm(this.data).map(si => {
+    this.initForm(this.data);
+  }
+  initForm(data: Array<OtherInfo> = []) {
+    // console.log('其他信息', data);
+    this.otherInfoFormArr.clear();
+    this.createForm(data).map(si => {
       this.otherInfoFormArr.push(si)
     })
+    // console.log('其他信息', this.otherInfoFormArr);
   }
 
   /** 其他信息 */

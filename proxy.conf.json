@@ -6,5 +6,9 @@
   "/DataService": {
     "target": "http://117.34.70.71:8092",
     "secure": false
+  },
+  "/receive": {
+    "target": "http://47.98.39.16:8988",
+    "secure": false
   }
 }

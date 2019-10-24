@@ -16,6 +16,8 @@ import { Comp } from 'src/app/models/component';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { TensionDevice } from 'src/app/models/jack';
 import { TensionHolesComponent } from './tension-holes/tension-holes.component';
+import { getModeStr, tensionOther2Date } from 'src/app/Function/tension';
+import { ScrollMenuComponent } from 'src/app/shared/scroll-menu/scroll-menu.component';
 
 @Component({
   selector: 'app-tension',
@@ -24,7 +26,7 @@ import { TensionHolesComponent } from './tension-holes/tension-holes.component';
 })
 export class TensionComponent implements OnInit, OnDestroy {
   dbName = 'tension';
-  @ViewChild('taskmenu', null) taskMenuDom: TaskMenuComponent;
+  @ViewChild('menu', null) menuDom: ScrollMenuComponent;
   @ViewChild('holes', null) holesDom: TensionHolesComponent;
   /** 构建选择菜单 */
   componentMneu$: Observable<Array<{label: string; value: any;}>>;
@@ -42,7 +44,7 @@ export class TensionComponent implements OnInit, OnDestroy {
     /** 梁长度 */
     beamLength: null,
     /** 张拉日期 */
-    tensinDate: null,
+    tensionDate: null,
     /** 浇筑日期 */
     castingDate: null,
     /** 压浆顺序 */
@@ -115,10 +117,10 @@ export class TensionComponent implements OnInit, OnDestroy {
               uploadPercentage: 15,
               /** 卸荷延时 */
               uploadDelay: 15,
-              A1: { wordMm: 5, theoryMm: 208},
-              A2: { wordMm: 4, theoryMm: 208},
-              B1: { wordMm: 3, theoryMm: 208},
-              B2: { wordMm: 2, theoryMm: 208},
+              A1: { reboundMm: 3.5, wordMm: 5, theoryMm: 208},
+              A2: { reboundMm: 3.5, wordMm: 4, theoryMm: 208},
+              B1: { reboundMm: 3.5, wordMm: 3, theoryMm: 208},
+              B2: { reboundMm: 3.5, wordMm: 2, theoryMm: 208},
             },
             /** 张拉记录 */
             record: {
@@ -183,20 +185,100 @@ export class TensionComponent implements OnInit, OnDestroy {
                   datas: {
                     hz: 1,
                     A1: {
-                      mpa: [3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5],
-                      mm: [3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5],
+                      mpa: [
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                      ],
+                      mm: [
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                      ],
                     },
                     A2: {
-                      mpa: [5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5].map(m => m * 4.5),
-                      mm: [5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5].map(m => m * 4.2),
+                      mpa: [
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                      ].map(m => Number((m * 4.5).toFixed(2))),
+                      mm: [
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        5.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                      ].map(m => Number((m * 4.2).toFixed(2))),
                     },
                     B1: {
-                      mpa: [3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5].map(m => m * 3.9),
-                      mm: [2.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5].map(m => m * 2),
+                      mpa: [
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                      ].map(m => Number((m * 3.9).toFixed(2))),
+                      mm: [
+                        2.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        2.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        2.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        2.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        2.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        2.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        2.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        2.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        2.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                      ].map(m => Number((m * 2).toFixed(2))),
                     },
                     B2: {
-                      mpa: [3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5].map(m => m * 3),
-                      mm: [8.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5].map(m => m * 3),
+                      mpa: [
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        3.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                      ].map(m => Number((m * 3).toFixed(2))),
+                      mm: [
+                        8.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        8.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        8.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        8.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        8.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        8.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        8.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        8.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                        8.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5,
+                      ].map(m => Number((m * 3).toFixed(2))),
                     }
                   }
                 }
@@ -254,10 +336,10 @@ export class TensionComponent implements OnInit, OnDestroy {
               uploadPercentage: 15,
               /** 卸荷延时 */
               uploadDelay: 15,
-              A1: { wordMm: 1, theoryMm: 222},
-              A2: { wordMm: 2, theoryMm: 222},
-              B1: { wordMm: 3, theoryMm: 222},
-              B2: { wordMm: 4, theoryMm: 222},
+              A1: { reboundMm: 3.5, wordMm: 1, theoryMm: 222},
+              A2: { reboundMm: 3.5, wordMm: 2, theoryMm: 222},
+              B1: { reboundMm: 3.5, wordMm: 3, theoryMm: 222},
+              B2: { reboundMm: 3.5, wordMm: 4, theoryMm: 222},
             },
             /** 张拉记录 */
             record: {
@@ -363,6 +445,13 @@ export class TensionComponent implements OnInit, OnDestroy {
   /** 修改数据判断 */
   updateFilterFun = (o1: TensionTask, o2: TensionTask) => o1.name === o2.name
     && o1.component === o2.component && o1.project === o2.project && o1.id !== o2.id
+  /** 菜单梁状态 */
+  menuStateFunc = (g: TensionTask) => {
+    console.log(g);
+    return g.tensionHoleInfos.map(item => {
+      return item.state
+    })
+  }
 
   constructor(
     public db: DbService,
@@ -392,7 +481,7 @@ export class TensionComponent implements OnInit, OnDestroy {
       /** 梁长度 */
       beamLength: [data.beamLength, [Validators.required]],
       /** 张拉日期 */
-      tensinDate: [data.tensinDate, [Validators.required]],
+      tensionDate: [data.tensionDate, [Validators.required]],
       /** 浇筑日期 */
       castingDate: [data.castingDate, [Validators.required]],
       /** 张拉顺序 */
@@ -409,15 +498,13 @@ export class TensionComponent implements OnInit, OnDestroy {
       supervisors: [data.supervisors],
       /** 自检员 */
       qualityInspector: [data.qualityInspector],
-      tensionHoleInfos: fb.array([]),
+      tensionHoleInfos: fb.array([], [Validators.required]),
     });
 
     // this.formData.setValue(data);
     console.log('初始化数据', data, !data.id && data.name);
     this.formData.controls.name.setAsyncValidators([nameRepetition(this.db, this.dbName, this.updateFilterFun)]);
-      setTimeout(() => {
-        this.formData.controls.name.updateValueAndValidity();
-      }, 1);
+    this.nameValueAndValidity();
   }
   /** 获取构建菜单 */
   getComponent() {
@@ -437,21 +524,18 @@ export class TensionComponent implements OnInit, OnDestroy {
     );
   }
   /** 构建选择 */
-  // conponentChange(value) {
-  //   console.log(value, this.componentHoles);
-  //   this.nowComponentHoleInfo = this.componentHoles.filter(f => f.value === value)[0].holes;
-  // }
+  conponentChange(value) {
+    console.log(value, this.componentHoles);
+    this.nameValueAndValidity();
+  }
   test() {
     // tslint:disable-next-line:forin
     for (const i in this.formData.controls) {
-      this.formData.controls[i].markAsDirty();
-      this.formData.controls[i].updateValueAndValidity();
       console.log(
         this.formData.controls[i].valid,
         i
       );
     }
-
     console.log(this.formData,
       this.formData.getRawValue(),
       this.formData.valid
@@ -468,18 +552,11 @@ export class TensionComponent implements OnInit, OnDestroy {
     this.tabsetShow = value.index;
   }
 
-  /** 选择梁 */
-  async onBridge(data: TensionTask) {
-    if (!data) {
-      return;
-    }
+  /** 切换梁 */
+  async selectBridge(data: TensionTask) {
+    if (!data) { return; }
     this.data = data;
-    this.uploading = false;
-    this.data.tensionHoleInfos.map(g => {
-      if (!g.uploading) {
-        this.uploading = true;
-      }
-    });
+    this.uploading = this.data.tensionHoleInfos.findIndex(g => !g.uploading) === -1;
     this.formInit();
     console.log('梁梁梁梁', this.data, this.uploading);
   }
@@ -487,45 +564,48 @@ export class TensionComponent implements OnInit, OnDestroy {
   /**
    * *编辑/添加
    */
-  onEdit(data: TensionTask) {
-    /** 复制 */
-    if (!data) {
-      data = { ...this.data };
-      data.id = null;
-      data.tensinDate = null;
-      data.castingDate = null;
-      data.template = false;
-      for (const g of data.tensionHoleInfos) {
-        g.state = 0;
-        g.uploading = false;
-        g.tasks.map(t => {
-          t.record = null;
-        })
-        console.log(g);
-      }
-      console.log(data);
-
-      this.data = data;
+  onEdit(data: TensionTask, modification = false) {
+    if (!modification) {
+      /** 复制 */
+      if (!data) {
+        data = { ...this.data };
+        data.id = null;
+        data.tensionDate = null;
+        data.castingDate = null;
+        data.template = false;
+        for (const g of data.tensionHoleInfos) {
+          g.state = 0;
+          g.uploading = false;
+          g.tasks.map(t => {
+            t.record = null;
+          })
+          console.log(g);
+        }
+        console.log(data);
+        this.data = data;
       /** 添加 */
-    } else {
-      this.data = getModelBase(baseEnum.groutingTask);
-      console.log(data);
-      this.data.project = this.taskMenuDom.project.select.id;
+      } else {
+        this.data = getModelBase(baseEnum.tension);
+        this.data.project = this.menuDom.projectId;
+      }
+      console.log('添加', this.data);
+      this.formInit();
     }
-    console.log('添加', this.data);
-    this.formInit();
   }
   /**
    * *编辑完成
    */
-  editOk(id: number) {
-    console.log();
-    if (id) {
-      // this.leftMenu.getMenuData(id);
-      this.taskMenuDom.res({ component: this.data.component, selectBridge: id });
+  editOk(data) {
+    console.log(data, this.menuDom.bridgeId);
+    if (data.bridgeId && data.bridgeId !== this.menuDom.bridgeId) {
+
+      this.menuDom.reset({
+        projectId: data.projectId,
+        componentName: data.componentName,
+        bridgeId: data.bridgeId
+      });
     } else {
-      // this.leftMenu.onClick();
-      this.taskMenuDom.onMneu();
+      this.menuDom.selectBridge(data.bridgeId);
     }
   }
   /** 删除 */
@@ -539,7 +619,8 @@ export class TensionComponent implements OnInit, OnDestroy {
       const msg = await this.db.db.tension.delete(this.appS.leftMenu);
       console.log('删除了', msg);
       this.appS.leftMenu = null;
-      this.taskMenuDom.getBridge();
+      // this.menuDom.getBridge();
+      this.menuDom.getBridgeMenu();
     }
     this.deleteShow = false;
   }
@@ -597,7 +678,7 @@ export class TensionComponent implements OnInit, OnDestroy {
   //   //   }
   //   // );
   }
-  /** 分组 */
+  /** 确认分组 */
   manualGroup() {
     this.mamualGroupState = true;
     const value = this.formData.get('component').value;
@@ -605,15 +686,21 @@ export class TensionComponent implements OnInit, OnDestroy {
     console.log('分组', value, this.nowComponentHoleInfo);
 
   }
+  /** 取消分组 */
   manualGroupCancel() {
     this.mamualGroupState = false;
   }
+  /** 创建分组数据 */
   manualGroupOk(event: Array<ManualGroup>) {
     this.mamualGroupState = false;
     console.log(event);
     const ccc = [];
     event.map(async (g) => {
       const device: TensionDevice = await this.db.db.jack.filter(f => f.id === g.deviceId).first();
+      const jacks: any = {}
+      getModeStr(g.mode).map(key => {
+        jacks[key] = { reboundMm: 3.5, wordMm: 5, theoryMm: 0}
+      })
       ccc.push({
           /** 孔号 */
           name: g.hole.join('/'),
@@ -658,10 +745,8 @@ export class TensionComponent implements OnInit, OnDestroy {
                 uploadPercentage: 10,
                 /** 卸荷延时 */
                 uploadDelay: 10,
-                A1: { wordMm: 0, theoryMm: 0 },
-                A2: { wordMm: 0, theoryMm: 0 },
-                B1: { wordMm: 0, theoryMm: 0 },
-                B2: { wordMm: 0, theoryMm: 0 },
+                /** 顶计算数据 */
+                ...jacks
               },
               /** 张拉记录 */
               record: null,
@@ -673,9 +758,16 @@ export class TensionComponent implements OnInit, OnDestroy {
       }
     });
   }
+  /** 分组完成更新数据 */
   successGroup(group) {
     console.log(group);
     this.data.tensionHoleInfos = group;
     this.holesDom.initForm();
+    this.nameValueAndValidity();
+  }
+  nameValueAndValidity() {
+    setTimeout(() => {
+      this.formData.controls.name.updateValueAndValidity();
+    }, 10);
   }
 }

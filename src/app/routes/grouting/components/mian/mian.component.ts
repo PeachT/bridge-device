@@ -22,6 +22,7 @@ export class GroutingMianComponent implements OnInit, OnChanges {
   @Input() groutingTask: GroutingTask;
   @Input() formData: FormGroup;
   @Input() edit = false;
+  @Input() unDel = [];
   /** 构建选择菜单 */
   componentMneu$: Observable<Array<{label: string; value: any;}>>;
   componentHoles = [];
