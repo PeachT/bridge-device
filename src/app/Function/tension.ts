@@ -1,5 +1,5 @@
 import { TensionDevice } from '../models/jack';
-import { TensionHoleTask, RecordCompute, TensionTask } from '../models/tension';
+import { TensionHoleTask, RecordCompute, TensionTask, TensionStage } from '../models/tension';
 import { getDatetimeS, getJSDate } from './unit';
 // 张拉模式  =42为4顶两端 =41为4顶单端  =21为2顶A1A2单端 =22为2顶A1B1单端 =23为2顶A1A2两端
 // =24为2顶B1B2两端 =25为2顶A1B1两端  =11为1顶A1单端  =12为1顶B1单端 =13为A1A2B1单端
@@ -154,23 +154,23 @@ export function holeNameShow (name: string, mode: number) {
   const names = name.split('/');
   switch (mode) {
     case 42: // 4顶两端
-      return { A1: names[0], A2: names[0], B1: names[1], B2: names[1], span: 2 };
+      return { A1: names[0], A2: names[0], B1: names[1], B2: names[1], span: 2, keys: 'A1A2B1B2' };
     case 41: // 4顶单端
-      return { A1: names[0], A2: names[1], B1: names[2], B2: names[3], span: 1 };
+      return { A1: names[0], A2: names[1], B1: names[2], B2: names[3], span: 1, keys: 'A1B1' };
     case 21: // A1|A2单端
-      return { A1: names[0], A2: names[1], span: 1 };
+      return { A1: names[0], A2: names[1], span: 1, keys: 'A1A2' };
     case 23: // A1|A2两端
-      return { A1: names[0], A2: names[0], span: 2 };
+      return { A1: names[0], A2: names[0], span: 2, keys: 'A1' };
     case 24: // B1|B2两端
-      return { B1: names[0], B2: names[0], span: 2 };
+      return { B1: names[0], B2: names[0], span: 2, keys: 'B1' };
     case 22: // A1|B1单端
-      return { A1: names[0], B1: names[1], span: 1 };
+      return { A1: names[0], B1: names[1], span: 1, keys: 'B1B2' };
     case 25: // A1|B1两端
-      return { A1: names[0], B1: names[2], span: 2 };
+      return { A1: names[0], B1: names[0], span: 2, keys: 'A1' };
     case 11: // A1单端
-      return { A1: names[0], span: 1 };
+      return { A1: names[0], span: 1, keys: 'A1' };
     case 12: // B1单端
-      return { B1: names[2], span: 1 };
+      return { B1: names[0], span: 1, keys: 'B1' };
     default:
       break;
   }
@@ -199,3 +199,27 @@ export function tensionOther2Date(data: TensionTask): TensionTask {
   data.modificationDate = getJSDate(data.modificationDate);
   return data;
 }
+
+export function createHoleTask(mode: number): TensionStage {
+  console.log(mode);
+
+  const jacks: any = {}
+  getModeStr(mode).map(key => {
+    jacks[key] = { reboundMm: 3.5, wordMm: 5, theoryMm: 0}
+  })
+  return  {
+    /** 张拉阶段应力百分比 */
+    knPercentage: [10, 20, 50, 100],
+    /** 阶段说明（初张拉 阶段一 超张拉 补张拉...） */
+    msg: ['初张拉', '阶段一', '阶段二', '终张拉'],
+    /** 阶段保压时间 */
+    time: [30, 30, 30, 300],
+    /** 卸荷比例 */
+    uploadPercentage: 10,
+    /** 卸荷延时 */
+    uploadDelay: 10,
+    /** 顶计算数据 */
+    ...jacks
+  }
+}
+

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { TensionHoleTask, OnceRecord, RecordCompute } from 'src/app/models/tension';
 import { holeNameShow, getModeStr, recordCompute } from 'src/app/Function/tension';
@@ -7,7 +7,8 @@ import { holeNameShow, getModeStr, recordCompute } from 'src/app/Function/tensio
   // tslint:disable-next-line:component-selector
   selector: 'tension-record',
   templateUrl: './tension-record.component.html',
-  styleUrls: ['./tension-record.component.less']
+  styleUrls: ['./tension-record.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TensionRecordComponent implements OnInit, OnChanges {
   @Input() formData: FormGroup;

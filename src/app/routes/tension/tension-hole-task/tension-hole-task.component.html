@@ -1,28 +1,34 @@
-<div *ngIf="tasks && tasks.length > 0">
+<div *ngIf="tasks && tasks.length > 0 && jackMneu?.length > 0">
   <form nz-form [formGroup]="formData">
     <!-- <ng-container formArrayName="tensionHoleInfos">
       <ng-container [formArrayName]="index"> -->
         <ng-container formArrayName="tasks">
           <ng-container *ngFor="let item of TaskFormArray.controls; index as i" [formArrayName]="i">
             <div>
-              <app-form-item label="二次张拉">
+              <app-form-item label="二次张拉" *ngIf="data.state === 0">
                 <nz-switch (ngModelChange)="stage.twiceChange($event)" formControlName="twice" nzCheckedChildren="二次张拉" nzUnCheckedChildren="无"></nz-switch>
               </app-form-item>
-              <app-form-item label="超张拉">
+              <app-form-item label="超张拉" *ngIf="data.state === 0">
                 <nz-switch (ngModelChange)="stage.superStage($event, '超张拉')" formControlName="super" nzCheckedChildren="超张拉" nzUnCheckedChildren="无"></nz-switch>
               </app-form-item>
-              <app-form-item label="补张拉">
+              <app-form-item label="补张拉" *ngIf="data.state === 2">
                 <nz-switch (ngModelChange)="stage.superStage($event, '补张拉')" formControlName="mend" nzCheckedChildren="补张拉" nzUnCheckedChildren="无"></nz-switch>
               </app-form-item>
 
               <app-form-item label="设置张拉应力">
                 <input type="number" nz-input placeholder="请输入设置张拉应力" formControlName="tensionKn">
               </app-form-item>
-              <app-form-item label="张拉设备">
-                <input nz-input placeholder="张拉设备" [value]="item.get('device').value.name">
+              <!-- <app-form-item label="张拉设备" >
+                <input nz-input [disabled]="!(data.state === 0)" placeholder="张拉设备" [value]="item.get('device').value.name">
+              </app-form-item> -->
+              <app-form-item label="设备选择" [errorShow]="false">
+                <nz-select style="width: 100%;" nzPlaceHolder="请选择设备" formControlName="deviceId" (ngModelChange)="selectTensionDevice($event, i)">
+                  <nz-option [nzValue]="jack.value" [nzLabel]="jack.label" *ngFor="let jack of jackMneu">
+                  </nz-option>
+                </nz-select>
               </app-form-item>
               <app-form-item label="张拉模式">
-                <nz-select style="width: 100%;" formControlName="mode" (ngModelChange)="stage.selectMode($event)" >
+                <nz-select style="width: 100%;" [nzDisabled]="!(data.state === 0)" formControlName="mode" (ngModelChange)="stage.selectMode($event)" >
                   <nz-option [nzDisabled]="!(holeNameLength === 2)" [nzValue]="42" nzLabel="4顶两端" ></nz-option>
                   <nz-option [nzDisabled]="!(holeNameLength === 4)" [nzValue]="41" nzLabel="4顶单端"></nz-option>
                   <nz-option [nzDisabled]="!(holeNameLength === 2)" [nzValue]="21" nzLabel="A1|A2单端"></nz-option>
@@ -39,7 +45,7 @@
               <app-add-other [formGroup]="item" [data]="tasks[i]?.otherInfo || []"></app-add-other>
             </div>
             <div>
-              <tension-hole-task-stage [formData]="item" [data]="tasks[i]" [holeName]="data.name" #stage></tension-hole-task-stage>
+              <tension-hole-task-stage [formData]="item" [data]="tasks[i]" [holeName]="data.name" [state]="data.state" #stage></tension-hole-task-stage>
             </div>
             <div>
               <tension-record [formData]="item.get('record')" [data]="tasks[i]" [holeName]="data.name"></tension-record>

@@ -3,7 +3,7 @@
     <app-scroll-menu style="flex: 1;" [dbName]="dbName" [stateFunc]="menuStateFunc" #menu (menuChange)="selectBridge($event)"></app-scroll-menu>
   </div>
   <div class="main" style="width: 100%;">
-    <div *ngIf="data?.template" class="template">
+    <div *ngIf="data?.template" class="task-template">
       <div class="text">模板</div>
     </div>
     <nz-tabset class="task-tabset" (nzSelectChange)="changeTabs($event)" [nzShowPagination]="false">
@@ -51,7 +51,7 @@
               </app-form-item>
             </div>
             <div>
-              <app-add-other [formGroup]="formData" [data]="data?.otherInfo || []"></app-add-other>
+              <app-add-other [formGroup]="formData" [data]="data?.otherInfo || []" [edit]="appS.edit"></app-add-other>
             </div>
             <div>
               <tension-holes [data]="data" [formData]="formData" #holes></tension-holes>
@@ -77,6 +77,7 @@
             (outEdit)="onEdit($event)"
             (outEditOk)="editOk($event)"
             (outDelete)="delete()"
+            (outCancelEdit)="cancelEdit()"
             (outModification)="onEdit(null, true)"
             >
             <button nz-button nzType="primary" (click)="upload()"

@@ -8,7 +8,7 @@
       </nz-form-control>
     </nz-form-item>
 
-    <app-add-other [formGroup]="validateForm" [keys]="otherKeys" #otherInfo></app-add-other>
+    <app-add-other [formGroup]="validateForm" [keys]="otherKeys" #otherInfo [edit]="appS.edit"></app-add-other>
 
     <nz-form-item>
       <nz-form-label [nzSm]="3">上传服务器</nz-form-label>

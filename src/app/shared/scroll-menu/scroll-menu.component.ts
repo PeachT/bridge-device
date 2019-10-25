@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { DbService, DbEnum } from 'src/app/services/db.service';
 import { Observable, from } from 'rxjs';
 import { map, groupBy, mergeMap, toArray } from 'rxjs/operators';
@@ -41,7 +41,6 @@ import { TensionTask } from 'src/app/models/tension';
 export class ScrollMenuComponent implements OnInit {
   @Input() dbName;
   @Input() stateFunc: any;
-  items = Array.from({ length: 100000 }).map((_, i) => `中文中文中文中文中文中 #${i}`);
   projects$: Observable<Menu$>;
   projectId: any;
   component$: Observable<Menu$>;
@@ -66,6 +65,7 @@ export class ScrollMenuComponent implements OnInit {
     private db: DbService,
     public appS: AppService,
     private activatedRoute: ActivatedRoute,
+    private crd: ChangeDetectorRef,
   ) { }
 
   ngOnInit() {
@@ -94,7 +94,6 @@ export class ScrollMenuComponent implements OnInit {
     this.selectProject();
     this.selectComponent(data.componentName);
     this.selectBridge(data.bridgeId);
-    console.warn('菜单路由', data, this.projectId);
   }
   /** 获取项目菜单 */
   async getProjectMenu() {
@@ -126,6 +125,7 @@ export class ScrollMenuComponent implements OnInit {
     );
   }
   async getBridgeMenu() {
+    console.log(this.projectId, this.componentName);
     this.bridge$ = await this.db.pageData<any>(
       this.dbName,
       (g) => this.projectId === g.project && g.component === this.componentName,
@@ -134,6 +134,9 @@ export class ScrollMenuComponent implements OnInit {
         state: this.stateFunc
       }
     );
+    this.bridge$.subscribe(r => {
+      this.crd.detectChanges();
+    })
   }
   /** 选择项目 */
   selectProject() {
@@ -142,7 +145,9 @@ export class ScrollMenuComponent implements OnInit {
   }
   /** 选择构建 */
   selectComponent(name) {
+
     if (!this.componentName) {
+      console.log('ssss');
       this.componentName = name;
       this.getBridgeMenu();
     } else {

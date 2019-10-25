@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { NzMessageService } from 'ng-zorro-antd';
@@ -17,7 +17,8 @@ import { ScrollMenuComponent } from 'src/app/shared/scroll-menu/scroll-menu.comp
 @Component({
   selector: 'app-grouting',
   templateUrl: './grouting.component.html',
-  styleUrls: ['./grouting.component.less']
+  styleUrls: ['./grouting.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GroutingComponent implements OnInit, OnDestroy {
   dbName = 'grouting';
@@ -361,7 +362,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
     && o1.component === o2.component && o1.project === o2.project && o1.id !== o2.id
   /** 菜单梁状态 */
   menuStateFunc = (g: GroutingTask) => {
-    console.log(g);
+    // console.log(g);
     return g.groutingInfo.map(item => {
       return item.state
     })
@@ -542,14 +543,13 @@ export class GroutingComponent implements OnInit, OnDestroy {
   editOk(data) {
     console.log(data, this.menuDom.bridgeId);
     if (data.bridgeId && data.bridgeId !== this.menuDom.bridgeId) {
-
       this.menuDom.reset({
         projectId: data.projectId,
         componentName: data.componentName,
         bridgeId: data.bridgeId
       });
     } else {
-      this.menuDom.selectBridge(data.bridgeId);
+      this.menuDom.selectBridge(this.menuDom.bridgeId);
     }
   }
   /** 删除 */

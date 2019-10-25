@@ -1,6 +1,7 @@
 <div style="display: flex; flex-direction: column;">
+  <!-- <p>{{device | json}}</p> -->
   <div>
-    <app-form-item label="修改张拉段数">
+    <app-form-item [label]="'张拉段数' + stageNumber" *ngIf="appS.edit && state === 0">
       <nz-select style="width: 100%;" [(ngModel)]="stageNumber" (ngModelChange)="stageChange()">
         <nz-option [nzValue]="3" nzLabel="3段" [nzDisabled]="twice"></nz-option>
         <nz-option [nzValue]="4" nzLabel="4段"></nz-option>
@@ -46,15 +47,16 @@
             </td>
           </tr>
           <tr *ngFor="let item of strMode; index as keyi">
-            <td [attr.rowspan]="holeNames.span" *ngIf="(holeNames.span === 2 && item.indexOf('1') > -1) || holeNames.span === 1">{{holeNames[item]}}</td>
+            <!-- <td [attr.rowspan]="holeNames.span" *ngIf="(holeNames.span === 2 && item.indexOf('1') > -1) || holeNames.span === 1">{{holeNames[item]}}</td> -->
+            <td [attr.rowspan]="holeNames.span" *ngIf="holeNames.keys.indexOf(item) !== -1">{{holeNames[item]}}</td>
             <td>{{item}}</td>
             <td *ngFor="let stage of knPercentageFormArray.value">
               <div>{{(tensionKn * (stage / 100)) | ToFixedr}}<sub>kn</sub> </div>
-              <div>{{(tensionKn * (stage / 100)) | kn2mpa: data.device: item}}<sub>mpa</sub> </div>
+              <div>{{(tensionKn * (stage / 100)) | kn2mpa: device: item}}<sub>mpa</sub> </div>
             </td>
             <td>
               <div>{{(tensionKn * (stageGroup.get('uploadPercentage').value / 100)) | ToFixedr}}<sub>kn</sub> </div>
-              <div>{{(tensionKn * (stageGroup.get('uploadPercentage').value / 100)) | kn2mpa: data.device: item}}<sub>mpa</sub> </div>
+              <div>{{(tensionKn * (stageGroup.get('uploadPercentage').value / 100)) | kn2mpa: device: item}}<sub>mpa</sub> </div>
             </td>
             <ng-container [formGroupName]="item">
               <td>
@@ -71,7 +73,8 @@
                   </app-form-item>
                 </div>
               </td>
-              <td [attr.rowspan]="holeNames.span" *ngIf="(holeNames.span === 2 && item.indexOf('1') > -1) || holeNames.span === 1">
+              <!-- <td [attr.rowspan]="holeNames.span === 3 ? 2 : holeNames.span" *ngIf="(holeNames.span === 2 && item.indexOf('1') > -1) || holeNames.span === 1"> -->
+              <td [attr.rowspan]="holeNames.span" *ngIf="holeNames.keys.indexOf(item) !== -1">
                 <div>
                   <app-form-item [row]="true" [errorShow]="false">
                     <input type="number" nz-input formControlName="theoryMm" (input)="inputWordmm($event, keyi, 'theoryMm')">

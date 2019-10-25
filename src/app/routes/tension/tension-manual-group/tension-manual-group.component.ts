@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -11,7 +11,8 @@ import { ManualGroup } from 'src/app/models/tension';
   // tslint:disable-next-line:component-selector
   selector: 'tension-manual-group',
   templateUrl: './tension-manual-group.component.html',
-  styleUrls: ['./tension-manual-group.component.less']
+  styleUrls: ['./tension-manual-group.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TensionManualGroupComponent implements OnInit {
   @Input() holes: Array<string>;

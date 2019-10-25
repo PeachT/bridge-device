@@ -4,7 +4,7 @@
     <app-scroll-menu style="flex: 1;" [dbName]="dbName" [stateFunc]="menuStateFunc" #menu (menuChange)="selectBridge($event)"></app-scroll-menu>
   </div>
   <div class="main " style="width: 100%; height: 100%;">
-      <div *ngIf="data?.template" class="template">
+      <div *ngIf="data?.template" class="task-template">
         <div class="text">模板</div>
       </div>
       <nz-tabset class="task-tabset " (nzSelectChange)="changeTabs($event)" [nzShowPagination]="false">
@@ -28,6 +28,7 @@
               (outEditOk)="editOk($event)"
               (outDelete)="delete()"
               (outModification)="onEdit(null, true)"
+              (outCancelEdit)="editOk(null)"
               >
               <button nz-button nzType="primary" (click)="upload()" [disabled]="!(data?.groutingInfo?.length > 0) || !uploading"><i nz-icon nzType="cloud-upload"
                 nzTheme="outline"></i>上传</button>

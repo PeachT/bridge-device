@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormArray, Validators, FormBuilder, ValidatorFn, AbstractControl } from '@angular/forms';
 import { AppService } from 'src/app/services/app.service';
 import { OtherInfo } from 'src/app/models/common';
@@ -6,7 +6,8 @@ import { OtherInfo } from 'src/app/models/common';
 @Component({
   selector: 'app-add-other',
   templateUrl: './add-other.component.html',
-  styleUrls: ['./add-other.component.less']
+  styleUrls: ['./add-other.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddOtherComponent implements OnInit, OnChanges {
   @Input() formGroup: FormGroup;
@@ -25,20 +26,26 @@ export class AddOtherComponent implements OnInit, OnChanges {
   constructor(
     public appS: AppService,
     private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit() {
+    this.cdr.detectChanges();
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    console.log('其他数据');
+
     this.initForm(this.data);
+    this.cdr.detectChanges();
   }
   initForm(data: Array<OtherInfo> = []) {
     // console.log('其他信息', data);
     this.otherInfoFormArr.clear();
     this.createForm(data).map(si => {
       this.otherInfoFormArr.push(si)
-    })
+    });
+    this.cdr.detectChanges();
     // console.log('其他信息', this.otherInfoFormArr);
   }
 

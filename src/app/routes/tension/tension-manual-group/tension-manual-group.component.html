@@ -3,7 +3,7 @@
   <div style="display: flex; flex-direction: column;">
     <div>
       <app-form-item label="设备选择" [errorShow]="false">
-        <nz-select style="width: 100%;" nzPlaceHolder="请选择构建" [(ngModel)]="selectJack">
+        <nz-select style="width: 100%;" nzPlaceHolder="请选择设备" [(ngModel)]="selectJack">
           <nz-option [nzValue]="item.value" [nzLabel]="item.label" *ngFor="let item of jackMneu$ | async">
           </nz-option>
         </nz-select>

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { TensionTask, ManualGroup, TensionHoleInfo } from 'src/app/models/tension';
 import { TaskMenuComponent } from 'src/app/shared/task-menu/task-menu.component';
 import { FormArray, FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -22,7 +22,8 @@ import { ScrollMenuComponent } from 'src/app/shared/scroll-menu/scroll-menu.comp
 @Component({
   selector: 'app-tension',
   templateUrl: './tension.component.html',
-  styleUrls: ['./tension.component.less']
+  styleUrls: ['./tension.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TensionComponent implements OnInit, OnDestroy {
   dbName = 'tension';
@@ -447,7 +448,7 @@ export class TensionComponent implements OnInit, OnDestroy {
     && o1.component === o2.component && o1.project === o2.project && o1.id !== o2.id
   /** 菜单梁状态 */
   menuStateFunc = (g: TensionTask) => {
-    console.log(g);
+    // console.log(g);
     return g.tensionHoleInfos.map(item => {
       return item.state
     })
@@ -458,7 +459,8 @@ export class TensionComponent implements OnInit, OnDestroy {
     private message: NzMessageService,
     public appS: AppService,
     public GPLCS: GroutingService,
-    private http: HttpService
+    private http: HttpService,
+    private crd: ChangeDetectorRef,
   ) {
 
   }
@@ -589,24 +591,26 @@ export class TensionComponent implements OnInit, OnDestroy {
         this.data.project = this.menuDom.projectId;
       }
       console.log('添加', this.data);
-      this.formInit();
     }
+    this.formInit();
   }
   /**
    * *编辑完成
    */
   editOk(data) {
     console.log(data, this.menuDom.bridgeId);
-    if (data.bridgeId && data.bridgeId !== this.menuDom.bridgeId) {
-
+    if (data && data.bridgeId && data.bridgeId !== this.menuDom.bridgeId) {
       this.menuDom.reset({
         projectId: data.projectId,
         componentName: data.componentName,
         bridgeId: data.bridgeId
       });
     } else {
-      this.menuDom.selectBridge(data.bridgeId);
+      this.menuDom.selectBridge(this.menuDom.bridgeId);
     }
+  }
+  cancelEdit() {
+    this.menuDom.selectBridge(this.menuDom.bridgeId);
   }
   /** 删除 */
   async delete() {

@@ -12,6 +12,7 @@
       [valid]="formData.valid"
       (outEdit)="edit($event)"
       (outEditOk)="editOk($event)"
+      (outCancelEdit)="editOk(null)"
       ></app-operat>
 
     <form nz-form class="form-edit" [ngClass]="{'edit-on': appS.edit}" [formGroup]="formData">

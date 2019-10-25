@@ -85,7 +85,7 @@
                   </app-form-item>
                 </div>
                 <div>
-                  <app-add-other [formGroup]="item" [data]="data[i].otherInfo || []"></app-add-other>
+                  <app-add-other [formGroup]="item" [data]="data[i].otherInfo || []" [edit]="appS.edit"></app-add-other>
                 </div>
                 <div>
                   <echarts-dynamic-line-grouting

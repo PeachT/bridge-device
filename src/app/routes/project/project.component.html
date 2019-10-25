@@ -9,7 +9,9 @@
       [valid]="formData.valid"
       (outEdit)="edit($event)"
       (outEditOk)="editOk($event)"
-      (outDelete)="delete()"></app-operat>
+      (outDelete)="delete()"
+      (outCancelEdit)="editOk(null)"
+      ></app-operat>
 
     <div class="form-edit scroll-content">
       <form nz-form class="form-edit" [ngClass]="{'edit-on': appS.edit}" [formGroup]="formData" [hidden]="!formData" >
@@ -17,7 +19,7 @@
           <input type="text" nz-input placeholder="请输入项目名称" formControlName="name">
         </app-form-item>
         <div>
-          <app-add-other [formGroup]="formData" [data]="data?.otherInfo || []" #other [unDel]="unDel"></app-add-other>
+          <app-add-other [formGroup]="formData" [data]="data?.otherInfo || []" #other [unDel]="unDel" [edit]="appS.edit"></app-add-other>
         </div>
         <nz-divider style="min-width: auto;" nzText="上传服务器" nzOrientation="left"></nz-divider>
         <app-form-item label="上传服务器" [row]="true">

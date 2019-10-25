@@ -18,13 +18,14 @@ export class OperatComponent implements OnInit, OnChanges {
   // @Input() saveState = true;
   @Input() coprState = false;
   @Input() addState = true;
-  @Input() valid = false;
+  @Input() valid: boolean;
+  @Input() leftMenu: any;
 
   @Output() outEditOk = new EventEmitter();
+  @Output() outCancelEdit = new EventEmitter();
   @Output() outEdit = new EventEmitter();
   @Output() outModification = new EventEmitter();
   @Output() outDelete = new EventEmitter();
-
 
   @Input() addFilterFun: (o1: any, o2: any) => boolean = (o1: any, o2: any) => o1.name === o2.name;
   @Input() updateFilterFun: (o1: any, o2: any) => boolean = (o1: any, o2: any) => o1.name === o2.name && o1.id !== o2.id;
@@ -66,13 +67,17 @@ export class OperatComponent implements OnInit, OnChanges {
     if (r.success) {
       this.message.success(`${msg}成功🙂`);
       this.appS.edit = false;
-      this.outEditOk.emit(
-        {
-          projectId: data.project,
-          componentName: data.component,
-          bridgeId: r.id
-        }
-      );
+      if (this.dbName === 'tension' || this.dbName === 'grouting') {
+        this.outEditOk.emit(
+          {
+            projectId: data.project,
+            componentName: data.component,
+            bridgeId: r.id
+          }
+          );
+        } else {
+          this.outEditOk.emit(r.id);
+      }
     } else {
       this.message.error(`${msg}失败😔`);
       console.log(`${msg}失败😔`, r.msg);
@@ -87,7 +92,7 @@ export class OperatComponent implements OnInit, OnChanges {
       nzCancelText: '继续编辑',
       nzOnOk: () => {
         this.appS.edit = false;
-        this.outEditOk.emit();
+        this.outCancelEdit.emit();
       },
       nzOnCancel: () => { console.log('取消'); }
     });
@@ -112,7 +117,6 @@ export class OperatComponent implements OnInit, OnChanges {
     this.outDelete.emit();
   }
   op(event) {
-    console.warn(this.appS.leftMenu);
     if (this.appS.userInfo) {
       if (this.appS.userInfo.jurisdiction > 0) {
         return true;

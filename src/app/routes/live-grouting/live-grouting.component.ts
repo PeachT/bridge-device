@@ -143,7 +143,6 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
       this.plcsub = this.GPLCS.plcSubject.subscribe((data: any) => {
         this.appS.groutingLive = !this.stop;
         if (this.monitoringMsg.start) {
-          console.warn(data.data[0]);
           if (data.data[0]) {
             console.error(data);
           }

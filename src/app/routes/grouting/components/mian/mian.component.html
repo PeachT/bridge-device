@@ -37,7 +37,7 @@
     </app-form-item>
   </div>
   <div>
-    <app-add-other [formGroup]="formData" [data]="groutingTask?.otherInfo || []" [unDel]="unDel"></app-add-other>
+    <app-add-other [formGroup]="formData" [data]="groutingTask?.otherInfo || []" [unDel]="unDel" [edit]="appS.edit"></app-add-other>
   </div>
   <div>
     <grouting-proportion [formGroup]="formData" [data]="groutingTask.proportionInfo"></grouting-proportion>

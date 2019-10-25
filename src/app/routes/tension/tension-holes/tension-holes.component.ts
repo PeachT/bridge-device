@@ -1,13 +1,15 @@
-import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { TensionHoleInfo, TensionTask } from 'src/app/models/tension';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { AppService } from 'src/app/services/app.service';
 
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'tension-holes',
   templateUrl: './tension-holes.component.html',
-  styleUrls: ['./tension-holes.component.less']
+  styleUrls: ['./tension-holes.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TensionHolesComponent implements OnInit, OnChanges {
   @Input() show = false;
@@ -35,7 +37,8 @@ export class TensionHolesComponent implements OnInit, OnChanges {
   @Output() updateHole = new EventEmitter();
 
   constructor(
-    private fb: FormBuilder
+    public appS: AppService,
+    private fb: FormBuilder,
   ) { }
 
   ngOnInit() {

@@ -1,20 +1,26 @@
-import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, AbstractControl, ValidatorFn, Validators, FormControl } from '@angular/forms';
 import { TensionStage, TensionHoleTask } from 'src/app/models/tension';
 import { Subscription } from 'rxjs';
-import { holeNameShow, getModeStr } from 'src/app/Function/tension';
+import { holeNameShow, getModeStr, createHoleTask } from 'src/app/Function/tension';
 import { copyAny } from 'src/app/models/base';
+import { AppService } from 'src/app/services/app.service';
+import { TensionDevice } from 'src/app/models/jack';
+import { DbService } from 'src/app/services/db.service';
 
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'tension-hole-task-stage',
   templateUrl: './tension-hole-task-stage.component.html',
-  styleUrls: ['./tension-hole-task-stage.component.less']
+  styleUrls: ['./tension-hole-task-stage.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
   @Input() formData: FormGroup;
   @Input() data: TensionHoleTask;
   @Input() holeName: string;
+  @Input() state: number;
+  @Input() edit:any;
   holeNames: any;
   stageNumber: number;
 
@@ -58,18 +64,23 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
   get mend(): number {
     return this.formData.controls.mend.value;
   }
+  get device(): TensionDevice {
+    return this.formData.controls.device.value;
+  }
 
   @Output() updateHole = new EventEmitter();
 
   constructor(
+    private db: DbService,
     private fb: FormBuilder,
+    public appS: AppService,
+    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit() {
-
+    this.edit = this.appS.edit;
   }
   ngOnChanges(changes: SimpleChanges) {
-    console.warn('任务阶段数据', this.strMode, this.data);
     if (this.data && 'stage' in this.data) {
       this.createForm(this.data.stage, this.data.mode);
     }
@@ -112,6 +123,12 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
 
     if (!this.stageNumber) {
       this.stageNumber = this.knPercentageFormArray.value.length;
+      if (this.formData.value.super) {
+        this.stageNumber --;
+      }
+      if (this.formData.value.mend) {
+        this.stageNumber --;
+      }
     }
 
     this.strMode.map(key => {
@@ -125,6 +142,8 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
         )
       );
     });
+
+    this.cdr.detectChanges();
   }
   createStageForm(kn: Array<number>, msg: Array<string>, time: Array<number>) {
 
@@ -180,6 +199,7 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
         this.timeFormArray.removeAt(index);
       }
     }
+    this.onCdr();
   }
   /** 二次张拉 */
   twiceChange(event) {
@@ -189,15 +209,23 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
         this.stageChange();
       }
     }
+    this.onCdr();
   }
   /** 切换张拉模式 */
-  selectMode(event) {
-    const value = copyAny(this.stageGroup.value)
-    console.log(event, value);
+  async selectMode(mode: number) {
+    // const value = copyAny(this.stageGroup.value)
+    // const device: TensionDevice = await this.db.db.jack.filter(f => f.id === g.deviceId).first();
+    const value = createHoleTask(mode);
+    console.log(mode, value);
     this.knPercentageFormArray.clear();
     this.msgFormArray.clear();
     this.timeFormArray.clear();
-    this.createForm(value, event);
+    this.createForm(value, mode);
+    this.stageNumber = 4;
+    if (this.formData.value.super) {
+      this.superStage(this.formData.value.super, '超张拉');
+    }
+    this.onCdr();
   }
   /** 修改工作长度|理论申长量 */
   inputWordmm(event, keyi, key) {
@@ -209,5 +237,8 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
         }
       });
     }
+  }
+  onCdr() {
+    this.cdr.detectChanges();
   }
 }

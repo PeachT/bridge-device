@@ -1,13 +1,15 @@
-import { Component, Input, OnInit, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, SimpleChanges, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { GroutingInfo, GroutingTask } from 'src/app/models/grouting';
+import { AppService } from 'src/app/services/app.service';
 
 @Component({
   // tslint:disable-next-line: component-selector
   selector: 'grouting-record',
   templateUrl: './grouting-record.component.html',
-  styleUrls: ['./grouting-record.component.less']
+  styleUrls: ['./grouting-record.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GroutingRecordComponent implements OnInit, OnChanges {
   @Input() show = false;
@@ -34,7 +36,8 @@ export class GroutingRecordComponent implements OnInit, OnChanges {
   @Output() updateHole = new EventEmitter();
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    public appS: AppService
   ) { }
 
   ngOnInit() {

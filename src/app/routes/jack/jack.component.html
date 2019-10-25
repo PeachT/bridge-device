@@ -6,9 +6,10 @@
     <app-operat
       [dbName]="dbName"
       [formData]="formData"
+      [valid]="formData.valid"
       (outEdit)="edit($event)"
       (outEditOk)="editOk($event)"
-      [valid]="formData.valid"
+      (outCancelEdit)="editOk(null)"
       ></app-operat>
 
     <div class="scroll-content">

@@ -32,7 +32,7 @@
             </app-form-item>
           </div>
           <div>
-            <app-add-other [formGroup]="item" [data]="tensionHoleInfos[i]?.otherInfo || []"></app-add-other>
+            <app-add-other [formGroup]="item" [data]="tensionHoleInfos[i]?.otherInfo || []" [edit]="appS.edit"></app-add-other>
           </div>
           <div>
             <tension-hole-task [formData]="item" [data]="tensionHoleInfos[i]" [index]="i"></tension-hole-task>

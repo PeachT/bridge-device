@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { NzMessageService, NzModalService } from 'ng-zorro-antd';
@@ -15,7 +15,8 @@ import { Comp } from 'src/app/models/component';
   // tslint:disable-next-line:component-selector
   selector: 'grouting-mian',
   templateUrl: './mian.component.html',
-  styleUrls: ['./mian.component.less']
+  styleUrls: ['./mian.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class GroutingMianComponent implements OnInit, OnChanges {

@@ -19,7 +19,6 @@ export function waterBinderRatio(dosage: Array<number>) {
 export function getDatetimeS(date: Date | string | number = null): number {
   if (date) {
     const t = Math.floor(new Date(date).getTime() / 1000);
-    console.warn(t, date);
     return t;
 
   } else {
@@ -35,7 +34,6 @@ export function getJSDate(date: Date | string | number = null): Date {
     } else {
       t = new Date(date);
     }
-    console.warn(t, date);
     return t;
   } else {
     return new Date();
