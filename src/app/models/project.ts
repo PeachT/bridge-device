@@ -12,7 +12,7 @@ export interface Project extends IBase {
   /** 监理 */
   supervisions?: Array<PersonInfo>;
   /** 质检员信息 */
-  qualityInspector?: Array<PersonInfo>;
+  qualityInspectors?: Array<PersonInfo>;
   /** 项目权限 */
   jurisdiction?: number;
   /** 其他信息 */

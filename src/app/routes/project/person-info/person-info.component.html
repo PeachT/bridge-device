@@ -8,11 +8,11 @@
       <ng-container *ngFor="let item of forFormArr.controls; index as i" [formGroupName]="i">
         <div class="card" nz-col nzSm="24" nzLg="12">
           <div class="item">
-            <app-form-item [row]="true" label="监理姓名" [errors]="item.get('name').errors">
-              <input placeholder="监理姓名" nz-input formControlName="name" />
+            <app-form-item [row]="true" [label]="dividerText + '姓名'" [errors]="item.get('name').errors">
+              <input [placeholder]="dividerText + '姓名'" nz-input formControlName="name" />
             </app-form-item>
-            <app-form-item [row]="true" label="监理公司" >
-              <input placeholder="监理公司" nz-input formControlName="unit" />
+            <app-form-item [row]="true" label="公司" >
+              <input placeholder="公司" nz-input formControlName="unit" />
             </app-form-item>
             <app-form-item [row]="true" label="联系方式">
               <input placeholder="联系方式" nz-input formControlName="phone" />

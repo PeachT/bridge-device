@@ -38,7 +38,7 @@ export class ProjectComponent implements OnInit, OnChanges {
       imgBase64: null
     }],
     /** 质检员信息 */
-    qualityInspector: [{
+    qualityInspectors: [{
       /** 名字 */
       name: '自检员',
       /** 联系方式 */
