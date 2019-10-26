@@ -1,8 +1,9 @@
-import { Component, Input, OnInit, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable, fromEvent } from 'rxjs';
 import { GroutingHoleItem } from 'src/app/models/grouting';
 import { AppService } from 'src/app/services/app.service';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   // tslint:disable-next-line: component-selector
@@ -28,9 +29,11 @@ export class GroutingRecordItemComponent implements OnInit, OnChanges {
   constructor(
     public appS: AppService,
     private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
+
   }
   ngOnChanges(changes: SimpleChanges) {
     this.createForm(this.data).map(si => {

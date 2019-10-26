@@ -1,27 +1,29 @@
-import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, SimpleChanges, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, SimpleChanges, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ECharts } from 'echarts';
 import { format } from 'date-fns';
 import { Process } from 'src/app/models/tension';
+import { Subscription } from 'rxjs';
+import { AppService } from 'src/app/services/app.service';
 // 引入 ECharts 主模块
 const echarts = require('echarts');
 
 const data: Process = {
   hz: 1,
   A1: {
-    mpa: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5],
-    mm: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5],
+    mpa: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5],
+    mm: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5],
   },
   A2: {
-    mpa: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5].map(m => m * 4.5),
-    mm: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5].map(m => m * 4.2),
+    mpa: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5].map(m => m * 4.5),
+    mm: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5].map(m => m * 4.2),
   },
   B1: {
-    mpa: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5].map(m => m * 3.9),
-    mm: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5].map(m => m * 2),
+    mpa: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5].map(m => m * 3.9),
+    mm: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5].map(m => m * 2),
   },
   B2: {
-    mpa: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5].map(m => m * 3),
-    mm: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ,7.5, 8.5, 9.5].map(m => m * 3),
+    mpa: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5].map(m => m * 3),
+    mm: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5].map(m => m * 3),
   }
 };
 @Component({
@@ -31,12 +33,11 @@ const data: Process = {
   styleUrls: ['./dynamic-line-tension.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterViewInit {
+export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @ViewChild('svg', { read: ElementRef, static: true }) svgDom: ElementRef;
   @Input() devs = [];
   @Input() live = 0;
-  @Input() data : Process;
-  @Input() width: number | string = 'auto';
+  @Input() data: Process;
   @Input() height: number | string = '300';
   @Input() index: null;
   @Input() name: null;
@@ -75,29 +76,27 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterView
   myChart: ECharts = null;
   oldWidth;
   maxs: any[] = [];
+  widthSub: Subscription;
 
   constructor(
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private appS: AppService
   ) { }
 
   ngOnInit() {
+    const doby = document.getElementsByTagName('body')[0];
+    console.log('数据变更ngOnInit', this.data);
     this.carterSvg();
+    this.widthSub = this.appS.bodySizeSub.subscribe((width: number) => {
+      // 这里处理页面变化时的操作
+      this.myChart.resize({ width: (width - 220) })
+      this.cdr.detectChanges();
+    });
   }
   ngOnChanges(changes: SimpleChanges) {
-    console.log('数据变更', this.width, this.data);
     if (!this.data) {
-
       this.carterSvg();
     } else {
-      if (this.myChart && this.width !== 0 && this.oldWidth !== this.width) {
-        if (this.width < 500) {
-          this.width = 500;
-        }
-        this.oldWidth = this.width;
-        this.myChart.resize({ width: this.width })
-      }
-    }
-    if (this.data && this.width === this.oldWidth) {
       console.log('data变更', this.data);
       this.series = this.strMode.map(name => {
         this.maxs = [...this.maxs, ...this.data[name][this.key]]
@@ -114,14 +113,17 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterView
     this.cdr.detectChanges();
   }
   ngAfterViewInit() {
-    this.cdr.detectChanges();
+    // this.cdr.detectChanges();
+  }
+  ngOnDestroy() {
+    this.widthSub.unsubscribe();
   }
   carterSvg() {
     if (!this.data) {
       this.data = data;
     }
     // 基于准备好的dom，初始化echarts实例
-    this.myChart = echarts.init(this.svgDom.nativeElement, null, {width: this.width, height: this.height});
+    this.myChart = echarts.init(this.svgDom.nativeElement, null, { width: this.appS.bodyWidth - 220, height: this.height });
     // 绘制图表
     this.myChart.setOption(
       {
@@ -131,10 +133,9 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterView
           // x: 'center',
         },
         grid: {
-          x: 40, // 默认是80px
-          y: 60, // 默认是60px
-          x2: 40, // 默认80px
-          // y2: 20 // 默认60px
+          left: 40, // 默认是80px
+          top: 60, // 默认是60px
+          right: 40, // 默认80px
         },
         // toolbox: {
         //   feature: {
@@ -153,7 +154,7 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterView
         },
         legend: {
           data: this.strMode,
-          x: 'center'
+          left: 'center'
         },
         // dataZoom: [
         //   {
@@ -183,7 +184,7 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterView
         ],
         yAxis: [
           {
-            name: `${this.text}(${this.text === '压力' ? 'MPa': 'mm'})`,
+            name: `${this.text}(${this.text === '压力' ? 'MPa' : 'mm'})`,
             type: 'value',
             max: Math.max(...this.maxs)
           },

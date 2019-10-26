@@ -1,7 +1,10 @@
-import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, SimpleChanges, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, SimpleChanges, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ECharts } from 'echarts';
 import { format } from 'date-fns';
 import { ProcessData } from 'src/app/models/grouting';
+import { fromEvent, Observable, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { AppService } from 'src/app/services/app.service';
 // 引入 ECharts 主模块
 const echarts = require('echarts');
 
@@ -39,12 +42,11 @@ const data: ProcessData = {
   styleUrls: ['./dynamic-line-grouting.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DynamicLineGroutingComponent implements OnInit, OnChanges, AfterViewInit {
+export class DynamicLineGroutingComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @ViewChild('svg', { read: ElementRef, static: true }) svgDom: ElementRef;
   @Input() devs = [];
   @Input() live = 0;
   @Input() data : ProcessData;
-  @Input() width: number | string = 'auto';
   @Input() height: number | string = '300';
   @Input() index: null;
   @Input() name: null;
@@ -77,43 +79,42 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges, AfterVie
   series = [];
   myChart: ECharts = null;
   oldWidth;
+  widthSub: Subscription;
 
   constructor(
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private appS: AppService
   ) { }
 
   ngOnInit() {
+    const doby = document.getElementsByTagName('body')[0];
+    console.log('数据变更ngOnInit',  this.data);
     this.carterSvg();
+    this.widthSub = this.appS.bodySizeSub.subscribe((width: number) => {
+        // 这里处理页面变化时的操作
+        console.warn(doby.offsetWidth);
+        this.myChart.resize({width: (width - 220)})
+        this.cdr.detectChanges();
+    });
   }
   ngOnChanges(changes: SimpleChanges) {
-    console.log('数据变更', this.width, this.data);
-    if (!this.data) {
-      this.carterSvg();
-    } else {
-      if (this.myChart && this.width !== 0 && this.oldWidth !== this.width) {
-        if (this.width < 500) {
-          this.width = 500;
-        }
-        this.oldWidth = this.width;
-        this.myChart.resize({ width: this.width })
-      }
-    }
-    if (this.data && this.width === this.oldWidth) {
-      console.log('data变更', this.data);
-      this.carterSvg();
-    }
+    console.log('数据变更ngOnChanges', this.data);
+    this.carterSvg();
     this.cdr.detectChanges();
     // this.update();
   }
   ngAfterViewInit() {
-    this.cdr.detectChanges();
+    // this.cdr.detectChanges();
+  }
+  ngOnDestroy() {
+    this.widthSub.unsubscribe();
   }
   carterSvg() {
     if (!this.data) {
       this.data = data;
     }
     // 基于准备好的dom，初始化echarts实例
-    this.myChart = echarts.init(this.svgDom.nativeElement, null, {width: this.width, height: this.height});
+    this.myChart = echarts.init(this.svgDom.nativeElement, null, {width: this.appS.bodyWidth - 220, height: this.height});
     // 绘制图表
     this.myChart.setOption(
       {
@@ -123,9 +124,9 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges, AfterVie
           // x: 'center',
         },
         grid: {
-          x: 40, // 默认是80px
-          y: 60, // 默认是60px
-          x2: 40, // 默认80px
+          left: 40, // 默认是80px
+          top: 60, // 默认是60px
+          right: 40, // 默认80px
           // y2: 20 // 默认60px
         },
         // toolbox: {
@@ -145,7 +146,7 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges, AfterVie
         },
         legend: {
           data: ['进浆压力', '回浆压力', '进浆量', '回浆量'],
-          x: 'center'
+          left: 'center'
         },
         // dataZoom: [
         //   {
@@ -216,75 +217,4 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges, AfterVie
     )
 
   }
-  // carterSvg() {
-  //   // 基于准备好的dom，初始化echarts实例
-  //   this.myChart = echarts.init(this.svgDom.nativeElement, null, {width: this.width, height: this.height});
-  //   // 绘制图表
-  //   this.myChart.setOption({
-
-  //     grid: {
-  //       x: 40, // 默认是80px
-  //       y: 60, // 默认是60px
-  //       x2: 40, // 默认80px
-  //       // y2: 20 // 默认60px
-  //     },
-  //     title: {
-  //       text: this.name,
-  //     },
-  //     legend: {
-  //       data: this.devs,
-  //       type: 'scroll',
-  //       top: 25,
-  //       itemGap: 20,
-  //       itemWidth: 15,
-  //       itemHeight: 20,
-  //       textStyle: {
-  //         fontSize: 16
-  //       },
-  //       // 使用回调函数
-  //       formatter: (name) => {
-  //         return nameConvert(name);
-  //       }
-  //     },
-  //     tooltip: {
-  //       trigger: 'axis',
-  //       showContent: false
-  //     },
-  //     dataset: {
-  //       source: this.data
-  //     },
-  //     xAxis: {
-  //       type: 'category',
-  //       boundaryGap: false,
-  //       splitLine: {
-  //         show: false
-  //       },
-  //       axisLabel: {
-  //         formatter: (value, index) => {
-  //           return DateFormat(new Date(value), 'hh:mm:ss');
-  //         }
-  //       }
-  //     },
-  //     yAxis: {
-  //       boundaryGap: [0, '5%'],
-  //       scale: true,
-  //       splitLine: {
-  //         show: false
-  //       }
-  //     },
-  //     // 缩放
-  //     dataZoom: [
-  //       {
-  //         id: 'dataZoomX',
-  //         type: 'inside',
-  //         xAxisIndex: [0],
-  //         filterMode: 'weakFilter', // 设定为 'filter' 从而 X 的窗口变化会影响 Y 的范围。
-  //         startValue: 0,
-  //         endValue: 0
-  //       },
-  //     ],
-
-  //     series: this.series
-  //   });
-  // }
 }

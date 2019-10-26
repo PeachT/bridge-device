@@ -1,6 +1,6 @@
 
 <form nz-form [formGroup]="formData" id="form">
-  <div formArrayName="groutingInfo" #groutingInfoDom>
+  <div formArrayName="groutingInfo">
     <table class="gridtable" [formArrayName]="index">
       <thead>
         <tr>
@@ -89,10 +89,9 @@
                 </div>
                 <div>
                   <echarts-dynamic-line-grouting
-                  [width]="(container.offsetWidth || 720) - 220"
-                  *ngIf="data && data[i]?.processDatas"
-                  [data]="data[i]?.processDatas"
-                  [satrtDate]="data[i].startDate"
+                    *ngIf="data && data[i]?.processDatas"
+                    [data]="data[i]?.processDatas"
+                    [satrtDate]="data[i].startDate"
                   ></echarts-dynamic-line-grouting>
                 </div>
               </div>
@@ -103,4 +102,3 @@
     </table>
   </div>
 </form>
-<div style="position: fixed; width: 100%;" #container></div>

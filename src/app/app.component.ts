@@ -8,8 +8,8 @@ import { Router, NavigationEnd } from "@angular/router";
 import { getModelBase } from "./models/base";
 import { Project } from "./models/project";
 import { GroutingService } from "./services/grouting.service";
-import { interval } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { interval, fromEvent } from 'rxjs';
+import { map, debounceTime } from 'rxjs/operators';
 import { format } from 'date-fns';
 import { trigger, transition, style, query, animateChild, animate, group } from '@angular/animations';
 
@@ -31,9 +31,10 @@ import { trigger, transition, style, query, animateChild, animate, group } from 
   ]
 })
 export class AppComponent implements OnInit {
-  time$ = interval(1000).pipe(
-    map(_ => format(new Date(), "H:mm:ss"))
-  );
+  time$ = null;
+  // time$ = interval(1000).pipe(
+  //   map(_ => format(new Date(), "H:mm:ss"))
+  // );
   title = "bridge";
   s1 = null;
   s2 = null;
@@ -99,6 +100,17 @@ export class AppComponent implements OnInit {
   //   }
   // }
   async ngOnInit() {
+    const doby = document.getElementsByTagName('body')[0];
+    console.warn(doby.offsetWidth);
+    this.appS.bodyWidth = doby.offsetWidth;
+    // 页面监听
+    fromEvent(window, 'resize').pipe(
+      debounceTime(300) // 以免频繁处理
+      ).subscribe((event) => {
+        // 这里处理页面变化时的操作
+        this.appS.bodySize.next(doby.offsetWidth);
+        this.appS.bodyWidth = doby.offsetWidth;
+    });
     /** 添加管理员 */
     await this.db.users
       .count()

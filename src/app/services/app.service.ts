@@ -8,6 +8,7 @@ import { NzMessageService } from 'ng-zorro-antd';
 
 @Injectable({ providedIn: 'root' })
 export class AppService {
+  bodyWidth = 0;
   /** ID */
   ID = null;
   /** 平台 */
@@ -23,7 +24,7 @@ export class AppService {
   uploadingData = JSON.parse(localStorage.getItem('uploadingData'));
   /** 软件信息 */
   public info = {
-    version: '1.1.5',
+    version: '1.1.6',
     unit: {
       name: '',
       tel: '联系技术员',
@@ -68,6 +69,12 @@ export class AppService {
   public leftMenu = null;
   public editId = null;
   public lock = false;
+
+  /** PLC sub */
+  bodySize = new Subject();
+  // 获得一个Observable;
+  bodySizeSub = this.bodySize.asObservable();
+
 
   constructor(
     private router: Router,
