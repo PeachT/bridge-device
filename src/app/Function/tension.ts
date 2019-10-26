@@ -154,9 +154,9 @@ export function holeNameShow (name: string, mode: number) {
   const names = name.split('/');
   switch (mode) {
     case 42: // 4顶两端
-      return { A1: names[0], A2: names[0], B1: names[1], B2: names[1], span: 2, keys: 'A1A2B1B2' };
+      return { A1: names[0], A2: names[0], B1: names[1], B2: names[1], span: 2, keys: 'A1B1' };
     case 41: // 4顶单端
-      return { A1: names[0], A2: names[1], B1: names[2], B2: names[3], span: 1, keys: 'A1B1' };
+      return { A1: names[0], A2: names[1], B1: names[2], B2: names[3], span: 1, keys: 'A1A2B1B2' };
     case 21: // A1|A2单端
       return { A1: names[0], A2: names[1], span: 1, keys: 'A1A2' };
     case 23: // A1|A2两端
@@ -164,7 +164,7 @@ export function holeNameShow (name: string, mode: number) {
     case 24: // B1|B2两端
       return { B1: names[0], B2: names[0], span: 2, keys: 'B1' };
     case 22: // A1|B1单端
-      return { A1: names[0], B1: names[1], span: 1, keys: 'B1B2' };
+      return { A1: names[0], B1: names[1], span: 1, keys: 'A1B1' };
     case 25: // A1|B1两端
       return { A1: names[0], B1: names[0], span: 2, keys: 'A1' };
     case 11: // A1单端

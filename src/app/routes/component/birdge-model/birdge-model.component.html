@@ -8,6 +8,16 @@
       <ng-container *ngFor="let item of forFormArr.controls; index as i" [formGroupName]="i">
         <div class="card" nz-col nzSm="24" nzLg="12">
           <div class="item">
+            <app-form-item [row]="true" label="示意图">
+              <div class="row up-file">
+                <img height="100px" width="100%" [src]="item.value.imgBase64 || onImg">
+                <input type="file" (change)="fileChange($event, item)" class="file-input" [ngClass]="{'show': imgsrc}"
+                accept="image/png, image/jpeg, image/jpg" >
+>
+                <!-- <input type="text" nz-input placeholder="图片" formControlName="imgBase64" hidden> -->
+                <!-- <button nz-button nzType="dashed" *ngIf="imgsrc">选择图片</button> -->
+              </div>
+            </app-form-item>
             <app-form-item [row]="true" label="梁型名称" [errors]="item.get('name').errors">
               <input placeholder="例：20米5孔" nz-input formControlName="name" />
             </app-form-item>
@@ -32,13 +42,6 @@
               <button nz-button nzType="default" nzShape="circle" (click)="remove(i)"><i nz-icon nzType="close"></i></button>
             </div>
           </div>
-
-          <!-- <nz-form-item>
-                <nz-form-label [nzSm]="6">图片</nz-form-label>
-                <nz-form-control [nzSm]="18">
-                    <input type="text" nz-input placeholder="图片" formControlName="ImgBase64">
-                </nz-form-control>
-              </nz-form-item> -->
 
         </div>
       </ng-container>

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { TensionHoleInfo, TensionTask } from 'src/app/models/tension';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -39,6 +39,7 @@ export class TensionHolesComponent implements OnInit, OnChanges {
   constructor(
     public appS: AppService,
     private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit() {
@@ -59,6 +60,7 @@ export class TensionHolesComponent implements OnInit, OnChanges {
     this.createForm(this.tensionHoleInfos).map(si => {
       this.tensionHoleInfosFormArray.push(si);
     })
+    this.cdr.detectChanges();
   }
   createForm(arrData: Array<TensionHoleInfo> = []): FormGroup[] {
     return arrData.map(d => {

@@ -37,4 +37,13 @@ export class JackItemComponent implements OnInit, OnChanges {
     this.jackItemForm.addControl('b', this.fb.control(this.data.b, Validators.required));
     this.jackItemForm.addControl('date', this.fb.control(this.data.date, Validators.required));
   }
+
+  /** 设置事件 */
+  selectDate(date) {
+    if (this.jackName === 'A1') {
+      (this.formGroup.get('A2') as FormGroup).get('date').setValue(date);
+      (this.formGroup.get('B1') as FormGroup).get('date').setValue(date);
+      (this.formGroup.get('B2') as FormGroup).get('date').setValue(date);
+    }
+  }
 }

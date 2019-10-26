@@ -117,11 +117,15 @@ export class OperatComponent implements OnInit, OnChanges {
     this.outDelete.emit();
   }
   op(event) {
-    if (this.appS.userInfo) {
-      if (this.appS.userInfo.jurisdiction > 0) {
-        return true;
+    if (event === 'a' ||
+      (((this.dbName === 'tension' || this.dbName === 'grouting') && this.appS.editId) ||
+      (this.dbName !== 'tension' && this.dbName !== 'grouting'))) {
+      if (this.appS.userInfo) {
+        if (this.appS.userInfo.jurisdiction > 0) {
+          return true;
+        }
+        return this.appS.userInfo.operation.indexOf(event) > - 1;
       }
-      return this.appS.userInfo.operation.indexOf(event) > - 1;
     }
     return false;
   }

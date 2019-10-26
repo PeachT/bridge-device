@@ -160,6 +160,7 @@ export class ScrollMenuComponent implements OnInit {
   /** 选择梁 */
   async selectBridge(id) {
     this.bridgeId = id;
+    this.appS.editId = id;
     let data = JSON.parse(localStorage.getItem(this.appS.userInfo.nameId)) || {};
     data = JSON.stringify(
       {

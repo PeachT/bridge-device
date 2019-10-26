@@ -9,6 +9,7 @@
     <ng-content select="nz-radio-group"></ng-content>
     <ng-content select="nz-input-group"></ng-content>
     <ng-content select="nz-checkbox-wrapper"></ng-content>
+    <ng-content select=".row"></ng-content>
 
     <div class="tip" *ngIf="errorShow">{{errors | ValidatorError: errorMsg}}</div>
   </nz-form-control>

@@ -19,7 +19,7 @@
         <div style="display: flex;flex-direction: column;" [hidden]="!(item.value.name === groupItem?.name)">
           <div>
             <app-form-item label="孔号">
-              <input type="text" nz-input placeholder="请输入孔号" formControlName="name">
+              <input type="text" readonly nz-input placeholder="请输入孔号" formControlName="name">
             </app-form-item>
             <app-form-item label="张拉工艺">
               <input type="number" nz-input placeholder="张拉工艺" formControlName="stretchDrawProcess">

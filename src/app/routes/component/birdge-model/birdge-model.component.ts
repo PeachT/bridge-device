@@ -1,20 +1,28 @@
-import { Component, OnInit, OnChanges, Input, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, SimpleChanges, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators, ValidatorFn, AbstractControl, FormControl } from '@angular/forms';
 import { PersonInfo } from 'src/app/models/project';
 import { AppService } from 'src/app/services/app.service';
 import { Hole } from 'src/app/models/component';
+import { DomSanitizer } from '@angular/platform-browser';
+import { onImg } from 'src/app/models/base64';
+import { NzMessageService } from 'ng-zorro-antd';
 
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'component-birdge-model',
   templateUrl: './birdge-model.component.html',
-  styleUrls: ['./birdge-model.component.less']
+  styleUrls: ['./birdge-model.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BirdgeModelComponent implements OnInit, OnChanges {
   @Input() formGroup: FormGroup;
   /** 候选的KEY */
   @Input() keys = [];
   @Input() data: Array<Hole> = [];
+  /** 上传图片地址 */
+  imgsrc: string;
+  imgBase64: any;
+  onImg = onImg;
 
   get forFormArr(): FormArray {
     return this.formGroup.get('hole') as FormArray;
@@ -23,6 +31,8 @@ export class BirdgeModelComponent implements OnInit, OnChanges {
   constructor(
     public appS: AppService,
     private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
+    private message: NzMessageService
   ) { }
 
   ngOnInit() {
@@ -41,7 +51,7 @@ export class BirdgeModelComponent implements OnInit, OnChanges {
     });
   }
   /** 其他form */
-  createControl(index: number, item: Hole = { name: null, holes: null, imgBase64: null }): FormGroup {
+  createControl(index: number, item: Hole = { name: null, holes: [], imgBase64: null }): FormGroup {
     return this.fb.group({
       /** 名字 */
       name: [item.name, [Validators.required, this.arrayValidator(index)]],
@@ -72,6 +82,8 @@ export class BirdgeModelComponent implements OnInit, OnChanges {
   }
   /** 输入孔号 */
   addHoleInput(control: FormGroup, name: string) {
+    console.log(control);
+
     if (control.value.holes.indexOf(name) !== -1) {
       console.log(name, '已存在');
       control.controls.holes.setErrors({valueRepetition: `${name} 已存在`})
@@ -115,5 +127,31 @@ export class BirdgeModelComponent implements OnInit, OnChanges {
       }
       return null;
     };
+  }
+  /** 上传图片 */
+  fileChange(e, controls: FormGroup) {
+    const file = e.srcElement.files[0]; // 获取图片这里只操作一张图片
+    // this.imgsrc = window.URL.createObjectURL(file); // 获取上传的图片临时路径
+    // if(!/image\/\w+/.test(file.type)){
+    //     alert("请确保文件为图像类型");
+    //     return false;
+    // }
+    console.log(file, file.size);
+
+    if (!/image\/\w+/.test(file.type)) {
+      this.message.error('请确保文件为图像类型');
+      return;
+    } else if (file.size > 1024 * 1024) {
+      this.message.error('图片文件太大，只能上传小于1M的图片'); // 149 551 2 102 400
+      return;
+    } else {
+      const reader =new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        this.imgBase64 = reader.result;
+        controls.get('imgBase64').setValue(reader.result);
+        this.cdr.detectChanges();
+      }
+    }
   }
 }
