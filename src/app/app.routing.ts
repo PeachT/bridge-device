@@ -123,6 +123,13 @@ const routes: Routes = [
           import("./routes/live-grouting/live-grouting.module").then(m => m.LiveGroutingModule),
         data: { title: "压浆监控" },
         canDeactivate: [GlobalEditGuard]
+      },
+      {
+        path: "live-tension",
+        loadChildren: () =>
+          import("./routes/live-tension/live-tension.module").then(m => m.LiveTensionModule),
+        data: { title: "张拉监控" },
+        canDeactivate: [GlobalEditGuard]
       }
     ]
   }

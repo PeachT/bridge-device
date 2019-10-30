@@ -61,7 +61,7 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
   get superState(): boolean {
     return this.formData.controls.super.value;
   }
-  get mend(): number {
+  get mend(): boolean {
     return this.formData.controls.mend.value;
   }
   get device(): TensionDevice {

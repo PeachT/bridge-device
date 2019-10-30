@@ -4,12 +4,17 @@ import { PLCSocket, testLink } from '../class/PLCSocket';
 import { DbService } from './db.service';
 import { NzMessageService } from 'ng-zorro-antd';
 import { ConnectionStr } from '../models/socketTCP';
+import { TensionTask } from '../models/tension';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PLCService {
   tcp: PLCSocket;
+  /** 张拉数据 */
+  data: TensionTask;
+  /** 张拉孔 */
+  holeIndex: number;
 
   constructor(
     private e: ElectronService,

@@ -85,6 +85,7 @@
                 nzTheme="outline"></i>上传</button>
             <button nz-button nzType="primary" (click)="test()" *ngIf="appS.platform === 'debug'">测试</button>
             <button nz-button nzType="primary" (click)="downHMI()" *ngIf="PLCS.tcp && !appS.edit && holeIndex !== null">张拉</button>
+            <button nz-button nzType="primary" (click)="downHMITest()" *ngIf="appS.platform === 'debug'">测试张拉</button>
           </app-operat>
         </div>
       </nz-tab>

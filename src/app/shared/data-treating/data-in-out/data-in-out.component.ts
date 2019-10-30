@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Observable, from, pipe } from 'rxjs';
 import { DbService, DbEnum } from 'src/app/services/db.service';
 import { map, groupBy, mergeMap, toArray } from 'rxjs/operators';
@@ -54,6 +54,7 @@ export class DataInOutComponent implements OnInit {
     public db: DbService,
     public appS: AppService,
     public e: ElectronService,
+    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit() {
@@ -181,9 +182,11 @@ export class DataInOutComponent implements OnInit {
     console.log(this.operationMode);
   }
   /** 选择模板路径 */
-  selectTempPath() {
-    this.tempPath = this.e.remote.dialog.showOpenDialog({
+  async selectTempPath() {
+    this.tempPath = await this.e.remote.dialog.showOpenDialogSync({
+      title: '选择导出模板',
       properties: ['openFile'],
+      buttonLabel: '确认模板',
       filters: [{ name: '模板', extensions: ['yjtmp'] }]
     })[0];
 
@@ -410,6 +413,7 @@ export class DataInOutComponent implements OnInit {
         this.exportData.errorState = true;
       }
       console.log('导出', data);
+      this.cdr.detectChanges();
     });
   }
 }

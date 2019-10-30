@@ -37,11 +37,12 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterView
   @ViewChild('svg', { read: ElementRef, static: true }) svgDom: ElementRef;
   @Input() devs = [];
   @Input() live = 0;
-  @Input() data: Process;
+  @Input() data: Process = data;
   @Input() height: number | string = '300';
   @Input() index: null;
   @Input() name: null;
   @Input() show: boolean;
+  @Input() subWidth = 220;
 
   @Input() satrtDate: number = new Date().getTime();
   @Input() strMode: Array<string> = ['A1', 'A2', 'B1', 'B2'];
@@ -89,12 +90,13 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterView
     this.carterSvg();
     this.widthSub = this.appS.bodySizeSub.subscribe((width: number) => {
       // 这里处理页面变化时的操作
-      this.myChart.resize({ width: (width - 220) })
+      this.myChart.resize({ width: (width - this.subWidth) })
       this.cdr.detectChanges();
     });
   }
   ngOnChanges(changes: SimpleChanges) {
     if (!this.data) {
+      this.data = data;
       this.carterSvg();
     } else {
       console.log('data变更', this.data);
@@ -119,11 +121,8 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterView
     this.widthSub.unsubscribe();
   }
   carterSvg() {
-    if (!this.data) {
-      this.data = data;
-    }
     // 基于准备好的dom，初始化echarts实例
-    this.myChart = echarts.init(this.svgDom.nativeElement, null, { width: this.appS.bodyWidth - 220, height: this.height });
+    this.myChart = echarts.init(this.svgDom.nativeElement, null, { width: this.appS.bodyWidth - this.subWidth, height: this.height });
     // 绘制图表
     this.myChart.setOption(
       {

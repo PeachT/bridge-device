@@ -17,8 +17,24 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{
 
 body {
   user-select: none;
+  background-color: #fffef9;
 }
-
+/** 张拉监控锚点样式 */
+.tension-live {
+  .ant-anchor {
+    display: flex;
+    margin: 10px;
+  }
+  nz-link {
+    margin-right: 5px;
+  }
+  .ant-anchor-link {
+    padding: 0;
+  }
+  .ant-anchor-ink {
+    opacity: 0;
+  }
+}
 .task-template {
   position: absolute;
   top: 108px;

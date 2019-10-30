@@ -18,6 +18,7 @@ import { PLCService } from 'src/app/services/plc.service';
 import { stringUnicode2Int16 } from 'src/app/Function/convertData';
 import { FC } from 'src/app/models/socketTCP';
 import { PLC_D } from 'src/app/models/IPCChannel';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tension',
@@ -459,7 +460,8 @@ export class TensionComponent implements OnInit, OnDestroy {
   constructor(
     public db: DbService,
     public appS: AppService,
-    public PLCS: PLCService
+    public PLCS: PLCService,
+    private router: Router,
   ) {
 
   }
@@ -663,7 +665,14 @@ export class TensionComponent implements OnInit, OnDestroy {
     await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2460),
       value: HMIData.reboundWord,
       channel: 'tensionuphmi2460'}).then(r => console.log(r));
-
+    this.PLCS.data = this.data;
+    this.PLCS.holeIndex = this.holeIndex;
+    this.router.navigate(['/live-tension']);
+  }
+  downHMITest() {
+    this.PLCS.data = this.data;
+    this.PLCS.holeIndex = this.holeIndex;
+    this.router.navigate(['/live-tension']);
   }
 
   /** 上传 */

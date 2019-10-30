@@ -1,21 +1,11 @@
 import { Menu, app, BrowserWindow, ipcMain, dialog } from 'electron';
-// const ejsexcel = require('../static/ejsexcel');
-// import * as ejsexcel from 'ejsexcel';
 import * as fs from "fs";
 import * as path from "path";
 import * as util from "util";
-
-import { renderExcel, renderExcelCb } from 'ejsexcel';
-// const fs = require('fs');
-// const path = require('path');
-// const util = require('util');
+import { renderExcel } from 'ejsexcel';
 
 const exec = require('child_process').exec;
-
 const ping = require('ping');
-
-// const path = require('path');
-// const url = require('url');
 
 // 注意这个autoUpdater不是electron中的autoUpdater
 // const { autoUpdater } = require('electron-updater');
@@ -51,6 +41,8 @@ function createWindow() {
   Menu.setApplicationMenu(null);
   win = new BrowserWindow(
     {
+      show: false,
+      backgroundColor: '#2e2c29',
       width: 1920, height: 1080,
       // fullscreen: true,
       webPreferences: {
@@ -60,17 +52,8 @@ function createWindow() {
     }
   );
   win.maximize();
-  // load the dist folder from Angular
   win.loadURL(winURL);
 
-  // Open the DevTools optionally:
-  // win.webContents.openDevTools()
-  console.log('start...');
-  // // 启动Modbus
-  // createModbus();
-  // // IPC 监听
-  // IPCOn('z', ztcp);
-  // IPCOn('c', ctcp);
   if (dev) {
     win.webContents.openDevTools();
   }
@@ -92,6 +75,9 @@ app.on('activate', () => {
   console.log('__static');
   if (win === null) {
     createWindow();
+    win.once('ready-to-show', () => {
+      win.show()
+    })
   }
 });
 
@@ -285,9 +271,7 @@ ipcMain.on('derivedExcel', async (event, data) => {
     console.log(filePath, savePath, outPath, data.outPath);
     const exlBuf = await readFileAsync(filePath);
     // 用数据源(对象)data渲染Excel模板
-    const exlBuf2 = await renderExcelCb(exlBuf, data.data, (r) => {
-      console.log('outExcelOK', r);
-    });
+    const exlBuf2 = await renderExcel(exlBuf, data.data);
     await writeFileAsync(savePath, exlBuf2);
     event.sender.send(data.channel, { success: true, filePath, savePath });
   } catch (error) {

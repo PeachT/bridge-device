@@ -1,0 +1,210 @@
+<div class="content">
+  <header>
+    <div>
+      <nz-alert nzType="success" nzMessage="正在张拉"></nz-alert>
+      <nz-alert nzType="info" nzMessage="预制T梁"></nz-alert>
+      <nz-alert nzType="info" nzMessage="20米5孔"></nz-alert>
+      <nz-alert nzType="info" nzMessage="N1/N2/N3/N4"></nz-alert>
+    </div>
+    <nz-alert nzType="error" nzMessage="没有张拉任务"></nz-alert>
+    <button nz-button nzType="primary" [routerLink]="'/tension'">选择任务</button>
+  </header>
+  <main>
+    <table class="gridtable">
+      <thead>
+        <tr>
+          <th width="100">顶</th>
+          <th width="100">压(KN)</th>
+          <th width="100">压力(MPa)</th>
+          <th width="100">位移(mm)</th>
+          <th>状态</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let key of strMode">
+          <td class="key">{{key}}</td>
+          <td>{{liveData[key][0]}}</td>
+          <td>{{liveData[key][1]}}</td>
+          <td>{{liveData[key][2]}}</td>
+          <td style="display: flex;">
+            <nz-alert nzType="error" *ngIf="liveData[key][3] >= 70 " [nzMessage]="alarm[liveData[key][3]]"></nz-alert>
+            <nz-alert nzType="info" *ngIf="liveData[key][3] < 70 " [nzMessage]="alarm[liveData[key][3]]"></nz-alert>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <nz-anchor [nzTarget]="con" class="tension-live" [nzShowInkInFixed]="false" (nzClick)="switchItem($event)"
+      (nzScroll)="switchItem($event)">
+      <nz-link nzHref="#task" [nzTitle]="taskT"></nz-link>
+      <nz-link nzHref="#record" [nzTitle]="recordT"></nz-link>
+      <nz-link nzHref="#csv" [nzTitle]="csvT"></nz-link>
+    </nz-anchor>
+    <div #con class="con">
+      <div style="flex: 1;">
+        <div id="task">
+          <h1 *ngIf="!data">没有数据</h1>
+          <nz-divider nzText="任务数据"></nz-divider>
+          <table class="gridtable" *ngIf="data">
+            <thead>
+              <tr>
+                <th colSpan="2">张拉任务</th>
+                <ng-container *ngFor="let item of task.stage.msg; index as i">
+                  <th [ngClass]="{'twice': item === '阶段二' && twice, 'super': superState && item === '超张拉',
+                      'mend': mend && item === '补张拉'}">
+                    {{item}}
+                  </th>
+                </ng-container>
+                <th width="100">卸荷</th>
+                <th width="100">回缩量mm</th>
+                <th width="100">工作长度mm</th>
+                <th width="100">理论申长量mm</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td width="65">孔号</td>
+                <td width="65">阶段%</td>
+                <td *ngFor="let item of task.stage.knPercentage; index as i">
+                  {{item}}
+                </td>
+                <td>
+                  {{task.stage.uploadPercentage}}
+                </td>
+              </tr>
+              <tr *ngFor="let key of strMode; index as keyi">
+                <td [attr.rowspan]="holeNames.span" *ngIf="holeNames.keys.indexOf(key) !== -1">{{holeNames[key]}}
+                </td>
+                <td>{{key}}</td>
+                <td *ngFor="let stage of task.stage.knPercentage">
+                  <div>{{(tensionKn * (stage / 100)) | ToFixedr}}<sub>kn</sub> </div>
+                  <div>{{(tensionKn * (stage / 100)) | kn2mpa: device: key}}<sub>mpa</sub> </div>
+                </td>
+                <td>
+                  <div>{{(tensionKn * (task.stage.uploadPercentage / 100)) | ToFixedr}}<sub>kn</sub>
+                  </div>
+                  <div>
+                    {{(tensionKn * (task.stage.uploadPercentage / 100)) | kn2mpa: device: key}}<sub>mpa</sub>
+                  </div>
+                </td>
+                <ng-container>
+                  <td>
+                    {{task.stage[key].reboundMm}}
+                  </td>
+                  <td>
+                    {{task.stage[key].wordMm}}
+                  </td>
+                  <td [attr.rowspan]="holeNames.span" *ngIf="holeNames.keys.indexOf(key) !== -1">
+                    {{task.stage[key].theoryMm}}
+                  </td>
+                </ng-container>
+              </tr>
+              <tr>
+                <td colSpan="2">保压时间s</td>
+                <td *ngFor="let item of task.stage.time; index as i">
+                  {{item}}
+                </td>
+                <td>
+                  {{task.stage.uploadDelay}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="record">
+          <nz-divider nzText="记录"></nz-divider>
+          <table class="gridtable">
+            <thead>
+              <tr>
+                <th colSpan="2">张拉记录</th>
+                <ng-container *ngFor="let msg of record.groups[0].msg; index as msgi">
+                  <th [ngClass]="{'twice': msg === '阶段二' && twice, 'super': superState && msg === '超张拉',
+                      'mend': mend && msg === '补张拉'}">
+                    {{msg}}
+                  </th>
+                </ng-container>
+                <th width="100">卸荷</th>
+                <th width="100">力筋回缩量</th>
+                <th width="100">伸长量mm</th>
+                <th width="100">偏差率%</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td width="65">孔号</td>
+                <td width="65">阶段%</td>
+                <td *ngFor="let kn of record.groups[0].knPercentage; index as kni">
+                  {{kn}}
+                </td>
+                <td>
+                  {{record.groups[0].uploadPercentage}}
+                </td>
+              </tr>
+              <tr *ngFor="let jackName of strMode; index as keyi">
+                <td [attr.rowspan]="holeNames.span"
+                  *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
+                  {{holeNames[jackName]}}</td>
+                <td>{{jackName}}</td>
+                <td *ngFor="let mpa of record.groups[0][jackName].mpa; index as mpai">
+                  <div>{{mpa | mpa2kn: task.device: jackName}}<sub>kn</sub></div>
+                  <div>{{mpa}}<sub>mpa</sub></div>
+                  <div>{{record.groups[0][jackName].mm[mpai]}}<sub>mm</sub></div>
+                </td>
+                <td>
+                  <div>{{record.groups[0][jackName].initMpa | mpa2kn: task.device: jackName}}<sub>kn</sub> </div>
+                  <div>{{record.groups[0][jackName].initMpa}}<sub>mpa</sub></div>
+                  <div>{{record.groups[0][jackName].initMm}}<sub>mm</sub></div>
+                </td>
+                <td>
+                  {{recordCalculate.stage[0][jackName].Sn}}
+                </td>
+                <td [attr.rowspan]="holeNames.span"
+                  *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
+                  {{holeNames.span === 2 ? recordCalculate[jackName + 'LZ'] : recordCalculate.stage[0][jackName].LZ}}
+                </td>
+                <td [attr.rowspan]="holeNames.span"
+                  *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
+                  {{holeNames.span === 2 ? recordCalculate[jackName + 'DR'] : recordCalculate.stage[0][jackName].DR}}
+                </td>
+              </tr>
+              <tr>
+                <td colSpan="2">保压时间s</td>
+                <td *ngFor="let time of record.groups[0].time; index as timei">
+                  {{time}}
+                </td>
+                <td>
+                  {{record.groups[0].uploadDelay}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="csv">
+          <nz-divider nzText="曲线"></nz-divider>
+          <echarts-dynamic-line-tension [key]="'mpa'" [text]="'压力'" [strMode]="strMode" *ngIf="true"
+            [subWidth]="0"
+            >
+          </echarts-dynamic-line-tension>
+          <echarts-dynamic-line-tension [key]="'mm'" [text]="'位移'" [strMode]="strMode" *ngIf="true"
+            [subWidth]="0"
+            ></echarts-dynamic-line-tension>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<ng-template #taskT>
+  <button nz-button [nzType]="nzHref === '#task' ? 'primary' : 'dashed'">
+    <i nz-icon nzType="form" nzTheme="outline"></i>任务
+  </button>
+</ng-template>
+<ng-template #recordT>
+  <button nz-button [nzType]="nzHref === '#record' ? 'primary' : 'dashed'">
+    <i nz-icon nzType="file-done" nzTheme="outline"></i>记录
+  </button>
+</ng-template>
+<ng-template #csvT>
+  <button nz-button [nzType]="nzHref === '#csv' ? 'primary' : 'dashed'">
+    <i nz-icon nzType="line-chart" nzTheme="outline"></i>曲线
+  </button>
+</ng-template>

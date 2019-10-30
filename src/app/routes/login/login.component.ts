@@ -11,6 +11,7 @@ const menus = [
   { platform: 'tension,windows', jurisdiction: 0, url: '/tension', icon: 'swap', name: '张拉' },
   { platform: 'tension,windows', jurisdiction: 1, url: '/tension-setting', icon: 'setting', name: '张拉设置' },
   { platform: 'tension,windows', jurisdiction: 1, url: '/jack', icon: 'usb', name: '千斤顶' },
+  { platform: 'tension,windows', jurisdiction: 0, url: '/live-tension', icon: 'fund', name: '张拉监控' },
   { platform: 'grouting,windows', jurisdiction: 0, url: '/grouting', icon: 'experiment', name: '压浆' },
   { platform: 'grouting,windows', jurisdiction: 1, url: '/grouting-setting', icon: 'setting', name: '压浆设置' },
   { platform: 'grouting,windows', jurisdiction: 0, url: '/live-grouting', icon: 'fund', name: '压浆监控' },
@@ -124,7 +125,7 @@ export class LoginComponent implements OnInit {
           if (stateTension) {
             this.router.navigate(['/auto']);
           } else if (this.appS.platform === 'tension') {
-            this.router.navigate(['/grouting']);
+            this.router.navigate(['/tesnion']);
           } else if (this.appS.platform === 'grouting') {
             this.router.navigate(['/grouting']);
           } else {

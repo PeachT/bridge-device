@@ -59,28 +59,18 @@ export class TensionSettingComponent implements OnInit {
     this.tcp = null;
   }
   setD() {
-    this.tcp.ipc(FC.F016_float, {address: PLC_D(2108), value: [10, 20, 50, 80, 100], channel: 's01ss'}, (r) => {
-      console.log(r);
-    })
+    this.tcp.ipc(FC.F016_float, {address: PLC_D(2108), value: [10, 20, 50, 80, 100], channel: 's01ss'})
   }
   setStr() {
-    this.tcp.ipc(FC.F016, {address: PLC_D(2042), value: [78, 49, 0, 0, 0, 0, 0, 0, 0, 0], channel: 'teststr'}, (r) => {
-      console.log(r);
-    })
+    this.tcp.ipc(FC.F016, {address: PLC_D(2042), value: [78, 49, 0, 0, 0, 0, 0, 0, 0, 0], channel: 'teststr'})
   }
   setStr1() {
-    this.tcp.ipc(FC.F016_float, {address: PLC_D(2152), value: [10.2, 20.3, 50.5, 80.8, 90.9], channel: 'teststr'}, (r) => {
-      console.log(r);
-    })
+    this.tcp.ipc(FC.F016_float, {address: PLC_D(2152), value: [10.2, 20.3, 50.5, 80.8, 90.9], channel: 'teststr'})
   }
   setStr2() {
-    this.tcp.ipc(FC.F016_float, {address: PLC_D(2168), value: [10, 20, 50, 80, 100], channel: 'teststr'}, (r) => {
-      console.log(r);
-    })
+    this.tcp.ipc(FC.F016_float, {address: PLC_D(2168), value: [10, 20, 50, 80, 100], channel: 'teststr'})
   }
   setStr3() {
-    this.tcp.ipc(FC.F016_float, {address: PLC_D(2184), value: [10.22], channel: 'teststr'}, (r) => {
-      console.log(r);
-    })
+    this.tcp.ipc(FC.F016_float, {address: PLC_D(2184), value: [10.22], channel: 'teststr'})
   }
 }
