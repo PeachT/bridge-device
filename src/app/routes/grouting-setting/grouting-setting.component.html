@@ -6,19 +6,19 @@
         <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.ip"/>
       </app-form-item>
       <app-form-item label="端口号">
-          <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.port"/>
+          <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.port"/>
       </app-form-item>
       <app-form-item label="PLC地址">
-          <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.address"/>
+          <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.address"/>
       </app-form-item>
       <app-form-item label="设备uid">
           <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.uid"/>
       </app-form-item>
       <app-form-item label="通信延时">
-          <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.setTimeout"/>
+          <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.setTimeout"/>
       </app-form-item>
-      <app-form-item label="IP">
-        <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.ip"/>
+      <app-form-item label="频率">
+        <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.hz"/>
       </app-form-item>
     </div>
     <div style="display: flex; align-items: center; margin-left: 100px;">

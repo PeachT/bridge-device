@@ -11,12 +11,7 @@
   "scripts": {
     "tsc": "tsc"
   },
-  "dependencies": {
-    "ejsexcel": "^3.5.3",
-    "electron-updater": "^4.1.2",
-    "modbus-serial": "^7.6.0",
-    "ping": "^0.2.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "typescript": "~3.4.5"
   }

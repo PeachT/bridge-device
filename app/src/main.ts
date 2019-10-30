@@ -1,23 +1,27 @@
 import { Menu, app, BrowserWindow, ipcMain, dialog } from 'electron';
-const ejsexcel = require('../static/ejsexcel');
-// const ejsexcel = require('../node_modules/ejsexcel/index');
-const fs = require('fs');
-const path = require('path');
-const util = require('util');
-const readFileAsync = util.promisify(fs.readFile);
-const writeFileAsync = util.promisify(fs.writeFile);
+// const ejsexcel = require('../static/ejsexcel');
+// import * as ejsexcel from 'ejsexcel';
+import * as fs from "fs";
+import * as path from "path";
+import * as util from "util";
+
+import { renderExcel, renderExcelCb } from 'ejsexcel';
+// const fs = require('fs');
+// const path = require('path');
+// const util = require('util');
+
 const exec = require('child_process').exec;
+
 const ping = require('ping');
 
-import { bf } from './bufferToNumber';
-import ModbusRTU from 'modbus-serial';
-import { ModbusTCP } from './modbus';
 // const path = require('path');
 // const url = require('url');
 
 // 注意这个autoUpdater不是electron中的autoUpdater
 // const { autoUpdater } = require('electron-updater');
 import { autoUpdater } from 'electron-updater';
+import { GroutingTcpModbus } from './grouting.TCP';
+import { TensionTcpModbus } from './tension.TCP';
 import { PLCTcpModbus } from './PLCTcpModbus';
 
 
@@ -28,11 +32,8 @@ console.log(args);
 
 const dev = args.some((val) => val === '--dev');
 
-/** 启动Modbus */
-let ztcp: ModbusTCP;
-let ctcp: ModbusTCP;
 /** 压浆tcp */
-let gtcp: PLCTcpModbus;
+let gtcp: GroutingTcpModbus;
 
 // tslint:disable-next-line:no-string-literal
 global['heartbeatRate'] = 1000;
@@ -104,53 +105,59 @@ ipcMain.on('tastLink', (event, data) => {
 /** 启动压浆Socket */
 ipcMain.on('groutingRun', (event, data) => {
   if (!gtcp) {
-    gtcp = new PLCTcpModbus(data, win);
+    gtcp = new GroutingTcpModbus(data, win);
     IPCOn('grouting', gtcp);
   }
 });
 
-/**
- * *启动Socket
- */
-ipcMain.on('runSocket', (event, data) => {
-  if (!ztcp) {
-    // tslint:disable-next-line:no-string-literal
-    global['heartbeatRate'] = Number(data.delay) || 10;
-    event.sender.send(data.channel, global.heartbeatRate);
-    console.log('3333333333333333333333333333333', data);
-    // 启动Modbus
-    createModbus();
-    // IPC 监听
-    IPCOn('z', ztcp);
-    IPCOn('c', ctcp);
+/** tcp链接集合 */
+const tcpList: {[prop: string]: TensionTcpModbus} = {};
+/** 测试链接tcp */
+ipcMain.on('TestLinkTCP', (event, data) => {
+  if (tcpList[data.uid]) {
+    event.sender.send(`${data.uid}testLink`, {alive: true, link: true, msg: '设备已连接'});
+    return;
   } else {
-    event.sender.send(data.channel, global.heartbeatRate);
-    ztcp.devicesLock();
-    ctcp.devicesLock();
+    ping.promise.probe(data.ip).then((res) => {
+      if (res.alive) {
+        // tcpList[data.uid] = new TensionTcpModbus(data, win);
+        // IPCOn(data.uid, tcpList[data.uid]);
+        // LinkTCP(data);
+        event.sender.send(`${data.uid}testLink`, {alive: true, link: false, msg: '测试链接'});
+      } else {
+        event.sender.send(`${data.uid}testLink`, { alive: false, link: false, msg: '测试链接' });
+      }
+    });
   }
 });
-/**
- * *采集频率
- */
-ipcMain.on('heartbeatRate', (event, data) => {
-  // tslint:disable-next-line:no-string-literal
-  global['heartbeatRate'] = Number(data.delay) || 10;
-  // tslint:disable-next-line:no-string-literal
-  event.sender.send(data.channel, global['heartbeatRate']);
-  console.log('global.heartbeatRate', global.heartbeatRate);
+/** 链接tcp */
+ipcMain.on('LinkTCP', (event, data) => {
+  tcpList[data.uid] = new TensionTcpModbus(data, win);
+  IPCOn(data.uid, tcpList[data.uid]);
+});
+/** 取消tcp */
+ipcMain.on('CancelTCP', (event, name) => {
+  tcpList[name].heartbeatStateFunc(false);
+  tcpList[name].close(() => {
+    event.sender.send(`${name}connection`, {success: false, msg: '关闭链接'});
+    ipcMain.removeAllListeners(`${name}F01`);
+    ipcMain.removeAllListeners(`${name}F03`);
+    ipcMain.removeAllListeners(`${name}F03_float`);
+    ipcMain.removeAllListeners(`${name}F05`);
+    ipcMain.removeAllListeners(`${name}F15`);
+    ipcMain.removeAllListeners(`${name}F06`);
+    ipcMain.removeAllListeners(`${name}F016`);
+    ipcMain.removeAllListeners(`${name}F016_float`);
+    ipcMain.removeAllListeners(`${name}F03ASCII`);
+    ipcMain.removeAllListeners(`${name}heartbeatState`);
+    delete tcpList[name];
+  })
 });
 
 
-function createModbus() {
-  console.log('start... Modbus');
-  ztcp = new ModbusTCP({ ip: '192.168.1.15', port: 502, address: 1 }, win);
-  // ztcp.connection();
-  ctcp = new ModbusTCP({ ip: '192.168.1.25', port: 502, address: 1 }, win);
-  // ctcp.connection();
-}
 
 /** ipc监听 */
-function IPCOn(d: string = 'z', tcp: ModbusTCP | PLCTcpModbus) {
+function IPCOn(d, tcp: PLCTcpModbus) {
   ipcMain.on(`${d}F01`, (e, arg) => {
     tcp.F01(arg.address, arg.value, arg.channel);
   });
@@ -177,6 +184,9 @@ function IPCOn(d: string = 'z', tcp: ModbusTCP | PLCTcpModbus) {
   });
   ipcMain.on(`${d}F03ASCII`, (e, arg) => {
     tcp.F03ASCII(arg.address, arg.value, arg.channel);
+  });
+  ipcMain.on(`${d}heartbeatState`, (e, arg) => {
+    tcp.heartbeatStateFunc(arg.state);
   });
 }
 
@@ -262,6 +272,8 @@ ipcMain.on('get-dbfile', async (event, data) => {
 
 // 导出表格
 ipcMain.on('derivedExcel', async (event, data) => {
+  const readFileAsync = util.promisify(fs.readFile);
+  const writeFileAsync = util.promisify(fs.writeFile);
   const outPath = data.outPath;
   if (!fs.existsSync(outPath)) {
     fs.mkdirSync(outPath);
@@ -273,7 +285,9 @@ ipcMain.on('derivedExcel', async (event, data) => {
     console.log(filePath, savePath, outPath, data.outPath);
     const exlBuf = await readFileAsync(filePath);
     // 用数据源(对象)data渲染Excel模板
-    const exlBuf2 = await ejsexcel.renderExcel(exlBuf, data.data);
+    const exlBuf2 = await renderExcelCb(exlBuf, data.data, (r) => {
+      console.log('outExcelOK', r);
+    });
     await writeFileAsync(savePath, exlBuf2);
     event.sender.send(data.channel, { success: true, filePath, savePath });
   } catch (error) {

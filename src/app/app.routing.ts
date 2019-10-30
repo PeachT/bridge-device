@@ -60,6 +60,14 @@ const routes: Routes = [
       //   data: { title: "设置" }
       // },
       {
+        path: "tension-setting",
+        loadChildren: () =>
+          import("./routes/tension-setting/tension-setting.module").then(
+            m => m.TensionSettingModule
+          ),
+        data: { title: "张拉设置" }
+      },
+      {
         path: "grouting-setting",
         loadChildren: () =>
           import("./routes/grouting-setting/grouting-setting.module").then(

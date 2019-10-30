@@ -1,8 +1,8 @@
 // import ModbusRTU from 'modbus-serial';
 import { app, BrowserWindow, ipcMain } from 'electron';
-const ModbusRTU = require('modbus-serial');
 import { bf } from './bufferToNumber';
-import { buffer } from 'rxjs/operators';
+import { ModbusRTU } from 'modbus-serial/ModbusRTU';
+const Modbus = require('modbus-serial');
 
 interface ConnectionStr {
   /** ip */
@@ -15,24 +15,27 @@ interface ConnectionStr {
   uid: string;
   /** 通信延时 */
   setTimeout: number;
+  hz: number;
 }
 
-export class PLCTcpModbus {
-  private connectionStr: ConnectionStr;
-  private connectionFunc: any;
+export abstract class PLCTcpModbus {
+  protected connectionStr: ConnectionStr;
+  protected connectionFunc: any;
   /** 正在链接状态 */
-  private cs = false;
-  private win: BrowserWindow;
-  private heartbeatT: any;
+  protected cs = false;
+  protected win: BrowserWindow;
+  protected heartbeatT: any;
+  protected heartbeatState = true;
+  protected closeState = false;
 
 
   public heartbeatRate = 10;
-  public client: any = null;
+  public client: ModbusRTU = null;
   overtimeT: any;
-  constructor(connectionStr: ConnectionStr, win: BrowserWindow) {
+  constructor(connectionStr: ConnectionStr, win: BrowserWindow, heartbeatState = true) {
     this.connectionStr = connectionStr;
     this.win = win;
-
+    this.heartbeatState = heartbeatState;
     this.connection();
   }
   /**
@@ -42,6 +45,12 @@ export class PLCTcpModbus {
    * @memberof ModbusTCP
    */
   public async connection(): Promise<boolean> {
+    if (this.closeState) {
+      this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: true, msg: '设备链接已关闭', connectionStr: this.connectionStr});
+      this.client = null;
+      console.log('close');
+      return;
+    }
     if (!this.cs && this.connectionState()) {
       this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: true, msg: '设备链接正常', connectionStr: this.connectionStr});
       this.heartbeat();
@@ -50,7 +59,7 @@ export class PLCTcpModbus {
     this.cs = true;
     this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: false, msg: '正在链接', connectionStr: this.connectionStr});
 
-    this.client = new ModbusRTU();
+    this.client = new Modbus();
     this.client.setTimeout(Number(this.connectionStr.setTimeout)); // 设置链接超时
 
     let state = false;
@@ -79,57 +88,31 @@ export class PLCTcpModbus {
   }
 
   /** 心跳包 */
-  private heartbeat() {
-    // console.log('hhhhhh', this.ifClient());
-
-    setTimeout(async () => {
-      if (this.ifClient()) {
-        // const d = new Date().getSeconds();
-        // // this.F06(4195, d)
-        // // this.client.readHoldingRegisters(0, 1).then((data) => {
-        // this.client.readHoldingRegisters(4548, 1).then((data) => {
-        //   // const float = bf.bufferToFloat(data.buffer);
-        //   // const dint16 = bf.bufferTo16int(data.buffer);
-        //   this.IPCSend(`${this.connectionStr.uid}heartbeat`, { uint16: data.data });
-        //   // console.log('heart', data);
-
-        //   this.heartbeat();
-        // }).catch((err) => {
-        //   this.connection();
-        // });
-        await this.client.readCoils(2094, 1).then((data) => {
-          // console.log(data);
-
-          this.IPCSend(`${this.connectionStr.uid}heartbeat`, { data: data.data });
-          // this.heartbeat();
-          this.client.readCoils(2098, 1).then((data1) => {
-            // console.log(data);
-            this.IPCSend(`${this.connectionStr.uid}heartbeat1`, { data: data1.data });
-            this.heartbeat();
-          }).catch((err) => {
-            this.connection();
-            this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: false, msg: '设备链接错误', connectionStr: this.connectionStr});
-          });
-        }).catch((err) => {
-          this.connection();
-          this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: false, msg: '设备链接错误', connectionStr: this.connectionStr});
-        });
-        // this.heartbeat();
-      }
-    // tslint:disable-next-line:no-string-literal
-    }, 20);
+  abstract heartbeat();
+  heartbeatStateFunc(state: boolean) {
+    this.heartbeatState = state;
+    if (state) {
+      this.heartbeat();
+    }
+  }
+  /** 关闭链接 */
+  close(callback: Function) {
+    this.client.close((r) => {
+      this.closeState = true;
+      callback();
+    });
   }
 
   /**
    * 发送数据到UI
    *
-   * @private
+   * @protected
    * @param {string} channel 发送名称
    * @param {*} message 发送数据
    * @param {string} channel 通知UI名称
    * @memberof ModbusTCP
    */
-  private IPCSend(channel: string, message: any) {
+  protected IPCSend(channel: string, message: any) {
     try {
       if (this.connectionState()) {
         this.win.webContents.send(channel, message);
@@ -137,7 +120,7 @@ export class PLCTcpModbus {
     } catch (error) {
     }
   }
-  private IPCSendSys(channel: string, data: any) {
+  protected IPCSendSys(channel: string, data: any) {
     try {
         this.win.webContents.send(channel, data);
     } catch (error) {
@@ -324,7 +307,8 @@ export class PLCTcpModbus {
     }
   }
   /** 获取当前链接状态 */
-  private connectionState() {
-    return this.client && this.client._port.isOpen;
+  protected connectionState() {
+    return this.client && this.client.isOpen;
   }
+
 }

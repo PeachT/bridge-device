@@ -4,7 +4,7 @@
   <nz-form-item *ngIf="tensionHoleInfos" style="z-index: 2;">
     <nz-radio-group [nzButtonStyle]="'solid'" class="hole-groups">
       <label nz-radio-button [nzValue]="item" *ngFor="let item of tensionHoleInfos; index as i"
-        (click)="switchHole(item)" [ngClass]="{'hole-active': item.name === groupItem?.name}"
+        (click)="switchHole(i, item)" [ngClass]="{'hole-active': item.name === groupItem?.name}"
         [class]="'hole' + item.state" class="hole">
         <!-- <i nz-icon nzType="cloud" nzTheme="outline" style="color: #00E676" *ngIf="!item.uploading"></i> -->
         <div *ngIf="item.uploading" class="template">

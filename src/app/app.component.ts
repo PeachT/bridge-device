@@ -8,6 +8,7 @@ import { Router, NavigationEnd } from "@angular/router";
 import { getModelBase } from "./models/base";
 import { Project } from "./models/project";
 import { GroutingService } from "./services/grouting.service";
+import { PLCService } from './services/plc.service';
 import { interval, fromEvent } from 'rxjs';
 import { map, debounceTime } from 'rxjs/operators';
 import { format } from 'date-fns';
@@ -49,8 +50,8 @@ export class AppComponent implements OnInit {
     public appS: AppService,
     private message: NzMessageService,
     private router: Router,
-    // public PLCS: PLCService,
     public GPLCS: GroutingService,
+    public PLCS: PLCService
   ) {
     // const args = process;
     // console.log(args);

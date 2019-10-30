@@ -9,6 +9,7 @@ import { ElectronService } from 'ngx-electron';
 
 const menus = [
   { platform: 'tension,windows', jurisdiction: 0, url: '/tension', icon: 'swap', name: '张拉' },
+  { platform: 'tension,windows', jurisdiction: 1, url: '/tension-setting', icon: 'setting', name: '张拉设置' },
   { platform: 'tension,windows', jurisdiction: 1, url: '/jack', icon: 'usb', name: '千斤顶' },
   { platform: 'grouting,windows', jurisdiction: 0, url: '/grouting', icon: 'experiment', name: '压浆' },
   { platform: 'grouting,windows', jurisdiction: 1, url: '/grouting-setting', icon: 'setting', name: '压浆设置' },

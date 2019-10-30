@@ -16,7 +16,7 @@
               </app-form-item>
 
               <app-form-item label="设置张拉应力">
-                <input type="number" nz-input placeholder="请输入设置张拉应力" formControlName="tensionKn">
+                <input type="number" nz-input placeholder="请输入设置张拉应力" formControlName="tensionKn" (input)="stage.onCdr()">
               </app-form-item>
               <!-- <app-form-item label="张拉设备" >
                 <input nz-input [disabled]="!(data.state === 0)" placeholder="张拉设备" [value]="item.get('device').value.name">

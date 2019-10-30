@@ -1,23 +1,23 @@
 import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { TensionTask, ManualGroup, TensionHoleInfo } from 'src/app/models/tension';
-import { TaskMenuComponent } from 'src/app/shared/task-menu/task-menu.component';
-import { FormArray, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
-import { GroutingService } from 'src/app/services/grouting.service';
 import { HttpService } from 'src/app/services/http.service';
 import { nameRepetition } from 'src/app/Validator/async.validator';
 import { getModelBase, baseEnum } from 'src/app/models/base';
-import { GroutingTask, GroutingHoleItem } from 'src/app/models/grouting';
 import { Observable, from } from 'rxjs';
-import { map, toArray } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Comp } from 'src/app/models/component';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { TensionDevice } from 'src/app/models/jack';
 import { TensionHolesComponent } from './tension-holes/tension-holes.component';
-import { getModeStr, tensionOther2Date } from 'src/app/Function/tension';
+import { getModeStr, holeNameShow, HMIstage } from 'src/app/Function/tension';
 import { ScrollMenuComponent } from 'src/app/shared/scroll-menu/scroll-menu.component';
+import { PLCService } from 'src/app/services/plc.service';
+import { stringUnicode2Int16 } from 'src/app/Function/convertData';
+import { FC } from 'src/app/models/socketTCP';
+import { PLC_D } from 'src/app/models/IPCChannel';
 
 @Component({
   selector: 'app-tension',
@@ -439,6 +439,8 @@ export class TensionComponent implements OnInit, OnDestroy {
   uploading = false;
   /** 手动分组 */
   mamualGroupState = false;
+  /** 孔张拉数据 */
+  holeIndex: number;
 
   /** 添加数据判断 */
   addFilterFun = (o1: any, o2: any) => o1.name === o2.name
@@ -456,11 +458,8 @@ export class TensionComponent implements OnInit, OnDestroy {
 
   constructor(
     public db: DbService,
-    private message: NzMessageService,
     public appS: AppService,
-    public GPLCS: GroutingService,
-    private http: HttpService,
-    private crd: ChangeDetectorRef,
+    public PLCS: PLCService
   ) {
 
   }
@@ -627,6 +626,44 @@ export class TensionComponent implements OnInit, OnDestroy {
       this.menuDom.getBridgeMenu();
     }
     this.deleteShow = false;
+  }
+  /** 下载张拉数据 */
+  async downHMI() {
+    console.log('下载的数据', this.data.tensionHoleInfos[this.holeIndex]);
+    const HMIData = HMIstage(this.data, this.holeIndex);
+    console.log(HMIData);
+
+    await this.PLCS.tcp.ipc(FC.F016, { address: PLC_D(2000),
+      value: HMIData.unicode,
+      channel: 'tensionuphmi2000'}).then(r => console.log(r));
+
+    await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2082),
+      value: HMIData.d2082,
+      channel: 'tensionuphmi2082'}).then(r => console.log(r));
+
+    await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2108),
+      value: HMIData.percentage,
+      channel: 'tensionuphmi2108'}).then(r => console.log(r));
+
+    await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2124),
+      value: HMIData.A1,
+      channel: 'tensionuphmi2124'}).then(r => console.log(r));
+    await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2198),
+      value: HMIData.A2,
+      channel: 'tensionuphmi2198'}).then(r => console.log(r));
+
+    await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2272),
+      value: HMIData.B1,
+      channel: 'tensionuphmi2272'}).then(r => console.log(r));
+
+    await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2346),
+      value: HMIData.B2,
+      channel: 'tensionuphmi2346'}).then(r => console.log(r));
+
+    await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2460),
+      value: HMIData.reboundWord,
+      channel: 'tensionuphmi2460'}).then(r => console.log(r));
+
   }
 
   /** 上传 */

@@ -54,7 +54,7 @@
               <app-add-other [formGroup]="formData" [data]="data?.otherInfo || []" [edit]="appS.edit"></app-add-other>
             </div>
             <div>
-              <tension-holes [data]="data" [formData]="formData" #holes></tension-holes>
+              <tension-holes [data]="data" [formData]="formData" #holes (outSelectHole)="holeIndex = $event"></tension-holes>
             </div>
             <!-- <div>
               <mixing-info [formData]="formData" [data]="groutingTask"></mixing-info>
@@ -84,6 +84,7 @@
               [disabled]="!(data?.groutingInfo?.length > 0) || !uploading"><i nz-icon nzType="cloud-upload"
                 nzTheme="outline"></i>上传</button>
             <button nz-button nzType="primary" (click)="test()" *ngIf="appS.platform === 'debug'">测试</button>
+            <button nz-button nzType="primary" (click)="downHMI()" *ngIf="PLCS.tcp && !appS.edit && holeIndex !== null">张拉</button>
           </app-operat>
         </div>
       </nz-tab>

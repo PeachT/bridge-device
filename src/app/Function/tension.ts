@@ -1,6 +1,7 @@
 import { TensionDevice } from '../models/jack';
-import { TensionHoleTask, RecordCompute, TensionTask, TensionStage } from '../models/tension';
+import { TensionHoleTask, RecordCompute, TensionTask, TensionStage, TensionHoleInfo } from '../models/tension';
 import { getDatetimeS, getJSDate } from './unit';
+import { stringUnicode2Int16 } from './convertData';
 // 张拉模式  =42为4顶两端 =41为4顶单端  =21为2顶A1A2单端 =22为2顶A1B1单端 =23为2顶A1A2两端
 // =24为2顶B1B2两端 =25为2顶A1B1两端  =11为1顶A1单端  =12为1顶B1单端 =13为A1A2B1单端
 /** 张拉模式转换顶名称 */
@@ -143,7 +144,7 @@ export function recordCompute(data: TensionHoleTask) {
 }
 
 /**
- * 孔号处理
+ * 孔号显示处理
  *
  * @export
  * @param {string} name 孔号
@@ -177,6 +178,7 @@ export function holeNameShow (name: string, mode: number) {
 }
 
 
+
 /** 张拉时间转时间戳 */
 export function tensionDate2Number(data: TensionTask): TensionTask {
   console.log(
@@ -200,6 +202,7 @@ export function tensionOther2Date(data: TensionTask): TensionTask {
   return data;
 }
 
+/** mode构建张拉顶数据 */
 export function createHoleTask(mode: number): TensionStage {
   console.log(mode);
 
@@ -221,5 +224,137 @@ export function createHoleTask(mode: number): TensionStage {
     /** 顶计算数据 */
     ...jacks
   }
+}
+/** HMI阶段数据处理 */
+export function HMIstage(data: TensionTask, index: number) {
+  const holeData: TensionHoleInfo = data.tensionHoleInfos[index];
+  const task: TensionHoleTask = holeData.tasks[0];
+
+  const modeStr = holeNameShow(holeData.name, task.mode);
+  const jackNames = getModeStr(task.mode);
+  const hn = {
+    A1: [...Array(10)].map(_ => 0),
+    A2: [...Array(10)].map(_ => 0),
+    B1: [...Array(10)].map(_ => 0),
+    B2: [...Array(10)].map(_ => 0),
+
+  };
+  const jn = {
+    A1: [...Array(37)].map(_ => 0),
+    A2: [...Array(37)].map(_ => 0),
+    B1: [...Array(37)].map(_ => 0),
+    B2: [...Array(37)].map(_ => 0),
+    unicode: []
+  };
+  jackNames.map((key) => {
+    hn[key] = stringUnicode2Int16(modeStr[key], 10);
+  });
+  jn.unicode = [
+    ...stringUnicode2Int16(data.component, 12),
+    ...stringUnicode2Int16(data.name, 30),
+    ...hn.A1,
+    ...hn.A2,
+    ...hn.B1,
+    ...hn.B2
+  ]
+  const d2082 = [
+    // 是否二次张拉
+    Number(task.twice),
+    // 张拉状态
+    task.record ? task.record.state : 0,
+    // 张拉模式
+    task.mode,
+    // 备用1
+    0,
+    // 识别码1
+    // 识别码2
+    // 年月日初
+    // 时分秒初
+    // 年月日终
+    // 时分秒终
+    // 备用2
+    // 备用3
+    // 备用4
+
+  ]
+  const stageP = [...task.stage.knPercentage];
+  const stageTime = [...task.stage.time];
+  console.log(stageP);
+  if (!task.super) {
+    stageP.push(0);
+    stageTime.push(0);
+  }
+  if (!task.mend) {
+    stageP.push(0);
+    stageTime.push(0);
+  }
+  console.log(stageP, stageP.length);
+  if (stageP.length === 5) {
+    stageP.splice(2, 0, 0, 0)
+    stageTime.splice(2, 0, 0, 0)
+  }
+  if (stageP.length === 6) {
+    stageP.splice(3, 0, 0)
+    stageTime.splice(3, 0, 0)
+  }
+  stageP.push(task.stage.uploadPercentage);
+  stageTime.push(task.stage.uploadDelay);
+
+
+  jackNames.map((key) => {
+    const kns = [];
+    const mpas = [];
+    stageP.map((item, i) => {
+      let kn = 0;
+      let mpa = 0;
+      if (item !== 0) {
+        const knp = task.tensionKn * (item / 100);
+        kn = (knp);
+        mpa = Number(kn2Mpa(knp, task.device, key));
+      }
+      kns.push(kn);
+      mpas.push(mpa);
+    })
+    jn[key] = [
+      task.tensionKn,
+      0,
+      task.device[key].a,
+      task.device[key].b,
+      task.device[key].a,
+      task.device[key].b,
+      ...kns,
+      ...mpas,
+      ...stageTime,
+      // A1理论伸长值
+      task.stage[key].theoryMm,
+      // A1预张理论伸长
+      0,
+      // A1运行状态
+      0,
+      // A1张拉状态
+      0,
+      // A1压力暂存
+      0,
+      // A1位移暂存
+      0,
+      // A1千斤顶吨位
+      0
+    ]
+  });
+  const reboundWord = [
+    task.stage.A1 ? task.stage.A1.reboundMm : 0,
+    task.stage.A2 ? task.stage.A2.reboundMm : 0,
+    task.stage.B1 ? task.stage.B1.reboundMm : 0,
+    task.stage.B2 ? task.stage.B2.reboundMm : 0,
+    0,
+    0,
+    0,
+    0,
+    task.stage.A1 ? task.stage.A1.wordMm : 0,
+    task.stage.A2 ? task.stage.A2.wordMm : 0,
+    task.stage.B1 ? task.stage.B1.wordMm : 0,
+    task.stage.B2 ? task.stage.B2.wordMm : 0,
+  ]
+  return {percentage: stageP, time: stageTime, ...jn, reboundWord, d2082};
 }
 

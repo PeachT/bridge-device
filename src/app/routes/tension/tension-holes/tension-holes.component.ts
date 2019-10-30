@@ -18,6 +18,8 @@ export class TensionHolesComponent implements OnInit, OnChanges {
   @Input() data: TensionTask;
   @Input() formData: FormGroup;
   @Input() upDataState = false;
+
+  @Output() outSelectHole = new EventEmitter();
   /** 上一次数据id */
   bid = null;
 
@@ -87,8 +89,11 @@ export class TensionHolesComponent implements OnInit, OnChanges {
     });
   }
   /** 切换孔 */
-  switchHole(item: TensionHoleInfo) {
-    console.log(item);
+  switchHole(index: number, item: TensionHoleInfo) {
+    console.log(index);
+    if (!this.appS.edit) {
+      this.outSelectHole.emit(index);
+    }
     this.groupItem = item;
   }
 
