@@ -85,8 +85,6 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterView
   ) { }
 
   ngOnInit() {
-    const doby = document.getElementsByTagName('body')[0];
-    console.log('数据变更ngOnInit', this.data);
     this.carterSvg();
     this.widthSub = this.appS.bodySizeSub.subscribe((width: number) => {
       // 这里处理页面变化时的操作
@@ -99,7 +97,7 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterView
       this.data = data;
       this.carterSvg();
     } else {
-      console.log('data变更', this.data);
+      // console.log('data变更', this.data);
       this.series = this.strMode.map(name => {
         this.maxs = [...this.maxs, ...this.data[name][this.key]]
         return {
@@ -175,7 +173,6 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterView
             boundaryGap: false,
             axisLine: { onZero: false },
             data: this.data[this.strMode[0]][this.key].map((str, i) => {
-              console.log(this.satrtDate);
               const date = new Date(this.satrtDate).getTime() + (i * (1000 / this.data.hz))
               return format(new Date(date), 'HH:mm:ss');
             })
@@ -185,7 +182,8 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterView
           {
             name: `${this.text}(${this.text === '压力' ? 'MPa' : 'mm'})`,
             type: 'value',
-            max: Math.max(...this.maxs)
+            max: Math.max(...this.maxs),
+            min: 0
           },
         ],
         series: this.series

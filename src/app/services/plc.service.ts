@@ -5,6 +5,8 @@ import { DbService } from './db.service';
 import { NzMessageService } from 'ng-zorro-antd';
 import { ConnectionStr } from '../models/socketTCP';
 import { TensionTask } from '../models/tension';
+import { Store } from '@ngrx/store';
+import { NgrxState } from '../ngrx/reducers';
 
 @Injectable({
   providedIn: 'root'
@@ -19,13 +21,14 @@ export class PLCService {
   constructor(
     private e: ElectronService,
     private message: NzMessageService,
+    private store$: Store<NgrxState>,
   ) { }
 
   async link(name: string) {
     console.log('链接');
     const connStr: ConnectionStr = JSON.parse(localStorage.getItem(name));
     if (connStr) {
-      await testLink(this.e, connStr).then((s) => {
+      await testLink(this.e, this.store$, connStr).then((s) => {
         this.tcp = s;
       }).catch((err) => {
         console.error(err);

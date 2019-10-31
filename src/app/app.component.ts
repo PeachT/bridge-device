@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ChangeDetectorRef } from "@angular/core";
 import { ElectronService } from "ngx-electron";
 import { AppService } from "./services/app.service";
 import { DbService, DB } from "./services/db.service";
@@ -9,10 +9,15 @@ import { getModelBase } from "./models/base";
 import { Project } from "./models/project";
 import { GroutingService } from "./services/grouting.service";
 import { PLCService } from './services/plc.service';
-import { interval, fromEvent } from 'rxjs';
+import { interval, fromEvent, Observable } from 'rxjs';
 import { map, debounceTime } from 'rxjs/operators';
 import { format } from 'date-fns';
 import { trigger, transition, style, query, animateChild, animate, group } from '@angular/animations';
+import { PLCSocket } from './class/PLCSocket';
+import { Store } from '@ngrx/store';
+import { NgrxState } from './ngrx/reducers';
+import { resetTensionLive } from './ngrx/actions/tensionLink.action';
+import { TensionLive } from './models/tensionLive';
 
 @Component({
   selector: "app-root",
@@ -44,6 +49,7 @@ export class AppComponent implements OnInit {
   // router跳转动画所需参数
   routerState = true;
   routerStateCode = 'active';
+  tensionLink$ = new Observable<TensionLive>();
   constructor(
     public e: ElectronService,
     private odb: DbService,
@@ -51,17 +57,13 @@ export class AppComponent implements OnInit {
     private message: NzMessageService,
     private router: Router,
     public GPLCS: GroutingService,
-    public PLCS: PLCService
+    public PLCS: PLCService,
+    private store$: Store<NgrxState>,
+    private crd: ChangeDetectorRef,
   ) {
-    // const args = process;
-    // console.log(args);
+
     console.log("平台", this.appS.platform);
     if (this.e.isWindows) {
-      // this.PLCS.lock = {
-      //   state: true,
-      //   success: false,
-      //   code: null
-      // };
       if (
         this.appS.platform === "grouting" &&
         this.GPLCS.connectionStr.ip &&
@@ -70,9 +72,6 @@ export class AppComponent implements OnInit {
         this.GPLCS.linkSocket();
       }
     } else if (this.e.isLinux) {
-      // if (this.appS.platform === "tension") {
-      //   this.runPLC();
-      // }
     }
     // 判断运行环境适合是 Electron
     this.appS.Environment = navigator.userAgent.indexOf("Electron") !== -1;
@@ -101,6 +100,11 @@ export class AppComponent implements OnInit {
   //   }
   // }
   async ngOnInit() {
+    this.store$.dispatch(resetTensionLive(null))
+    this.tensionLink$ = this.store$.select(state => state.tensionLive);
+    this.tensionLink$.subscribe(() => {
+      this.crd.markForCheck();
+    });
     const doby = document.getElementsByTagName('body')[0];
     console.warn(doby.offsetWidth);
     this.appS.bodyWidth = doby.offsetWidth;

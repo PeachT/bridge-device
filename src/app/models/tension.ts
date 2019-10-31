@@ -116,6 +116,10 @@ export interface TensionRecord {
 }
 /** 每次张拉记录 */
 export interface OnceRecord {
+  /** 开始时间 */
+  startDate: Date | string | number;
+  /** 完成时间 */
+  endDate: Date | string | number;
   /** 张拉阶段应力百分比 */
   knPercentage: Array<number>;
   /** 阶段名称 */

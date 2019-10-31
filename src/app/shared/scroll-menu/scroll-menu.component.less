@@ -12,14 +12,24 @@
   }
 }
 .search {
-  height: 49px;
+  height: 64px;
   border-bottom: 1px solid;
-  display: contents;
-  justify-content: center;
-  align-items: center;
-  .checkbox {
+  display: flex;
+  flex-direction: column;
+  .item{
+    padding: 0 5px;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
+    .checkbox {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+  }
+  .item1{
+    display: flex;
+    flex-direction: column;
+    padding: 0 5px;
   }
 }

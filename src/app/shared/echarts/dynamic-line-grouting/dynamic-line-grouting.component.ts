@@ -177,12 +177,14 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges, AfterVie
           {
             name: '压力(MPa)',
             type: 'value',
-            max: Math.max(...this.data.intoPulpPressure, ...this.data.outPulpPressure)
+            max: Math.max(...this.data.intoPulpPressure, ...this.data.outPulpPressure),
+            min: 0
           },
           {
             name: '流量(m³/s)',
             type: 'value',
-            max: Math.max(...this.data.intoPulpvolume, ...this.data.outPulpvolume)
+            max: Math.max(...this.data.intoPulpvolume, ...this.data.outPulpvolume),
+            min: 0
           }
         ],
         series: [

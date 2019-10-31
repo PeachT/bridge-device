@@ -1,10 +1,14 @@
 
 import { ElectronService } from "ngx-electron";
 import { ConnectionStr } from '../models/socketTCP';
+import { Store } from '@ngrx/store';
+import { NgrxState } from '../ngrx/reducers';
+import { resetTensionLive, initTensionLive } from '../ngrx/actions/tensionLink.action';
+import { TensionLive } from '../models/tensionLive';
 
 export class PLCSocket {
   connStr: ConnectionStr;
-  linkMsg = {
+  linkMsg: TensionLive = {
     state: false,
     now: false,
     link: false,
@@ -14,8 +18,9 @@ export class PLCSocket {
   };
   constructor(
     private e: ElectronService,
+    private store$: Store<NgrxState>,
     connStr: ConnectionStr,
-    link: boolean = false
+    link: boolean = false,
   ) {
     this.connStr = connStr;
     if (!link) {
@@ -38,8 +43,10 @@ export class PLCSocket {
       console.log(data);
       if (data.success) {
         this.linkMsg.state = false;
+        this.store$.dispatch(resetTensionLive({data: {msg: '链接中'}}))
       } else {
         this.linkMsg.link = false;
+        this.store$.dispatch(resetTensionLive({data: {msg: '链接有误'}}))
       }
     });
     /** 监听心跳 */
@@ -48,13 +55,16 @@ export class PLCSocket {
       const time = new Date().getTime();
       const delayTime =  (time - this.linkMsg.oldTime - this.connStr.hz) || time;
       this.linkMsg.oldTime = time;
-      // console.log(delayTime);
+      let delayTimeStr = this.linkMsg.delayTime;
       if (delayTime < 500) {
-        this.linkMsg.delayTime = '0.5s';
+        delayTimeStr = '0.5s';
       } else if (delayTime > 500 && delayTime < 1001) {
-        this.linkMsg.delayTime = '1s';
+        delayTimeStr = '1s';
       } else {
-        this.linkMsg.delayTime = '2s';
+        delayTimeStr = '2s';
+      }
+      if (delayTimeStr !== this.linkMsg.delayTime) {
+        this.store$.dispatch(resetTensionLive({data: {delayTime: delayTimeStr}}))
       }
     });
   }
@@ -65,6 +75,7 @@ export class PLCSocket {
     this.e.ipcRenderer.removeAllListeners(`${this.connStr.uid}heartbeat`);
     this.e.ipcRenderer.send('CancelTCP', this.connStr.uid);
     this.linkMsg.delayTime = '0s';
+    this.store$.dispatch(initTensionLive(null))
   }
   /** ipc */
   ipc(channel: string, data:{address: number, value: any, channel: string} | {state: boolean, channel: string}) {
@@ -73,7 +84,7 @@ export class PLCSocket {
         reject({success: false, data: '超时错误'});
       }, this.connStr.setTimeout);
       this.e.ipcRenderer.send(`${this.connStr.uid}${channel}`, data);
-      this.e.ipcRenderer.on(data.channel, (r) => {
+      this.e.ipcRenderer.once(data.channel, (r) => {
         clearTimeout(t);
         resolve({success: true, data: r});
       })
@@ -82,23 +93,25 @@ export class PLCSocket {
 }
 
 /** 测试链接 */
-export function testLink(e: ElectronService, connStr: ConnectionStr): Promise<PLCSocket> {
+export function testLink(e: ElectronService, store$, connStr: ConnectionStr): Promise<PLCSocket> {
   return new Promise((resolve, reject) => {
     console.log('链接');
     e.ipcRenderer.send('TestLinkTCP', connStr);
+    const t = setTimeout(() => {
+      reject('超时错误');
+    }, 3000);
     /** 监听ip测试 */
     e.ipcRenderer.once(`${connStr.uid}testLink`, async (event, data) => {
       // {alive: true, link: false, msg: '测试链接'}
       if (data.alive) {
-        resolve(new PLCSocket(e, connStr, data.link));
+        resolve(new PLCSocket(e, store$, connStr, data.link));
         console.log(data);
+        clearTimeout(t);
       } else {
         console.error(data);
+        clearTimeout(t);
         reject('测试链接错误');
       }
     });
-    setTimeout(() => {
-      reject('超时错误');
-    }, 3000);
   });
 }

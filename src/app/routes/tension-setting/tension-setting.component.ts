@@ -6,6 +6,8 @@ import { NzMessageService } from 'ng-zorro-antd';
 import { PLCSocket, testLink } from 'src/app/class/PLCSocket';
 import { FC, ConnectionStr } from 'src/app/models/socketTCP';
 import { PLC_D } from 'src/app/models/IPCChannel';
+import { Store } from '@ngrx/store';
+import { NgrxState } from 'src/app/ngrx/reducers';
 
 @Component({
   selector: 'app-tension-setting',
@@ -29,6 +31,7 @@ export class TensionSettingComponent implements OnInit {
     private odb: DbService,
     private message: NzMessageService,
     private cdr: ChangeDetectorRef,
+    private store$: Store<NgrxState>,
   ) { }
 
   ngOnInit() {
@@ -48,7 +51,7 @@ export class TensionSettingComponent implements OnInit {
   }
   async link() {
     console.log('链接');
-    await testLink(this.e, this.connStr).then((s) => {
+    await testLink(this.e, this.store$, this.connStr).then((s) => {
       this.tcp = s;
     }).catch((err) => {
       console.error(err);

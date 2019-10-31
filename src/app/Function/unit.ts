@@ -1,3 +1,5 @@
+import { format } from 'date-fns';
+
 function constareChannel(name: string = 't'): string {
   return `${name}${new Date().getTime()}`;
 }
@@ -53,4 +55,17 @@ export function uuid() {
   s[8] = s[13] = s[18] = s[23] = "-";
 
   return s.join("");
+}
+
+/**
+ * 时间日期重新赋值时间
+ *
+ * @export
+ * @param {(Date | string | number)} date
+ * @param {string} time 重新设置的时间字符串 ‘12:12:12’
+ * @returns {number} 返回时间戳
+ */
+export function dateResetTime(date: Date | string | number, time: string): number {
+  const t = format(new Date(date), 'yyyy-MM-dd');
+  return (new Date(`${t} ${time}`).getTime());
 }

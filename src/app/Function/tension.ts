@@ -69,7 +69,7 @@ export function mpa2Kn(mpa: number, jack: TensionDevice, jackName: string) {
 }
 
 /** 张拉结果数据计算 */
-export function recordCompute(data: TensionHoleTask) {
+export function recordCompute(data: TensionHoleTask, length: number = null) {
   const strMode = getModeStr(data.mode);
   // RecordCompute(this.data, key, index);
   const rc: RecordCompute = {
@@ -84,7 +84,7 @@ export function recordCompute(data: TensionHoleTask) {
       // 总伸长量LZ=(LK+L1-2L0)-NS-LQ
       // 伸长量偏差DR=(LZ-LL)/LL
       // 力筋回缩量Sn=(LK-LM)-(1-σ0/σk)LQ
-      const dl = group[name].mm.length - 1;
+      const dl = length === null ? group[name].mm.length - 1 : length;
       const L0 = group[name].mm[0];
       const L1 = group[name].mm[1];
       const LK = group[name].mm[dl];
@@ -98,22 +98,25 @@ export function recordCompute(data: TensionHoleTask) {
       const NS = data.stage[name].reboundMm;
       const LZ = Number((LK - (2 * L0) + L1 - LQ - NS).toFixed(2));
       const DR = Number(((LZ - LL) / LL).toFixed(2));
-      const Sn = ((LK - LM) - (1 - σ0 / σk) * LQ).toFixed(2)	;
+      let Sn = NaN;
+      if (LM) {
+        Sn = Number(((LK - LM) - (1 - σ0 / σk) * LQ).toFixed(2))	;
+      }
       console.log();
       console.log();
       stage[name] = {LZ, DR, Sn};
       if (data.mode === 42 || data.mode === 23) {
         if (name.indexOf('A') > -1) {
-          ALZ += LZ;
+          Number((ALZ += LZ).toFixed(2));
         }
       }
       if (data.mode === 42 || data.mode === 24) {
         if (name.indexOf('B') > -1) {
-          BLZ += LZ;
+          Number((BLZ += LZ).toFixed(2));
         }
       }
       if (data.mode === 25) {
-        ABLZ += LZ;
+        Number((ABLZ += LZ).toFixed(2));
       }
     });
     rc.stage.push(stage);
@@ -123,23 +126,21 @@ export function recordCompute(data: TensionHoleTask) {
     const ADR = Number(((ALZ - ALL) / ALL * 100).toFixed(2));
     console.log(ALZ, ALL, ADR, (ALZ - ALL), ((ALZ - ALL) / ALL));
 
-    rc.A1LZ = ALZ;
-    rc.A1DR = ADR;
+    rc.A1LZ = Number((ALZ).toFixed(2));
+    rc.A1DR = Number((ADR).toFixed(2));
   }
   if (data.mode === 42 || data.mode === 24) {
     const BLL = data.stage.B1.theoryMm;
     const BDR = Number(((BLZ - BLL) / BLL * 100).toFixed(2));
-    rc.B1LZ = BLZ;
-    rc.B1DR = BDR;
+    rc.B1LZ = Number((BLZ).toFixed(2));
+    rc.B1DR = Number((BDR).toFixed(2));
   }
   if (data.mode === 25) {
     const LL = data.stage.A1.theoryMm;
     const ABDR = Number(((ABLZ - LL) / LL * 100).toFixed(2));
-    rc.A1LZ = ABLZ;
-    rc.A1DR = ABDR;
+    rc.A1LZ = Number((ABLZ).toFixed(2));
+    rc.A1DR = Number((ABDR).toFixed(2));
   }
-  console.log(rc);
-
   return rc;
 }
 

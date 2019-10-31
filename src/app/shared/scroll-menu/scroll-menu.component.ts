@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { DbService, DbEnum } from 'src/app/services/db.service';
 import { Observable, from } from 'rxjs';
 import { map, groupBy, mergeMap, toArray } from 'rxjs/operators';
@@ -10,11 +10,14 @@ import { AppService } from 'src/app/services/app.service';
 import { Project } from 'src/app/models/project';
 import { ActivatedRoute } from '@angular/router';
 import { TensionTask } from 'src/app/models/tension';
+import { format } from 'date-fns/esm';
+import { dateResetTime } from 'src/app/Function/unit';
 
 @Component({
   selector: 'app-scroll-menu',
   templateUrl: './scroll-menu.component.html',
   styleUrls: ['./scroll-menu.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('pageAnimations', [
       transition(':enter', [
@@ -38,12 +41,12 @@ import { TensionTask } from 'src/app/models/tension';
     ]),
   ]
 })
-export class ScrollMenuComponent implements OnInit {
+export class ScrollMenuComponent implements OnInit, OnChanges {
   @Input() dbName;
   @Input() stateFunc: any;
   projects$: Observable<Menu$>;
   projectId: any;
-  component$: Observable<Menu$>;
+  @Input() component$: Observable<Menu$>;
   componentName: any = null;
   bridge$: Observable<Menu$>;
   bridgeId: number;
@@ -53,9 +56,9 @@ export class ScrollMenuComponent implements OnInit {
     /** 已完成 */
     done: false,
     /** 完成时间 */
-    doneTime: null,
+    doneDate: [],
     /** 浇筑完成 */
-    ouringTime: null
+    castingDate: []
   }
 
 
@@ -88,6 +91,12 @@ export class ScrollMenuComponent implements OnInit {
 
     });
   }
+
+  ngOnChanges(changes: SimpleChanges) {
+    console.warn('数据更新');
+
+  }
+
   reset(data) {
     this.projectId = data.projectId;
     this.componentName = null;
@@ -123,20 +132,55 @@ export class ScrollMenuComponent implements OnInit {
         return { data, count: data.length };
       })
     );
+    this.onCrd(this.component$);
   }
+  /** 获取梁数据 */
   async getBridgeMenu() {
     console.log(this.projectId, this.componentName);
-    this.bridge$ = await this.db.pageData<any>(
+    this.bridge$ = await this.db.pageData<TensionTask | GroutingTask>(
       this.dbName,
-      (g) => this.projectId === g.project && g.component === this.componentName,
+      (g) => {
+        if (this.projectId === g.project && g.component === this.componentName) {
+          if (this.dbName === 'tension') {
+            g = g as TensionTask;
+            if (this.search.done && g.tensionHoleInfos[0].tasks.find(f => f.record.groups.length > 0)) {
+              if (this.search.doneDate.length > 0) {
+                const st = dateResetTime(this.search.doneDate[0], '00:00:00') / 1000;
+                const et = dateResetTime(this.search.doneDate[1], '23:59:59') / 1000;
+                // tslint:disable-next-line:max-line-length
+                if (g.tensionHoleInfos[0].tasks.find(f => f.record.groups.length > 0 && f.record.groups[0].startDate >= st && f.record.groups[0].startDate <= et)) {
+                  return true;
+                }
+              } else {
+                return true
+              }
+            }
+            if (this.search.unDone && g.tensionHoleInfos[0].tasks.find(f => f.record.groups.length === 0)) {
+              return true
+            }
+            if (this.search.castingDate.length > 0) {
+              const st = dateResetTime(this.search.castingDate[0], '00:00:00') / 1000;
+              const et = dateResetTime(this.search.castingDate[1], '23:59:59') / 1000;
+              // tslint:disable-next-line:max-line-length
+              if (g.castingDate >= st && g.castingDate <= et) {
+                return true;
+              }
+            }
+            if (!this.search.done && !this.search.unDone && this.search.doneDate.length === 0 && this.search.castingDate.length === 0) {
+              return true;
+            }
+          } else {
+            g = g as GroutingTask;
+          }
+        }
+        return false;
+      },
       {
         label: 'name', value: 'id',
         state: this.stateFunc
       }
     );
-    this.bridge$.subscribe(r => {
-      this.crd.detectChanges();
-    })
+    this.onCrd(this.bridge$);
   }
   /** 选择项目 */
   selectProject() {
@@ -179,6 +223,19 @@ export class ScrollMenuComponent implements OnInit {
   }
   /** 搜索 */
   onSerach() {
-
+    console.log(this.search);
+    this.getBridgeMenu();
+  }
+  /** 时间过滤 */
+  onFilterDate(e, key) {
+    console.log(e, this.search);
+    this.getBridgeMenu();
+  }
+  /** 更新 */
+  onCrd(ob) {
+    const sub = ob.subscribe(r => {
+      this.crd.markForCheck();
+      sub.unsubscribe();
+    })
   }
 }

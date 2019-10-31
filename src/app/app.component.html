@@ -11,8 +11,11 @@
     (click)="GPLCS.linkSocket()">压浆链接</button>
   </div>
   <div *ngIf="!GPLCS.linkMsg.link" class="btng">
-    <div class="bg" [ngClass]="{'stop': !PLCS.tcp}" [ngStyle]="{'animation-duration': PLCS.tcp?.linkMsg?.delayTime || '0s'}"></div>
-    <span>张拉</span>
+    <div class="bg" [ngClass]="{'stop': !PLCS.tcp}" [ngStyle]="{'animation-duration': (tensionLink$ | async)?.delayTime || '0s'}"></div>
+    <div class="msg">
+      <span class="top">张拉</span>
+      <span class="bottom">{{(tensionLink$ | async)?.msg || ''}}</span>
+    </div>
     <button nz-button nzType="dashed"
       *ngIf="(appS.platform === 'tension' || appS.platform === 'debug' || appS.platform === 'windows') && !PLCS.tcp"
     (click)="PLCS.link('tensionLink')">张拉链接</button>
