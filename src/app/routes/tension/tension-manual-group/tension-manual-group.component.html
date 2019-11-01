@@ -2,7 +2,7 @@
   (nzOnOk)="Ok()">
   <div style="display: flex; flex-direction: column;">
     <div>
-      <app-form-item label="设备选择" [errorShow]="false">
+      <!-- <app-form-item label="设备选择" [errorShow]="false">
         <nz-select style="width: 100%;" nzPlaceHolder="请选择设备" [(ngModel)]="selectJack">
           <nz-option [nzValue]="item.value" [nzLabel]="item.label" *ngFor="let item of jackMneu$ | async">
           </nz-option>
@@ -21,7 +21,26 @@
           <nz-option [nzDisabled]="!(residueNumber >= 1)" [nzValue]="11" nzLabel="A1单端"></nz-option>
           <nz-option [nzDisabled]="!(residueNumber >= 1)" [nzValue]="12" nzLabel="B1单端"></nz-option>
         </nz-select>
+      </app-form-item> -->
+      <app-form-item label="设备选择" [errorShow]="false" [row]="true">
+        <nz-radio-group [(ngModel)]="selectJack">
+          <label nz-radio [nzValue]="item.value" *ngFor="let item of jackMneu$ | async">{{item.label}}</label>
+        </nz-radio-group>
       </app-form-item>
+      <app-form-item label="张拉模式" [errorShow]="false" [row]="true">
+        <nz-radio-group [(ngModel)]="selectMode" (ngModelChange)="modeChange()">
+          <label nz-radio *ngIf="(residueNumber >= 2)" [nzValue]="42">4顶两端</label>
+          <label nz-radio *ngIf="(residueNumber >= 4)" [nzValue]="41">4顶单端</label>
+          <label nz-radio *ngIf="(residueNumber >= 2)" [nzValue]="21">A1|A2单端</label>
+          <label nz-radio *ngIf="(residueNumber >= 1)" [nzValue]="23">A1|A2两端</label>
+          <label nz-radio *ngIf="(residueNumber >= 1)" [nzValue]="24">B1|B2两端</label>
+          <label nz-radio *ngIf="(residueNumber >= 2)" [nzValue]="22">A1|B1单端</label>
+          <label nz-radio *ngIf="(residueNumber >= 1)" [nzValue]="25">A1|B1两端</label>
+          <label nz-radio *ngIf="(residueNumber >= 1)" [nzValue]="11">A1单端</label>
+          <label nz-radio *ngIf="(residueNumber >= 1)" [nzValue]="12">B1单端</label>
+        </nz-radio-group>
+      </app-form-item>
+
     </div>
     <div class="manual-group">
       <div class="item" style="margin-right: 25px;">
@@ -32,7 +51,7 @@
 
             <app-form-item [label]="item + '孔号'" [row]="true" [errorShow]="false">
               <nz-select style="width: 100%;" nzPlaceHolder="请选择孔号" [(ngModel)]="groupKey[item]"
-                (ngModelChange)="holeChange($event)">
+                (ngModelChange)="holeChange($event)" [nzAllowClear]="true">
                 <nz-option [nzValue]="item" [nzLabel]="item" *ngFor="let item of residue">
                 </nz-option>
               </nz-select>

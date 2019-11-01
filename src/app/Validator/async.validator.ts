@@ -45,7 +45,7 @@ export function nameRepetition(
   dbName: string,
   f: (o1: any, o2: any) => boolean = (o1: any, o2: any) => o1.name === o2.name && o1.id !== o2.id,
   nowkey: string = 'name'): AsyncValidatorFn {
-  return (control: AbstractControl): Observable<ValidationErrors | null> => {
+   return (control: AbstractControl): Observable<ValidationErrors | null> => {
     const value = control.root.value;
     value[nowkey] = control.value;
     console.log(control.root.value);

@@ -55,13 +55,15 @@ export class TensionHolesComponent implements OnInit, OnChanges {
     this.initForm();
   }
   initForm() {
-
-    console.log(this.data);
-    console.log(this.tensionHoleInfos);
     this.tensionHoleInfosFormArray.clear();
     this.createForm(this.tensionHoleInfos).map(si => {
       this.tensionHoleInfosFormArray.push(si);
     })
+    // this.formData.controls.name.updateValueAndValidity();
+    setTimeout(() => {
+      this.formData.controls.name.markAsDirty();
+      this.formData.controls.name.updateValueAndValidity();
+    }, 10);
     this.cdr.detectChanges();
   }
   createForm(arrData: Array<TensionHoleInfo> = []): FormGroup[] {

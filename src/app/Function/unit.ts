@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, startOfDay, endOfDay, isAfter, isBefore } from 'date-fns';
 
 function constareChannel(name: string = 't'): string {
   return `${name}${new Date().getTime()}`;
@@ -20,9 +20,7 @@ export function waterBinderRatio(dosage: Array<number>) {
 /** 获取时间戳s */
 export function getDatetimeS(date: Date | string | number = null): number {
   if (date) {
-    const t = Math.floor(new Date(date).getTime() / 1000);
-    return t;
-
+    return Math.floor(new Date(date).getTime() / 1000);
   } else {
     return Math.floor(new Date().getTime() / 1000);
   }
@@ -38,7 +36,7 @@ export function getJSDate(date: Date | string | number = null): Date {
     }
     return t;
   } else {
-    return new Date();
+    return null;
   }
 }
 
@@ -58,14 +56,31 @@ export function uuid() {
 }
 
 /**
- * 时间日期重新赋值时间
+ * 获取日期的开始时间或结束
  *
  * @export
  * @param {(Date | string | number)} date
- * @param {string} time 重新设置的时间字符串 ‘12:12:12’
+ * @param {boolean} start_end true 获取开始时间 false 获取结束数据
  * @returns {number} 返回时间戳
  */
-export function dateResetTime(date: Date | string | number, time: string): number {
-  const t = format(new Date(date), 'yyyy-MM-dd');
-  return (new Date(`${t} ${time}`).getTime());
+export function dateResetTime(date: Date | string | number, start_end: boolean): Date {
+  if (start_end) {
+    return startOfDay(new Date(date));
+  } else {
+    return endOfDay(new Date(date));
+  }
+}
+
+/**
+ * 获取一个时间是否在另外两个时间内
+ *
+ * @export
+ * @param {Array<Date>} cDate 0：开始 1：结束
+ * @param {Date} nDate 比较时间
+ * @returns
+ */
+export function cmp3Date(cDate: Array<Date>, nDate: Date): boolean {
+  const sd = startOfDay(new Date(cDate[0]));
+  const ed = endOfDay(new Date(cDate[1]));
+  return isAfter(nDate, sd) && isBefore(nDate, ed);
 }

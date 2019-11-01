@@ -34,7 +34,7 @@ export class AddOtherComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log('其他数据');
+    // console.log('其他数据');
 
     this.initForm(this.data);
     this.cdr.detectChanges();

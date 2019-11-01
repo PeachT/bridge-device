@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/core";
 import { Router } from "@angular/router";
 import { AppService } from "src/app/services/app.service";
 import { Observable } from "rxjs";
@@ -10,7 +10,8 @@ import { NgrxState } from 'src/app/ngrx/reducers';
 @Component({
   selector: "app-header",
   templateUrl: "./header.component.html",
-  styleUrls: ["./header.component.less"]
+  styleUrls: ["./header.component.less"],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HeaderComponent implements OnInit {
 
@@ -20,6 +21,7 @@ export class HeaderComponent implements OnInit {
     private router: Router,
     public appS: AppService,
     private store$: Store<NgrxState>,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {

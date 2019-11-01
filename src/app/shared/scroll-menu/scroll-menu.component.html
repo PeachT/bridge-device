@@ -13,8 +13,20 @@
       ><i nz-icon nzType="funnel-plot" nzTheme="outline"></i>筛选</span>
     </div>
     <div class="item1">
-      <span [ngStyle]="{'text-decoration': !search.done ? 'line-through' : 'none'}">已：{{search.doneDate[0] || null | date: 'yyyy-MM-dd ~ '}}{{search.doneDate[1] || null | date: 'yyyy-MM-dd'}}</span>
-      <span>筑：{{search.castingDate[0] || null | date: 'yyyy-MM-dd ~ '}}{{search.castingDate[1] || null | date: 'yyyy-MM-dd'}}</span>
+      <span
+      nz-popover
+      nzPopoverTitle="高级筛选"
+      [nzPopoverContent]="contentTemplate"
+      nzPopoverPlacement="rightTop"
+      nzPopoverTrigger="click"
+      [ngStyle]="{'text-decoration': !search.done ? 'line-through' : 'none'}">已：{{search.doneDate[0] || null | date: 'yyyy-MM-dd ~ '}}{{search.doneDate[1] || null | date: 'yyyy-MM-dd'}}</span>
+      <span
+      nz-popover
+      nzPopoverTitle="高级筛选"
+      [nzPopoverContent]="contentTemplate"
+      nzPopoverPlacement="rightTop"
+      nzPopoverTrigger="click"
+      >筑：{{search.castingDate[0] || null | date: 'yyyy-MM-dd ~ '}}{{search.castingDate[1] || null | date: 'yyyy-MM-dd'}}</span>
     </div>
   </div>
   <div class="project">
@@ -60,16 +72,24 @@
 </div>
 <ng-template #contentTemplate>
   <div>
-    <div>
+    <div class="range-picker-content">
+      <p>任务状态：</p>
       <label nz-checkbox [(ngModel)]="search.done" (click)="onSerach()">已完成</label>
       <label nz-checkbox [(ngModel)]="search.unDone" (click)="onSerach()">未完成</label>
     </div>
-    <div>
-      已完成日期: <nz-range-picker readonly [nzDisabled]="!search.done" [(ngModel)]="search.doneDate" (ngModelChange)="onFilterDate($event, 'done')"></nz-range-picker>
+    <br>
+    <div class="range-picker-content">
+      <p>完成日期：</p>
+      <nz-range-picker
+        [nzRanges]="ranges1"
+        [nzDisabled]="!search.done" [(ngModel)]="search.doneDate" (ngModelChange)="onFilterDate($event, 'done')"></nz-range-picker>
     </div>
     <br>
-    <div>
-      浇筑日期: <nz-range-picker readonly [(ngModel)]="search.castingDate" (ngModelChange)="onFilterDate($event,'unDone')"></nz-range-picker>
+    <div class="range-picker-content">
+      <p>浇筑日期：</p>
+      <nz-range-picker
+        [nzRanges]="ranges1"
+        [(ngModel)]="search.castingDate" (ngModelChange)="onFilterDate($event,'unDone')"></nz-range-picker>
     </div>
   </div>
 </ng-template>

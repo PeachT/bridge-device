@@ -14,11 +14,12 @@
       <!-- <div class="icon" *ngFor="let item of appS.menus" [ngClass]="{'active': ifUrl(item.url)}" -->
       <div class="icon" *ngFor="let item of appS.menus" [ngClass]="{'active': item.url === (routerInfo$ | async).url}"
         (click)="goUrl(item.url)">
-        <i nz-icon [nzType]="item.icon" nzTheme="outline"></i>
+        <!-- <i nz-icon [nzType]="item.icon" nzTheme="outline"></i> -->
+        <i [attr.class]="'iconfont ' + item.icon"></i>
         <div class="text">{{item.name}}</div>
       </div>
       <div class="icon" (click)="appS.dataTreatingShow = true">
-        <i nz-icon nzType="file-sync" theme="outline"></i>
+        <i class="iconfont icon-shuju"></i>
         <div class="text">数据</div>
       </div>
     </div>

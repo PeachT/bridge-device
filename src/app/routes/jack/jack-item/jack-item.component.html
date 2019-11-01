@@ -8,7 +8,7 @@
       <input placeholder="输入油泵编号" nz-input formControlName="pumpNo" />
     </app-form-item>
     <app-form-item label="标定日期" [errors]="jackItemForm.get('date').errors" >
-      <nz-date-picker formControlName="date" placeholder="标定日期" (ngModelChange)="selectDate($event)"></nz-date-picker>
+       <nz-date-picker readonly formControlName="date" placeholder="标定日期" (ngModelChange)="selectDate($event)" [nzAllowClear]="false"></nz-date-picker>
     </app-form-item>
     <div>
       <app-form-item label="方程式" [row]="true">

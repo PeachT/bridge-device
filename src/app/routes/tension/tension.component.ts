@@ -69,6 +69,7 @@ export class TensionComponent implements OnInit, OnDestroy {
     public appS: AppService,
     public PLCS: PLCService,
     private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {
 
   }
@@ -417,14 +418,23 @@ export class TensionComponent implements OnInit, OnDestroy {
   }
   /** 分组完成更新数据 */
   successGroup(group) {
+    // tslint:disable-next-line:forin
+    for (const i in this.formData.controls) {
+      console.log(
+        this.formData.controls[i].valid,
+        i
+      );
+    }
     console.log(group);
     this.data.tensionHoleInfos = group;
     this.holesDom.initForm();
-    this.nameValueAndValidity();
+    // this.nameValueAndValidity();
   }
   nameValueAndValidity() {
     setTimeout(() => {
+      this.formData.controls.name.markAsDirty();
       this.formData.controls.name.updateValueAndValidity();
+      this.cdr.detectChanges();
     }, 10);
   }
 }

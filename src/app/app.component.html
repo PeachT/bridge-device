@@ -1,5 +1,5 @@
 <div class="plc-state">
-  <div *ngIf="!PLCS.tcp" class="btng">
+  <div *ngIf="!PLCS.tcp && (appS.platform === 'grouting' || appS.platform === 'debug' || appS.platform === 'windows')" class="btng">
     <!-- <div class="item" *ngIf="GPLCS.linkMsg.link" [ngClass]="{'active': GPLCS.linkMsg.link}">压:{{GPLCS.linkMsg.delayTime}}</div> -->
     <div class="bg" [ngClass]="{'stop': !GPLCS.linkMsg.link}" [ngStyle]="{'animation-duration': GPLCS.linkMsg?.delayTime || '0s'}"></div>
     <span>压浆</span>
@@ -7,17 +7,17 @@
       *ngIf="GPLCS.linkMsg.link"
       (click)="PLCS.cancelLink()">取消链接</button>
     <button nz-button nzType="dashed"
-      *ngIf="(appS.platform === 'grouting' || appS.platform === 'debug' || appS.platform === 'windows') && !GPLCS.linkMsg.link && appS.userInfo && !GPLCS.linkMsg.now"
+      *ngIf="!GPLCS.linkMsg.link && appS.userInfo && !GPLCS.linkMsg.now"
     (click)="GPLCS.linkSocket()">压浆链接</button>
   </div>
-  <div *ngIf="!GPLCS.linkMsg.link" class="btng">
+  <div *ngIf="!GPLCS.linkMsg.link && (appS.platform === 'tension' || appS.platform === 'debug' || appS.platform === 'windows')" class="btng">
     <div class="bg" [ngClass]="{'stop': !PLCS.tcp}" [ngStyle]="{'animation-duration': (tensionLink$ | async)?.delayTime || '0s'}"></div>
     <div class="msg">
       <span class="top">张拉</span>
       <span class="bottom">{{(tensionLink$ | async)?.msg || ''}}</span>
     </div>
     <button nz-button nzType="dashed"
-      *ngIf="(appS.platform === 'tension' || appS.platform === 'debug' || appS.platform === 'windows') && !PLCS.tcp"
+      *ngIf="!PLCS.tcp"
     (click)="PLCS.link('tensionLink')">张拉链接</button>
     <button nz-button nzType="danger"
       *ngIf="PLCS.tcp"

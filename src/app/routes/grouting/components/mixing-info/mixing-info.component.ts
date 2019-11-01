@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { AppService } from 'src/app/services/app.service';
@@ -9,7 +9,8 @@ import { MixingInfo, GroutingTask } from 'src/app/models/grouting';
   // tslint:disable-next-line: component-selector
   selector: 'mixing-info',
   templateUrl: './mixing-info.component.html',
-  styleUrls: ['./mixing-info.component.less']
+  styleUrls: ['./mixing-info.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MixingInfoComponent implements OnInit, OnChanges {
   @Input() formData: FormGroup;

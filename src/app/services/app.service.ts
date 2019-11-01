@@ -18,7 +18,7 @@ export class AppService {
   // tension
   // grouting
   // debug
-  initSetPlatform = 'grouting';
+  initSetPlatform = 'windows';
   platformName = localStorage.getItem('platformName');
   /** 上传信息 */
   uploadingData = JSON.parse(localStorage.getItem('uploadingData'));
@@ -74,7 +74,7 @@ export class AppService {
   bodySize = new Subject();
   // 获得一个Observable;
   bodySizeSub = this.bodySize.asObservable();
-
+  routerStateCode = 'active';
 
   constructor(
     private router: Router,

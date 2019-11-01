@@ -73,7 +73,7 @@ export class TensionHoleTaskComponent implements OnInit, OnChanges {
       this.jackMneu.push({ label: item.name, value: item.id })
       console.warn('获取设备菜单', item);
     })
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
   createForm(arrData: Array<TensionHoleTask> = []): FormGroup[] {
     this.tensionDeviceId = [];
@@ -112,6 +112,10 @@ export class TensionHoleTaskComponent implements OnInit, OnChanges {
     console.log(id, device);
     (this.TaskFormArray.at(i) as FormGroup).get('device').setValue(device);
     this.stageDom.onCdr();
+  }
+  /** ifDevice */
+  deviceExist(device: TensionDevice) {
+    return this.jackMneu.find(f => f.label === device.name && f.value === device.id) === undefined;
   }
 }
 

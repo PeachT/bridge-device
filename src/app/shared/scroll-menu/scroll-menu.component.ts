@@ -10,8 +10,9 @@ import { AppService } from 'src/app/services/app.service';
 import { Project } from 'src/app/models/project';
 import { ActivatedRoute } from '@angular/router';
 import { TensionTask } from 'src/app/models/tension';
-import { format } from 'date-fns/esm';
-import { dateResetTime } from 'src/app/Function/unit';
+import { format, endOfMonth, endOfWeek, startOfWeek, startOfMonth, isAfter, isBefore } from 'date-fns/esm';
+import { dateResetTime, cmp3Date } from 'src/app/Function/unit';
+import { NzMessageService } from 'ng-zorro-antd';
 
 @Component({
   selector: 'app-scroll-menu',
@@ -41,6 +42,7 @@ import { dateResetTime } from 'src/app/Function/unit';
     ]),
   ]
 })
+
 export class ScrollMenuComponent implements OnInit, OnChanges {
   @Input() dbName;
   @Input() stateFunc: any;
@@ -60,7 +62,7 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
     /** 浇筑完成 */
     castingDate: []
   }
-
+  ranges1 = { 本周: [startOfWeek(new Date()), endOfWeek(new Date())], 本月: [startOfMonth(new Date()), endOfMonth(new Date())] };
 
   @Output() menuChange = new EventEmitter();
 
@@ -69,9 +71,12 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
     public appS: AppService,
     private activatedRoute: ActivatedRoute,
     private crd: ChangeDetectorRef,
+    private message: NzMessageService
   ) { }
 
   ngOnInit() {
+    this.appS.editId = null;
+    this.appS.leftMenu = null;
     this.getProjectMenu();
     this.activatedRoute.queryParams.subscribe(queryParams => {
       let data = null;
@@ -88,7 +93,6 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
       } else {
         console.warn('没有菜单数据', data);
       }
-
     });
   }
 
@@ -142,27 +146,23 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
       (g) => {
         if (this.projectId === g.project && g.component === this.componentName) {
           if (this.dbName === 'tension') {
-            g = g as TensionTask;
-            if (this.search.done && g.tensionHoleInfos[0].tasks.find(f => f.record.groups.length > 0)) {
+            const t = g as TensionTask;
+            if (this.search.done && t.tensionHoleInfos.find(h => h.tasks.find(f => f.record.state > 0) !== undefined)) {
               if (this.search.doneDate.length > 0) {
-                const st = dateResetTime(this.search.doneDate[0], '00:00:00') / 1000;
-                const et = dateResetTime(this.search.doneDate[1], '23:59:59') / 1000;
                 // tslint:disable-next-line:max-line-length
-                if (g.tensionHoleInfos[0].tasks.find(f => f.record.groups.length > 0 && f.record.groups[0].startDate >= st && f.record.groups[0].startDate <= et)) {
+                if (t.tensionHoleInfos[0].tasks.find(f => f.record.groups.length > 0 && cmp3Date(this.search.doneDate, f.record.groups[0].startDate))) {
                   return true;
                 }
               } else {
                 return true
               }
             }
-            if (this.search.unDone && g.tensionHoleInfos[0].tasks.find(f => f.record.groups.length === 0)) {
+            if (this.search.unDone && t.tensionHoleInfos.find(h => h.tasks.find(f => f.record.state === 0) !== undefined)) {
               return true
             }
             if (this.search.castingDate.length > 0) {
-              const st = dateResetTime(this.search.castingDate[0], '00:00:00') / 1000;
-              const et = dateResetTime(this.search.castingDate[1], '23:59:59') / 1000;
               // tslint:disable-next-line:max-line-length
-              if (g.castingDate >= st && g.castingDate <= et) {
+              if (cmp3Date(this.search.castingDate, t.castingDate)) {
                 return true;
               }
             }
@@ -170,7 +170,29 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
               return true;
             }
           } else {
-            g = g as GroutingTask;
+            const gr = g as GroutingTask;
+            if (this.search.done && gr.groutingInfo.find(f => f.state > 0)) {
+              if (this.search.doneDate.length > 0) {
+                // tslint:disable-next-line:max-line-length
+                if (gr.groutingInfo[0].groups.find(f => cmp3Date(this.search.doneDate, f.startDate))) {
+                  return true;
+                }
+              } else {
+                return true
+              }
+            }
+            if (this.search.unDone && gr.groutingInfo[0].groups.find(f => !f.startDate)) {
+              return true
+            }
+            if (this.search.castingDate.length > 0) {
+              // tslint:disable-next-line:max-line-length
+              if (cmp3Date(this.search.castingDate, gr.castingDate)) {
+                return true;
+              }
+            }
+            if (!this.search.done && !this.search.unDone && this.search.doneDate.length === 0 && this.search.castingDate.length === 0) {
+              return true;
+            }
           }
         }
         return false;
@@ -203,8 +225,13 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
   }
   /** 选择梁 */
   async selectBridge(id) {
+    if (this.appS.edit) {
+      this.message.error('请完成编辑');
+      return;
+    }
     this.bridgeId = id;
     this.appS.editId = id;
+    this.appS.leftMenu = this.projectId;
     let data = JSON.parse(localStorage.getItem(this.appS.userInfo.nameId)) || {};
     data = JSON.stringify(
       {

@@ -8,21 +8,20 @@ import { Router } from '@angular/router';
 import { ElectronService } from 'ngx-electron';
 
 const menus = [
-  { platform: 'tension,windows', jurisdiction: 0, url: '/tension', icon: 'swap', name: '张拉' },
-  { platform: 'tension,windows', jurisdiction: 1, url: '/tension-setting', icon: 'setting', name: '张拉设置' },
-  { platform: 'tension,windows', jurisdiction: 1, url: '/jack', icon: 'usb', name: '千斤顶' },
-  { platform: 'tension,windows', jurisdiction: 0, url: '/live-tension', icon: 'fund', name: '张拉监控' },
-  { platform: 'grouting,windows', jurisdiction: 0, url: '/grouting', icon: 'experiment', name: '压浆' },
-  { platform: 'grouting,windows', jurisdiction: 1, url: '/grouting-setting', icon: 'setting', name: '压浆设置' },
-  { platform: 'grouting,windows', jurisdiction: 0, url: '/live-grouting', icon: 'fund', name: '压浆监控' },
-  { platform: 'all', jurisdiction: 1, url: '/project', icon: 'appstore', name: '项目' },
-  { platform: 'all', jurisdiction: 1, url: '/component', icon: 'deployment-unit', name: '构建' },
-  { platform: 'all', jurisdiction: 1, url: '/user', icon: 'user', name: '用户' },
+  { platform: 'tension,windows', jurisdiction: 0, url: '/tension', icon: 'icon-renwuguanli', name: '张拉' },
+  { platform: 'tension,windows', jurisdiction: 1, url: '/tension-setting', icon: 'icon-settings-1', name: '张拉设置' },
+  { platform: 'tension,windows', jurisdiction: 1, url: '/jack', icon: 'icon-yeyaxitong', name: '千斤顶' },
+  { platform: 'tension,windows', jurisdiction: 0, url: '/live-tension', icon: 'icon-jiankong', name: '张拉监控' },
+  { platform: 'grouting,windows', jurisdiction: 0, url: '/grouting', icon: 'icon-renwufenpei', name: '压浆' },
+  { platform: 'grouting,windows', jurisdiction: 1, url: '/grouting-setting', icon: 'icon-185096settingsstreamline', name: '压浆设置' },
+  { platform: 'grouting,windows', jurisdiction: 0, url: '/live-grouting', icon: 'icon-shishishipinjiankong', name: '压浆监控' },
+  { platform: 'all', jurisdiction: 1, url: '/project', icon: 'icon-xiangmu', name: '项目' },
+  { platform: 'all', jurisdiction: 1, url: '/component', icon: 'icon-bridge', name: '构建' },
+  { platform: 'all', jurisdiction: 1, url: '/user', icon: 'icon-yonghu', name: '用户' },
   // { platform: 'tension', jurisdiction: 0, url: '/manual', icon: 'deployment-unit', name: '手动' },
   // { platform: 'tension', jurisdiction: 1, url: '/setting', icon: 'setting', name: '张拉设置' },
   // { platform: 'tension', jurisdiction: 8, url: '/auto', icon: 'box-plot', name: '自动' },
-  { platform: 'all', jurisdiction: 0, url: '/help', icon: 'question', name: '帮助'},
-  { platform: 'all', jurisdiction: 0, url: '/help', icon: 'question', name: 'LINUX', linux: true},
+  { platform: 'all', jurisdiction: 0, url: '/help', icon: 'icon-icon', name: '帮助'},
 ];
 @Component({
   selector: 'app-login',
@@ -107,36 +106,38 @@ export class LoginComponent implements OnInit {
             nameId: `${user.name}-${user.id}`,
             operation: user.operation || []
           };
-          const stateTension = localStorage.getItem('stateTension');
-          console.log('stateTension', stateTension, localStorage.getItem('stateTension'));
           // this.message.success('登录成功🙂');
           /** 菜单过滤 */
           this.appS.menus = menus.filter(menu => {
             if (this.appS.platform === 'debug' || menu.platform.indexOf(this.appS.platform) > -1 || menu.platform === 'all') {
-              if (menu.linux) {
-                if (this.e.isLinux) {
-                  return menu.jurisdiction <= user.jurisdiction;
-                }
-              } else {
-                return menu.jurisdiction <= user.jurisdiction;
-              }
+              return menu.jurisdiction <= user.jurisdiction;
             }
           });
-          if (stateTension) {
-            this.router.navigate(['/auto']);
-          } else if (this.appS.platform === 'tension') {
-            this.router.navigate(['/tesnion']);
-          } else if (this.appS.platform === 'grouting') {
-            this.router.navigate(['/grouting']);
-          } else {
-            const url = JSON.parse(localStorage.getItem(this.appS.userInfo.nameId));
-            console.log('fsdkjflsdfjsdklfjsdj', url);
-            if (!url) {
-              this.router.navigate(['/grouting']);
-            } else {
-              this.router.navigate([url.url]);
+          const url = JSON.parse(localStorage.getItem(this.appS.userInfo.nameId));
+          let goUrl = '/tension';
+          if (!url) {
+            if (this.appS.platform === 'grouting') {
+              goUrl = '/grouting';
             }
+          } else {
+            goUrl = url.url;
           }
+          console.warn(url, goUrl)
+          this.router.navigate([goUrl]);
+          // if (stateTension) {
+          //   this.router.navigate(['/auto']);
+          // } else if (this.appS.platform === 'tension') {
+          //   this.router.navigate(['/tesnion']);
+          // } else if (this.appS.platform === 'grouting') {
+          //   this.router.navigate(['/grouting']);
+          // } else {
+          //   console.log('fsdkjflsdfjsdklfjsdj', url);
+          //   if (!url) {
+          //     this.router.navigate(['/grouting']);
+          //   } else {
+          //     this.router.navigate([url.url]);
+          //   }
+          // }
         } else {
           this.message.error('登录失败😔');
         }

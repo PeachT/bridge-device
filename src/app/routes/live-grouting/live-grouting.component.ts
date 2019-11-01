@@ -294,7 +294,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
               /** 开始时间 */
               startDate: this.mixingDataNow.date,
               /** 完成时间 */
-              endDate: getDatetimeS(),
+              endDate: new Date(),
               /** 搅拌时间 */
               mixingTime: this.mixingDataNow.time,
               /** 泌水率 */

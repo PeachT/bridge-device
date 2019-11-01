@@ -23,9 +23,9 @@ export interface TensionTask extends TaskBase {
   /** 梁长度 */
   beamLength: number;
   /** 张拉日期 */
-  tensionDate: Date | string | number;
+  tensionDate: Date;
   /** 浇筑日期 */
-  castingDate: Date | string | number;
+  castingDate: Date;
   /** 张拉顺序 */
   sort?: string;
   /** 设备编号 */
@@ -117,9 +117,9 @@ export interface TensionRecord {
 /** 每次张拉记录 */
 export interface OnceRecord {
   /** 开始时间 */
-  startDate: Date | string | number;
+  startDate: Date;
   /** 完成时间 */
-  endDate: Date | string | number;
+  endDate: Date;
   /** 张拉阶段应力百分比 */
   knPercentage: Array<number>;
   /** 阶段名称 */

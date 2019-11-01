@@ -18,6 +18,7 @@ import { Store } from '@ngrx/store';
 import { NgrxState } from './ngrx/reducers';
 import { resetTensionLive } from './ngrx/actions/tensionLink.action';
 import { TensionLive } from './models/tensionLive';
+import { goRouter } from './ngrx/actions/router.action';
 
 @Component({
   selector: "app-root",
@@ -26,11 +27,11 @@ import { TensionLive } from './models/tensionLive';
   animations: [
     trigger('routeAnimation', [
       transition('* => *', [
-        query(':leave', style({ transform: 'translateX(0)', width: '100%'}), { optional: true }),
-        query(':enter', style({ transform: 'translateX(50%)', width: '0%'}), { optional: true }),
+        // query(':leave', style({ opacity: 1}), { optional: true }),
+        query(':enter', style({ opacity: 0}), { optional: true }),
         group([
-          query(':leave', animate('.5s ease-in-out', style({transform: 'translateX(50%)', width: '0%'})), { optional: true }),
-          query(':enter', animate('.5s ease-in-out', style({transform: 'translateX(0)', width: '100%'})), { optional: true })
+          // query(':leave', animate('.5s ease-in-out', style({opacity: 0})), { optional: true }),
+          query(':enter', animate('.5s ease-in-out', style({opacity: 1})), { optional: true })
         ])
       ])
     ])
@@ -84,9 +85,10 @@ export class AppComponent implements OnInit {
         }
         console.log(event);
         this.appS.nowUrl = event.url;
-        // 每次路由跳转改变状态
+        // 每次路由跳转改变状态动画切换
         this.routerState = !this.routerState;
         this.routerStateCode = this.routerState ? 'active' : 'inactive';
+        this.store$.dispatch(goRouter({routerInfo: {url: event.url, state: false }}))
       }
     });
   }

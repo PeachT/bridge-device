@@ -39,15 +39,18 @@ export class GroutingMianComponent implements OnInit, OnChanges {
   constructor(
     public db: DbService,
     public appS: AppService,
-    public GPLCS: GroutingService
+    public GPLCS: GroutingService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
     this.getComponent();
+    this.cdr.detectChanges();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    // console.log('配比数据更新', changes, this.data);
+    console.log('配比数据更新', changes);
+    this.cdr.detectChanges();
     // this.piFormGroup.controls.waterBinderRatio.setValue(this.data.waterBinderRatio);
     // this.createForm(this.data.proportions).map(si => {
     //   this.proportionrFormArr.push(si)

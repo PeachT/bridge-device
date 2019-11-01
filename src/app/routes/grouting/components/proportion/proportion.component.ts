@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { AppService } from 'src/app/services/app.service';
 import { arrayValidator } from 'src/app/Validator/repetition.validator';
@@ -9,7 +9,8 @@ import { waterBinderRatio } from 'src/app/Function/unit';
   // tslint:disable-next-line: component-selector
   selector: 'grouting-proportion',
   templateUrl: './proportion.component.html',
-  styleUrls: ['./proportion.component.less']
+  styleUrls: ['./proportion.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProportionComponent implements OnInit, OnChanges {
   @Input() formGroup: FormGroup;

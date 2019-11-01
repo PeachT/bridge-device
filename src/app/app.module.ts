@@ -53,7 +53,7 @@ registerLocaleData(zh);
   ],
   providers: [
     { provide: NZ_I18N, useValue: zh_CN },
-    { provide: NZ_ICONS, useValue: AllIcons }
+    // { provide: NZ_ICONS, useValue: AllIcons }
   ],
   bootstrap: [AppComponent]
 })

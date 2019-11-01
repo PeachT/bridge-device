@@ -178,31 +178,6 @@ export function holeNameShow (name: string, mode: number) {
   }
 }
 
-
-
-/** 张拉时间转时间戳 */
-export function tensionDate2Number(data: TensionTask): TensionTask {
-  console.log(
-    data,
-    data.tensionDate,
-    data.castingDate,
-    data.createdDate,
-  );
-
-  data.tensionDate = getDatetimeS(data.tensionDate);
-  data.castingDate = getDatetimeS(data.castingDate);
-  // data.createdDate = getDatetimeS(data.createdDate);
-  return data;
-}
-/** 张拉时间转控件显示时间 */
-export function tensionOther2Date(data: TensionTask): TensionTask {
-  data.tensionDate = getJSDate(data.tensionDate);
-  data.castingDate = getJSDate(data.castingDate);
-  data.createdDate = getJSDate(data.createdDate);
-  data.modificationDate = getJSDate(data.modificationDate);
-  return data;
-}
-
 /** mode构建张拉顶数据 */
 export function createHoleTask(mode: number): TensionStage {
   console.log(mode);

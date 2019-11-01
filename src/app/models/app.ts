@@ -1,6 +1,6 @@
 export interface RouterInfo {
   url: string;
-  state: boolean;
+  state?: boolean;
 }
 /** 菜单 */
 export interface MenuItem {

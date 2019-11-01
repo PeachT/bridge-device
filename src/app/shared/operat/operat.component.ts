@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef, SimpleChanges, OnChanges, DoCheck } from '@angular/core';
 import { DbService } from 'src/app/services/db.service';
 import { Project } from 'src/app/models/project';
 import { NzMessageService, NzModalService } from 'ng-zorro-antd';
@@ -10,15 +10,16 @@ import { getModelBase } from 'src/app/models/base';
   selector: 'app-operat',
   templateUrl: './operat.component.html',
   styleUrls: ['./operat.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OperatComponent implements OnInit, OnChanges {
+export class OperatComponent implements OnInit, OnChanges, DoCheck {
   @Input() dbName: string;
   @Input() formData: FormGroup;
   // @Input() saveState = true;
   @Input() coprState = false;
   @Input() addState = true;
-  @Input() valid: boolean;
+  @Input() valid: any;
+  oldValid: boolean;
   @Input() leftMenu: any;
 
   @Output() outEditOk = new EventEmitter();
@@ -42,7 +43,14 @@ export class OperatComponent implements OnInit, OnChanges {
   ngOnInit() {
   }
   ngOnChanges(changes: SimpleChanges) {
-    this.cdr.detectChanges();
+    console.log(this.valid);
+    this.cdr.markForCheck();
+  }
+  ngDoCheck() {
+    if (this.oldValid !== this.valid) {
+      console.log(this.valid);
+      this.oldValid = this.valid;
+    }
   }
   /** 保存数据 */
   async save() {
@@ -82,7 +90,7 @@ export class OperatComponent implements OnInit, OnChanges {
       this.message.error(`${msg}失败😔`);
       console.log(`${msg}失败😔`, r.msg);
     }
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
   /** 取消编辑 */
   cancelEdit() {
@@ -92,6 +100,7 @@ export class OperatComponent implements OnInit, OnChanges {
       nzCancelText: '继续编辑',
       nzOnOk: () => {
         this.appS.edit = false;
+        this.cdr.markForCheck();
         this.outCancelEdit.emit();
       },
       nzOnCancel: () => { console.log('取消'); }
@@ -101,11 +110,12 @@ export class OperatComponent implements OnInit, OnChanges {
    * *true:添加 | false:复制
    */
   edit(state: boolean) {
+    this.appS.edit = true;
     this.appS.editId = null;
     this.appS.leftMenu = null;
     const data = state ? getModelBase(this.dbName) : null;
     this.outEdit.emit(data);
-    this.appS.edit = true;
+    this.cdr.markForCheck();
   }
   /** 修改 */
   modification() {

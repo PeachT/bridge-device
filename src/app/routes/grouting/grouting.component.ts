@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { NzMessageService } from 'ng-zorro-antd';
@@ -23,25 +23,6 @@ import { ScrollMenuComponent } from 'src/app/shared/scroll-menu/scroll-menu.comp
 export class GroutingComponent implements OnInit, OnDestroy {
   dbName = 'grouting';
   @ViewChild('menu', null) menuDom: ScrollMenuComponent;
-
-  // @Input() taskMenu: TaskMenuComponent;
-  // set proportionsForm(formArray: FormArray) {
-  //   (this.formData.controls.proportionInfo as FormGroup).controls.proportions = formArray;
-  // }
-
-  // get mixingInfoForm(): FormArray {
-  //   return this.formData.controls.mixingInfo as FormArray;
-  // }
-  // set mixingInfoForm(formArray: FormArray) {
-  //   this.formData.controls.mixingInfo = formArray;
-  // }
-  // get groutingInfoForm(): FormArray {
-  //   return this.formData.controls.groutingInfo as FormArray;
-  // }
-  // set groutingInfoForm(formArray: FormArray) {
-  //   this.formData.controls.groutingInfo = formArray;
-  // }
-
 
   data: GroutingTask = {
     id: null,
@@ -373,7 +354,8 @@ export class GroutingComponent implements OnInit, OnDestroy {
     private message: NzMessageService,
     public appS: AppService,
     public GPLCS: GroutingService,
-    private http: HttpService
+    private http: HttpService,
+    private crd: ChangeDetectorRef
   ) {
 
   }
@@ -423,13 +405,14 @@ export class GroutingComponent implements OnInit, OnDestroy {
       mixingInfo: fb.array([]),
       groutingInfo: fb.array([]),
     });
-
     // this.formData.setValue(data);
     console.log('初始化数据', data, !data.id && data.name);
     this.formData.controls.name.setAsyncValidators([nameRepetition(this.odb, this.dbName, this.updateFilterFun)]);
-      setTimeout(() => {
-        this.formData.controls.name.updateValueAndValidity();
-      }, 1);
+    setTimeout(() => {
+      console.log('测试验证');
+      this.formData.controls.name.updateValueAndValidity();
+    }, 1);
+    this.crd.detectChanges();
   }
 
   /** 选择构建 */
@@ -447,12 +430,12 @@ export class GroutingComponent implements OnInit, OnDestroy {
   test() {
     // tslint:disable-next-line:forin
     for (const i in this.formData.controls) {
-      this.formData.controls[i].markAsDirty();
-      this.formData.controls[i].updateValueAndValidity();
       console.log(
         this.formData.controls[i].valid,
         i
       );
+      // this.formData.controls[i].markAsDirty();
+      // this.formData.controls[i].updateValueAndValidity();
     }
 
     console.log(this.formData,
@@ -520,11 +503,13 @@ export class GroutingComponent implements OnInit, OnDestroy {
         this.data = getModelBase(baseEnum.groutingTask);
         this.data.project = this.menuDom.projectId;
       }
-    }
-    const other = this.projectAddOther(project);
-    if (other) {
-      this.otherUnDel = other.unDel;
-      this.data.otherInfo = other.other;
+      const other = this.projectAddOther(project);
+      if (other) {
+        this.otherUnDel = other.unDel;
+        this.data.otherInfo = other.other;
+      }
+    } else {
+      this.formData.controls.name.updateValueAndValidity();
     }
     console.log('添加', this.data, project, this.otherUnDel);
     this.formInit(this.data);
@@ -542,7 +527,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
    */
   editOk(data) {
     console.log(data, this.menuDom.bridgeId);
-    if (data.bridgeId && data.bridgeId !== this.menuDom.bridgeId) {
+    if (data && data.bridgeId && data.bridgeId !== this.menuDom.bridgeId) {
       this.menuDom.reset({
         projectId: data.projectId,
         componentName: data.componentName,

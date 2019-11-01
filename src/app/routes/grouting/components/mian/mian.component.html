@@ -9,17 +9,18 @@
     <app-form-item label="构建" [errors]="formData.get('component').errors">
       <nz-select style="width: 100%;" nzPlaceHolder="请选择构建" formControlName="component" (ngModelChange)="conponentChange($event)">
         <nz-option [nzValue]="item.value" [nzLabel]="item.label" *ngFor="let item of componentMneu$ | async"></nz-option>
+        <nz-option [nzValue]="groutingTask?.component" [nzLabel]="groutingTask?.component" *ngIf="(componentMneu$ | async)?.indexOf(groutingTask?.component) === -1"></nz-option>
       </nz-select>
     </app-form-item>
     <app-form-item label="梁长度" [errors]="formData.get('beamLength').errors">
       <input type="number" nz-input placeholder="请输入梁长度" formControlName="beamLength">
     </app-form-item>
 
-    <app-form-item label="浇筑日期" [errors]="formData.get('castingDate').errors">
-      <nz-date-picker formControlName="castingDate" placeholder="浇筑日期"></nz-date-picker>
+    <app-form-item   label="浇筑日期" [errors]="formData.get('castingDate').errors">
+       <nz-date-picker readonly formControlName="castingDate" placeholder="浇筑日期" [nzAllowClear]="false"></nz-date-picker>
     </app-form-item>
-    <app-form-item label="张拉日期" [errors]="formData.get('tensinDate').errors">
-      <nz-date-picker formControlName="tensinDate" placeholder="张拉日期"></nz-date-picker>
+    <app-form-item  label="张拉日期" [errors]="formData.get('tensinDate').errors">
+       <nz-date-picker readonly formControlName="tensinDate" placeholder="张拉日期" [nzAllowClear]="false"></nz-date-picker>
     </app-form-item>
 
     <app-form-item label="压浆顺序">
@@ -36,7 +37,7 @@
       <input type="text" nz-input placeholder="自检员" formControlName="qualityInspector">
     </app-form-item>
   </div>
-  <div>
+  <!-- <div>
     <app-add-other [formGroup]="formData" [data]="groutingTask?.otherInfo || []" [unDel]="unDel" [edit]="appS.edit"></app-add-other>
   </div>
   <div>
@@ -47,6 +48,6 @@
   </div>
   <div>
     <grouting-record [formData]="formData" [data]="groutingTask"></grouting-record>
-  </div>
+  </div> -->
   <div class="edit" *ngIf="!appS.edit"></div>
 </form>
