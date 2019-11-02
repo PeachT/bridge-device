@@ -5,4 +5,5 @@ export interface TensionLive {
   oldTime?: number
   delayTime?: string;
   msg?: string;
+  monitoringState?: boolean;
 }

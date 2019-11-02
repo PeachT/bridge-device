@@ -108,7 +108,7 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
     this.holeNames = holeNameShow(this.holeData.name, this.task.mode);
     this.jackModeStr = JackModeEnum[this.task.mode];
     if (this.PLCS.tcp.linkMsg.link) {
-      this.live();
+      this.getLiveData();
     }
   }
 
@@ -164,7 +164,7 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
     this.nzHref = event.nzHref;
   }
   /** 监控 */
-  live() {
+  getLiveData() {
     const delay = 100;
     this.liveT = setTimeout(() => {
       if (this.PLCS.tcp.linkMsg.link) {
@@ -180,13 +180,14 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
             this.liveData.B1 = r.float.slice(12, 18)
             this.liveData.B2 = r.float.slice(18, 24)
             clearTimeout(t);
-            this.live();
+            this.getLiveData();
           })
         }
     }, delay);
   }
   test() {
     this.liveData.state = !this.liveData.state;
+    this.PLCS.tcp.linkMsg.monitoringState = this.liveData.stage;
     if (!this.liveData.t) {
       this.liveData.t = setInterval(() => {
         if (this.liveData.state) {

@@ -92,15 +92,6 @@ export class AppComponent implements OnInit {
       }
     });
   }
-  // runPLC() {
-  //   const lastTime = Number(localStorage.getItem("lastTime"));
-  //   const nowTime = new Date().getTime();
-  //   if (nowTime < lastTime) {
-  //     this.appS.lock = true;
-  //   } else {
-  //     this.PLCS.runSocket();
-  //   }
-  // }
   async ngOnInit() {
     this.store$.dispatch(resetTensionLive(null))
     this.tensionLink$ = this.store$.select(state => state.tensionLive);
@@ -361,5 +352,14 @@ export class AppComponent implements OnInit {
     console.log("取消");
     clearTimeout(this.appS.powerDelayT);
     this.appS.powerDelayT = null;
+  }
+  /** 取消TCP链接 */
+  cancleLink() {
+    if (this.PLCS.tcp.linkMsg.monitoringState) {
+      this.message.warning('正在监控，必须完成监控任务才能取消链接');
+    } else {
+      this.PLCS.tcp.cancelLink();
+    }
+
   }
 }

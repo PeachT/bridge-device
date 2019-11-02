@@ -56,12 +56,6 @@
             <div>
               <tension-holes [data]="data" [formData]="formData" #holes (outSelectHole)="holeIndex = $event"></tension-holes>
             </div>
-            <!-- <div>
-              <mixing-info [formData]="formData" [data]="groutingTask"></mixing-info>
-            </div>
-            <div>
-              <grouting-record [formData]="formData" [data]="groutingTask"></grouting-record>
-            </div> -->
           </form>
           <div class="edit" *ngIf="!appS.edit"></div>
         </div>

@@ -14,7 +14,8 @@ export class GroutingService {
     now: false,
     link: false,
     oldTime: 0,
-    delayTime: '0s'
+    delayTime: '0s',
+    msg: null
   };
 
   /** PLC sub */
@@ -64,9 +65,13 @@ export class GroutingService {
       if (data.success) {
         this.linkMsg.state = false;
         // this.linkMsg.link = true;
+        this.linkMsg.msg = '链接中';
+        // this.store$.dispatch(resetTensionLive({data: {msg: '链接中'}}));
       } else {
         this.linkMsg.link = false;
         this.plcSub.next({state: false, data});
+        // this.store$.dispatch(resetTensionLive({data: {msg: '链接有误'}}));
+        this.linkMsg.msg = '链接有误';
       }
     });
     this.e.ipcRenderer.on(`groutingheartbeat`, async (event, data) => {

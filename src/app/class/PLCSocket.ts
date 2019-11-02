@@ -5,6 +5,7 @@ import { Store } from '@ngrx/store';
 import { NgrxState } from '../ngrx/reducers';
 import { resetTensionLive, initTensionLive } from '../ngrx/actions/tensionLink.action';
 import { TensionLive } from '../models/tensionLive';
+import { NzMessageService } from 'ng-zorro-antd';
 
 export class PLCSocket {
   connStr: ConnectionStr;
@@ -14,7 +15,8 @@ export class PLCSocket {
     link: false,
     oldTime: 0,
     delayTime: '0s',
-    msg: ''
+    msg: '',
+    monitoringState: false
   };
   constructor(
     private e: ElectronService,
@@ -43,10 +45,10 @@ export class PLCSocket {
       console.log(data);
       if (data.success) {
         this.linkMsg.state = false;
-        this.store$.dispatch(resetTensionLive({data: {msg: '链接中'}}))
+        this.store$.dispatch(resetTensionLive({data: {msg: '链接中', link: true}}));
       } else {
         this.linkMsg.link = false;
-        this.store$.dispatch(resetTensionLive({data: {msg: '链接有误'}}))
+        this.store$.dispatch(resetTensionLive({data: {msg: '链接有误', link: false}}));
       }
     });
     /** 监听心跳 */

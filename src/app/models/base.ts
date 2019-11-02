@@ -86,7 +86,7 @@ const base = {
     /** 梁长度 */
     beamLength: null,
     /** 张拉日期 */
-    tensinDate: null,
+    tensionDate: null,
     /** 浇筑日期 */
     castingDate: null,
     /** 张拉顺序 */

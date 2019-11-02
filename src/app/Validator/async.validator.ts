@@ -48,7 +48,7 @@ export function nameRepetition(
    return (control: AbstractControl): Observable<ValidationErrors | null> => {
     const value = control.root.value;
     value[nowkey] = control.value;
-    console.log(control.root.value);
+    // console.log(control.root.value);
 
     return control.valueChanges.pipe(
       // 延时防抖

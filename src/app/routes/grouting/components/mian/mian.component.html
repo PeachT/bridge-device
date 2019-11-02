@@ -19,8 +19,8 @@
     <app-form-item   label="浇筑日期" [errors]="formData.get('castingDate').errors">
        <nz-date-picker readonly formControlName="castingDate" placeholder="浇筑日期" [nzAllowClear]="false"></nz-date-picker>
     </app-form-item>
-    <app-form-item  label="张拉日期" [errors]="formData.get('tensinDate').errors">
-       <nz-date-picker readonly formControlName="tensinDate" placeholder="张拉日期" [nzAllowClear]="false"></nz-date-picker>
+    <app-form-item  label="张拉日期" [errors]="formData.get('tensionDate').errors">
+       <nz-date-picker readonly formControlName="tensionDate" placeholder="张拉日期" [nzAllowClear]="false"></nz-date-picker>
     </app-form-item>
 
     <app-form-item label="压浆顺序">
@@ -37,7 +37,7 @@
       <input type="text" nz-input placeholder="自检员" formControlName="qualityInspector">
     </app-form-item>
   </div>
-  <!-- <div>
+  <div>
     <app-add-other [formGroup]="formData" [data]="groutingTask?.otherInfo || []" [unDel]="unDel" [edit]="appS.edit"></app-add-other>
   </div>
   <div>
@@ -48,6 +48,6 @@
   </div>
   <div>
     <grouting-record [formData]="formData" [data]="groutingTask"></grouting-record>
-  </div> -->
+  </div>
   <div class="edit" *ngIf="!appS.edit"></div>
 </form>

@@ -379,7 +379,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
       /** 梁长度 */
       beamLength: [data.beamLength, [Validators.required]],
       /** 张拉日期 */
-      tensinDate: [data.tensionDate, [Validators.required]],
+      tensionDate: [data.tensionDate, [Validators.required]],
       /** 浇筑日期 */
       castingDate: [data.castingDate, [Validators.required]],
       /** 压浆顺序 */
