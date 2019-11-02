@@ -1,34 +1,6 @@
 <main class="setting">
   <div style="display: flex; flex-direction: column;">
-    <nz-divider style="min-width: auto;" nzText="设备通信参数" nzOrientation="left"></nz-divider>
-    <div>
-      <app-form-item label="IP">
-        <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.ip"/>
-      </app-form-item>
-      <app-form-item label="端口号">
-          <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.port"/>
-      </app-form-item>
-      <app-form-item label="PLC地址">
-          <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.address"/>
-      </app-form-item>
-      <app-form-item label="设备uid">
-          <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.uid"/>
-      </app-form-item>
-      <app-form-item label="通信延时">
-          <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.setTimeout"/>
-      </app-form-item>
-      <app-form-item label="频率">
-        <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="GPLCS.connectionStr.hz"/>
-      </app-form-item>
-    </div>
-    <div style="display: flex; align-items: center; margin-left: 100px;">
-      <button nz-button nzType="primary" [nzLoading]="tastLinkMsg.state" (click)="tastLink()">保存测试链接</button>
-        <nz-alert style="flex: 1;" *ngIf="tastLinkMsg.msg && !tastLinkMsg.success" nzType="error" [nzMessage]="tastLinkMsg.msg" nzShowIcon
-          nzDescription="检查路由器、网线、电脑网路。不能解决请联系售后人员！"
-        ></nz-alert>
-        <nz-alert style="flex: 1;" *ngIf="tastLinkMsg.msg && tastLinkMsg.success" nzType="error" [nzMessage]="tastLinkMsg.msg" nzShowIcon></nz-alert>
-    </div>
-
+    <link-base [linkName]="'groutingLink'" [heartbeatAddress]="0"></link-base>
   </div>
   <div>
     <nz-divider style="min-width: auto;" nzText="设备" nzOrientation="left"></nz-divider>

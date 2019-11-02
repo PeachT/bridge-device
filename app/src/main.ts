@@ -10,8 +10,6 @@ const ping = require('ping');
 // 注意这个autoUpdater不是electron中的autoUpdater
 // const { autoUpdater } = require('electron-updater');
 import { autoUpdater } from 'electron-updater';
-import { GroutingTcpModbus } from './grouting.TCP';
-import { TensionTcpModbus } from './tension.TCP';
 import { PLCTcpModbus } from './PLCTcpModbus';
 
 
@@ -21,9 +19,6 @@ const args = process.argv.slice(1);
 console.log(args);
 
 const dev = args.some((val) => val === '--dev');
-
-/** 压浆tcp */
-let gtcp: GroutingTcpModbus;
 
 // tslint:disable-next-line:no-string-literal
 global['heartbeatRate'] = 1000;
@@ -35,7 +30,7 @@ const winURL = dev ? 'http://localhost:4200' :
 
 let win: BrowserWindow;
 
-
+/** 创建窗口 */
 function createWindow() {
   /*隐藏electron创听的菜单栏*/
   Menu.setApplicationMenu(null);
@@ -81,45 +76,34 @@ app.on('activate', () => {
   }
 });
 
-/** 测试链接 */
-ipcMain.on('tastLink', (event, data) => {
-  ping.promise.probe(data).then((res) => {
-    event.sender.send('tastLink', res);
-  });
-});
-
-/** 启动压浆Socket */
-ipcMain.on('groutingRun', (event, data) => {
-  if (!gtcp) {
-    gtcp = new GroutingTcpModbus(data, win);
-    IPCOn('grouting', gtcp);
-  }
-});
 
 /** tcp链接集合 */
-const tcpList: {[prop: string]: TensionTcpModbus} = {};
+const tcpList: {[prop: string]: PLCTcpModbus} = {};
 /** 测试链接tcp */
-ipcMain.on('TestLinkTCP', (event, data) => {
+ipcMain.on('TCPLink', (event, data) => {
   if (tcpList[data.uid]) {
-    event.sender.send(`${data.uid}testLink`, {alive: true, link: true, msg: '设备已连接'});
+    event.sender.send(`${data.uid}testLink`, {alive: true, link: true, msg: `${data.uid}>设备已连接`});
     return;
   } else {
     ping.promise.probe(data.ip).then((res) => {
       if (res.alive) {
-        // tcpList[data.uid] = new TensionTcpModbus(data, win);
-        // IPCOn(data.uid, tcpList[data.uid]);
-        // LinkTCP(data);
-        event.sender.send(`${data.uid}testLink`, {alive: true, link: false, msg: '测试链接'});
+        event.sender.send(`${data.uid}testLink`, {alive: true, link: false, msg: `${data.uid}测试链接`});
       } else {
-        event.sender.send(`${data.uid}testLink`, { alive: false, link: false, msg: '测试链接' });
+        event.sender.send(`${data.uid}testLink`, { alive: false, link: false, msg: `${data.uid}测试链接` });
       }
     });
   }
 });
 /** 链接tcp */
 ipcMain.on('LinkTCP', (event, data) => {
-  tcpList[data.uid] = new TensionTcpModbus(data, win);
-  IPCOn(data.uid, tcpList[data.uid]);
+  if (tcpList[data.uid]) {
+    event.sender.send(`${data.uid}testLink`, {link: true, msg: `${data.uid}>设备已连接`});
+    return;
+  } else {
+    event.sender.send(`${data.uid}testLink`, {link: false, msg: `${data.uid}>创建新链接`});
+    tcpList[data.uid] = new PLCTcpModbus(data, win);
+    IPCOn(data.uid, tcpList[data.uid]);
+  }
 });
 /** 取消tcp */
 ipcMain.on('CancelTCP', (event, name) => {

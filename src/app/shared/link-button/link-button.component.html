@@ -1,0 +1,40 @@
+<div class="plc-state">
+  <div
+    [@slideInOut]="move"
+    *ngIf="(!PLCS.connStr?.uid || PLCS.connStr?.uid === 'groutingLink' ) && (appS.platform === 'grouting' || appS.platform === 'debug' || appS.platform === 'windows')"
+    class="btng">
+    <div [attr.class]="'bg ' + PLCS.socketInfo.state"
+      [ngStyle]="{'animation-duration': animationTime}"></div>
+    <div class="msg" nz-popover nzPopoverTitle="操作" [nzPopoverContent]="contentTemplate" nzPopoverTrigger="click"
+      nzPopoverPlacement="topLeft" [(nzVisible)]="visible">
+      <span class="top">压浆</span>
+      <span class="bottom"
+        [ngStyle]="{'color': plcState ? '#11999E' : 'red'}">{{PLCS.socketInfo.msg}}</span>
+    </div>
+    <button nz-button nzType="dashed" *ngIf="!PLCS.socketInfo.link" (click)="PLCS.link('groutingLink'); move='moveRight'">点击链接</button>
+  </div>
+  <div
+    [@slideInRight]
+    *ngIf="(!PLCS.connStr?.uid || PLCS.connStr?.uid === 'tensionLink' ) && (appS.platform === 'tension' || appS.platform === 'debug' || appS.platform === 'windows')"
+    class="btng">
+    <div [attr.class]="'bg ' + PLCS.socketInfo.state"
+      [ngStyle]="{'animation-duration': animationTime}"></div>
+    <div class="msg" nz-popover nzPopoverTitle="操作" [nzPopoverContent]="contentTemplate" nzPopoverTrigger="click"
+      nzPopoverPlacement="topLeft" [(nzVisible)]="visible">
+      <span class="top">张拉</span>
+      <span class="bottom"
+        [ngStyle]="{'color': plcState ? '#11999E' : 'red'}">{{PLCS.socketInfo.msg}}</span>
+    </div>
+    <button nz-button nzType="dashed" *ngIf="!PLCS.socketInfo.link" (click)="PLCS.link('tensionLink')">点击链接</button>
+  </div>
+</div>
+
+<ng-template #contentTemplate>
+  <div>
+    <h3 style="color: #fd1d1d" *ngIf="PLCS.noOut"> 正在监控任务不能取消链接！！ </h3>
+    <div *ngIf="!PLCS.noOut">
+      <h3>确定要取消链接吗？</h3>
+      <button nz-button nzType="danger" nzBlock (click)="cancelLink()">取消链接</button>
+    </div>
+  </div>
+</ng-template>

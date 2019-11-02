@@ -3,13 +3,14 @@ import { ElectronService } from "ngx-electron";
 import { ConnectionStr } from '../models/socketTCP';
 import { Store } from '@ngrx/store';
 import { NgrxState } from '../ngrx/reducers';
-import { resetTensionLive, initTensionLive } from '../ngrx/actions/tensionLink.action';
-import { TensionLive } from '../models/tensionLive';
+import { resetTcpLive, initTcpLive } from '../ngrx/actions/tcpLink.action';
+import { TcpLive } from '../models/tensionLive';
 import { NzMessageService } from 'ng-zorro-antd';
+import { Subject } from 'rxjs';
 
 export class PLCSocket {
   connStr: ConnectionStr;
-  linkMsg: TensionLive = {
+  linkMsg: TcpLive = {
     state: false,
     now: false,
     link: false,
@@ -18,6 +19,12 @@ export class PLCSocket {
     msg: '',
     monitoringState: false
   };
+
+  /** PLC sub */
+  private plclink = new Subject();
+  // 获得一个Observable;
+  LinkState$ = this.plclink.asObservable();
+
   constructor(
     private e: ElectronService,
     private store$: Store<NgrxState>,
@@ -30,6 +37,7 @@ export class PLCSocket {
     } else {
       console.log('已连接监听');
       this.ipcon();
+      this.linkState(true);
     }
   }
   /** 链接 */
@@ -43,13 +51,7 @@ export class PLCSocket {
     /** 监听链接状态 */
     this.e.ipcRenderer.on(`${this.connStr.uid}connection`, async (event, data) => {
       console.log(data);
-      if (data.success) {
-        this.linkMsg.state = false;
-        this.store$.dispatch(resetTensionLive({data: {msg: '链接中', link: true}}));
-      } else {
-        this.linkMsg.link = false;
-        this.store$.dispatch(resetTensionLive({data: {msg: '链接有误', link: false}}));
-      }
+      this.linkState(data.success);
     });
     /** 监听心跳 */
     this.e.ipcRenderer.on(`${this.connStr.uid}heartbeat`, async (event, data) => {
@@ -57,17 +59,17 @@ export class PLCSocket {
       const time = new Date().getTime();
       const delayTime =  (time - this.linkMsg.oldTime - this.connStr.hz) || time;
       this.linkMsg.oldTime = time;
-      let delayTimeStr = this.linkMsg.delayTime;
-      if (delayTime < 500) {
+      let delayTimeStr;
+      if (delayTime < 150) {
+        delayTimeStr = '0.2s';
+      } else if (delayTime > 150 && delayTime < 500) {
         delayTimeStr = '0.5s';
       } else if (delayTime > 500 && delayTime < 1001) {
         delayTimeStr = '1s';
       } else {
         delayTimeStr = '2s';
       }
-      if (delayTimeStr !== this.linkMsg.delayTime) {
-        this.store$.dispatch(resetTensionLive({data: {delayTime: delayTimeStr}}))
-      }
+      this.store$.dispatch(resetTcpLive({data: {delayTime: delayTimeStr}}))
     });
   }
   /** 取消链接 */
@@ -77,7 +79,7 @@ export class PLCSocket {
     this.e.ipcRenderer.removeAllListeners(`${this.connStr.uid}heartbeat`);
     this.e.ipcRenderer.send('CancelTCP', this.connStr.uid);
     this.linkMsg.delayTime = '0s';
-    this.store$.dispatch(initTensionLive(null))
+    this.store$.dispatch(initTcpLive(null))
   }
   /** ipc */
   ipc(channel: string, data:{address: number, value: any, channel: string} | {state: boolean, channel: string}) {
@@ -92,13 +94,24 @@ export class PLCSocket {
       })
     })
   }
+  /** 链接状态 */
+  linkState(state: boolean) {
+    this.plclink.next(state);
+    if (state) {
+      this.linkMsg.state = false;
+      this.store$.dispatch(resetTcpLive({data: {msg: '链接中', link: true, state: 'success'}}));
+    } else {
+      this.linkMsg.link = false;
+      this.store$.dispatch(resetTcpLive({data: {msg: '链接有误', link: false, state: 'error'}}));
+    }
+  }
 }
 
 /** 测试链接 */
 export function testLink(e: ElectronService, store$, connStr: ConnectionStr): Promise<PLCSocket> {
   return new Promise((resolve, reject) => {
     console.log('链接');
-    e.ipcRenderer.send('TestLinkTCP', connStr);
+    e.ipcRenderer.send('TCPLink', connStr);
     const t = setTimeout(() => {
       reject('超时错误');
     }, 3000);

@@ -243,34 +243,34 @@ export class TensionComponent implements OnInit, OnDestroy {
     const HMIData = HMIstage(this.data, this.holeIndex);
     console.log(HMIData);
 
-    await this.PLCS.tcp.ipc(FC.F016, { address: PLC_D(2000),
+    await this.PLCS.ipc(FC.F016, { address: PLC_D(2000),
       value: HMIData.unicode,
       channel: 'tensionuphmi2000'}).then(r => console.log(r));
 
-    await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2082),
+    await this.PLCS.ipc(FC.F016_float, { address: PLC_D(2082),
       value: HMIData.d2082,
       channel: 'tensionuphmi2082'}).then(r => console.log(r));
 
-    await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2108),
+    await this.PLCS.ipc(FC.F016_float, { address: PLC_D(2108),
       value: HMIData.percentage,
       channel: 'tensionuphmi2108'}).then(r => console.log(r));
 
-    await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2124),
+    await this.PLCS.ipc(FC.F016_float, { address: PLC_D(2124),
       value: HMIData.A1,
       channel: 'tensionuphmi2124'}).then(r => console.log(r));
-    await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2198),
+    await this.PLCS.ipc(FC.F016_float, { address: PLC_D(2198),
       value: HMIData.A2,
       channel: 'tensionuphmi2198'}).then(r => console.log(r));
 
-    await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2272),
+    await this.PLCS.ipc(FC.F016_float, { address: PLC_D(2272),
       value: HMIData.B1,
       channel: 'tensionuphmi2272'}).then(r => console.log(r));
 
-    await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2346),
+    await this.PLCS.ipc(FC.F016_float, { address: PLC_D(2346),
       value: HMIData.B2,
       channel: 'tensionuphmi2346'}).then(r => console.log(r));
 
-    await this.PLCS.tcp.ipc(FC.F016_float, { address: PLC_D(2460),
+    await this.PLCS.ipc(FC.F016_float, { address: PLC_D(2460),
       value: HMIData.reboundWord,
       channel: 'tensionuphmi2460'}).then(r => console.log(r));
     this.PLCS.data = this.data;

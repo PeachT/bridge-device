@@ -16,9 +16,11 @@ interface ConnectionStr {
   /** 通信延时 */
   setTimeout: number;
   hz: number;
+  /** 心跳链接地址 */
+  heartbeatAddress: number;
 }
 
-export abstract class PLCTcpModbus {
+export class PLCTcpModbus {
   protected connectionStr: ConnectionStr;
   protected connectionFunc: any;
   /** 正在链接状态 */
@@ -45,19 +47,20 @@ export abstract class PLCTcpModbus {
    * @memberof ModbusTCP
    */
   public async connection(): Promise<boolean> {
+    const backIPC = `${this.connectionStr.uid}connection`;
     if (this.closeState) {
-      this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: true, msg: '设备链接已关闭', connectionStr: this.connectionStr});
+      this.IPCSendSys(backIPC, {state: 'success', msg: '链接中', connectionStr: this.connectionStr});
       this.client = null;
       console.log('close');
       return;
     }
     if (!this.cs && this.connectionState()) {
-      this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: true, msg: '设备链接正常', connectionStr: this.connectionStr});
+      this.IPCSendSys(backIPC, {state: 'success', msg: '链接中', connectionStr: this.connectionStr});
       this.heartbeat();
       return;
     }
     this.cs = true;
-    this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: false, msg: '正在链接', connectionStr: this.connectionStr});
+    this.IPCSendSys(backIPC, {state: 'error', msg: '尝试链接', connectionStr: this.connectionStr});
 
     this.client = new Modbus();
     this.client.setTimeout(Number(this.connectionStr.setTimeout)); // 设置链接超时
@@ -71,15 +74,16 @@ export abstract class PLCTcpModbus {
       this.cs = false;
       state = true;
       this.client.setID(Number(this.connectionStr.address));
-      this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: true, msg: '链接成功', connectionStr: this.connectionStr});
+      this.IPCSendSys(backIPC, {state: 'success', msg: '链接中', connectionStr: this.connectionStr});
       console.log('success = true');
 
       this.heartbeat();
       /** 链接失败 */
     }).catch((err) => {
       this.cs = false;
-      this.IPCSendSys(`${this.connectionStr.uid}connection`, {success: false, msg: '正在失败，5s后重新链接', connectionStr: this.connectionStr});
+      this.IPCSendSys(backIPC, {state: 'error', msg: '5s后重试', connectionStr: this.connectionStr});
       setTimeout(() => {
+        console.log('erroe--86');
         this.connection();
       }, 5000);
       console.log('success = false');
@@ -88,7 +92,21 @@ export abstract class PLCTcpModbus {
   }
 
   /** 心跳包 */
-  abstract heartbeat();
+  heartbeat() {
+    setTimeout(async () => {
+      if (this.ifClient('heartbeat') && this.heartbeatState) {
+        const d = new Date().getSeconds();
+        this.client.readHoldingRegisters(this.connectionStr.heartbeatAddress || 0, 1).then((data) => {
+          this.IPCSend(`${this.connectionStr.uid}heartbeat`, { uint16: data.data });
+          this.heartbeat();
+        }).catch((err) => {
+          console.log('heartbeat--102');
+
+          this.connection();
+        });
+      }
+    }, this.connectionStr.hz || 1000);
+  };
   heartbeatStateFunc(state: boolean) {
     this.heartbeatState = state;
     if (state) {
@@ -136,7 +154,7 @@ export abstract class PLCTcpModbus {
    * @memberof ModbusTCP
    */
   public F01(address: number, length: number, channel: string): void {
-    if (this.ifClient()) {
+    if (this.ifClient('F01')) {
       this.client.readCoils(address, length).then((data) => {
         this.IPCSend(channel, { data: data.data });
       }).catch((err) => {
@@ -153,7 +171,7 @@ export abstract class PLCTcpModbus {
    * @memberof ModbusTCP
    */
   public F03(address: number, length: number, channel: string): void {
-    if (this.ifClient()) {
+    if (this.ifClient('F03')) {
       this.client.readHoldingRegisters(address, length).then((data) => {
         const float = bf.bufferToFloat(data.buffer);
         const dint16 = bf.bufferTo16int(data.buffer);
@@ -164,7 +182,7 @@ export abstract class PLCTcpModbus {
     }
   }
   public F03ASCII(address: number, length: number, channel: string): void {
-    if (this.ifClient()) {
+    if (this.ifClient('F03ASCII')) {
       this.client.readHoldingRegisters(address, length).then((data) => {
         const float = bf.bufferToFloat(data.buffer);
         const dint16 = bf.bufferTo16int(data.buffer);
@@ -186,7 +204,7 @@ export abstract class PLCTcpModbus {
    * @memberof ModbusTCP
    */
   public F03_float(address: number, length: number, channel: string): void {
-    if (this.ifClient()) {
+    if (this.ifClient('F03_float')) {
       this.client.readHoldingRegisters(address, length).then((data) => {
         const float = bf.bufferToFloat(data.buffer);
         // const dint16 = bf.bufferTo16int(data.buffer);
@@ -205,7 +223,7 @@ export abstract class PLCTcpModbus {
    * @memberof ModbusTCP
    */
   public F05(address: number, state: boolean = false, channel: string): void {
-    if (this.ifClient()) {
+    if (this.ifClient('F05')) {
       this.client.writeCoil(address, state).then((data) => {
         this.IPCSend(channel, data);
       }).catch((err) => {
@@ -224,7 +242,7 @@ export abstract class PLCTcpModbus {
    * @memberof ModbusTCP
    */
   public F15(address: number, array: Array<boolean>, channel: string): void {
-    if (this.ifClient()) {
+    if (this.ifClient('F15')) {
       this.client.writeCoils(address, array).then((data) => {
         this.IPCSend(channel, data);
       }).catch((err) => {
@@ -243,7 +261,7 @@ export abstract class PLCTcpModbus {
    * @memberof ModbusTCP
    */
   public F06(address: number, value: number = 0, channel: string): void {
-    if (this.ifClient()) {
+    if (this.ifClient('F06')) {
       this.client.writeRegister(address, value).then((data) => {
         this.IPCSend(channel, data);
       }).catch((err) => {
@@ -262,7 +280,7 @@ export abstract class PLCTcpModbus {
    * @memberof ModbusTCP
    */
   public F016_float(address: number, array: Array<number>, channel: string): void {
-    if (this.ifClient()) {
+    if (this.ifClient('F016_float')) {
       const ints = bf.floatToBuffer(array);
       this.client.writeRegisters(address, ints).then((data) => {
         console.log(data);
@@ -283,7 +301,7 @@ export abstract class PLCTcpModbus {
    * @memberof ModbusTCP
    */
   public F016(address: number, array: Array<number>, channel: string): void {
-    if (this.ifClient()) {
+    if (this.ifClient('F016')) {
       this.client.writeRegisters(address, array).then((data) => {
         this.IPCSend(channel, data);
       }).catch((err) => {
@@ -298,11 +316,12 @@ export abstract class PLCTcpModbus {
    * @returns 正常返回 true 异常返回 false
    * @memberof ModbusTCP
    */
-  public ifClient() {
+  public ifClient(FC) {
     // console.log(this.dev, '---1111', this.connectionState());
     if (this.connectionState()) {
       return true;
     } else {
+      console.log('heartbeat--324', FC);
       this.connection();
     }
   }

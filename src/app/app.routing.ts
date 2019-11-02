@@ -2,7 +2,7 @@ import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
 import { DefaultComponent } from "./layout/default/default.component";
 import { HeaderComponent } from "./layout/header/header.component";
-import { GlobalEditGuard } from "./models/edit-guard";
+import { GlobalEditGuard, TaskGuard } from "./models/edit-guard";
 
 const routes: Routes = [
   {
@@ -122,14 +122,16 @@ const routes: Routes = [
         loadChildren: () =>
           import("./routes/live-grouting/live-grouting.module").then(m => m.LiveGroutingModule),
         data: { title: "压浆监控" },
-        canDeactivate: [GlobalEditGuard]
+        canDeactivate: [GlobalEditGuard],
+        canActivate:[TaskGuard]
       },
       {
         path: "live-tension",
         loadChildren: () =>
           import("./routes/live-tension/live-tension.module").then(m => m.LiveTensionModule),
         data: { title: "张拉监控" },
-        canDeactivate: [GlobalEditGuard]
+        canDeactivate: [GlobalEditGuard],
+        canActivate:[TaskGuard]
       }
     ]
   }

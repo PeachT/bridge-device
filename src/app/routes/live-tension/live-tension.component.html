@@ -11,9 +11,10 @@
       &nbsp;&nbsp;张拉阶段：
       <nz-alert nzType="success" [nzMessage]="liveData.stage !== null ? task.stage.msg[liveData.stage] : '未开始张拉'"></nz-alert>
     </div>
+    <nz-alert nzType="error" nzMessage="设备链接有误！！" *ngIf="!plcState"></nz-alert>
     <nz-alert nzType="error" nzMessage="没有张拉任务" *ngIf="!PLCS.data"></nz-alert>
     <button nz-button nzType="primary" [routerLink]="'/tension'" *ngIf="!PLCS.data">选择任务</button>
-    <button nz-button nzType="primary" (click)="test()" *ngIf="appS.platform === 'debug'">测试</button>
+    <button nz-button nzType="primary" (click)="test()" [disabled]="!plcState" *ngIf="appS.platform === 'debug'">{{ liveData.state ? '停止' : '开始'}}</button>
   </header>
   <main>
     <table class="gridtable">

@@ -10,6 +10,8 @@ export interface ConnectionStr {
   /** 通信延时 */
   setTimeout: number;
   hz: number;
+  /** 心跳链接地址 */
+  heartbeatAddress: number;
 }
 
 // FC2“读取输入状态”
@@ -35,4 +37,9 @@ export enum FC {
   F016_float = 'F016_float',
   /** 停止心跳链接 */
   heartbeatStateFunc = 'heartbeatStateFunc'
+}
+
+export enum deviceName {
+  tension = 'tension',
+  grouting = 'grouting'
 }

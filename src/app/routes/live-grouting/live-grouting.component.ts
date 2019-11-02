@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { DbService } from 'src/app/services/db.service';
 import { GroutingTask, MixingInfo, GroutingHoleItem, GroutingInfo } from 'src/app/models/grouting';
 import { GroutingService } from 'src/app/services/grouting.service';
@@ -9,6 +9,8 @@ import { ElectronService } from 'ngx-electron';
 import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
 import { waterBinderRatio, getDatetimeS } from 'src/app/Function/unit';
+import { PLCService } from 'src/app/services/plc.service';
+import { FC } from 'src/app/models/socketTCP';
 
 const groutingHoleItemBase: GroutingHoleItem = {
   /** 压浆方向 */
@@ -56,7 +58,8 @@ const groutingHoleItemBase: GroutingHoleItem = {
 @Component({
   selector: 'app-live-grouting',
   templateUrl: './live-grouting.component.html',
-  styleUrls: ['./live-grouting.component.less']
+  styleUrls: ['./live-grouting.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LiveGroutingComponent implements OnInit, OnDestroy {
 
@@ -113,11 +116,16 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
     save: false
   };
   /** 实时数据 */
-  liveT;
+  liveT: any;
+  liveDelay = 100;
   /** 模拟数据T */
-  tt;
+  svgT: any;
   /** 停止监控 */
   stop = false;
+  /** plc状态 */
+  get plcState(): boolean {
+    return this.PLCS.socketInfo.state === 'success';
+  }
   /** 添加数据判断 */
   addFilterFun = (o1: any, o2: any) => o1.name === o2.name
     && o1.component === o2.component && o1.project === o2.project;
@@ -125,139 +133,103 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
   updateFilterFun = (o1: GroutingTask, o2: GroutingTask) => o1.name === o2.name
     && o1.component === o2.component && o1.project === o2.project && o1.id !== o2.id;
 
-
   constructor(
     public appS: AppService,
-    public GPLCS: GroutingService,
+    public PLCS: PLCService,
     private odb: DbService,
     private e: ElectronService,
     private message: NzMessageService,
-  ) { }
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit() {
-
-
-  }
-  livePLC() {
-    if (!this.plcsub) {
-      this.plcsub = this.GPLCS.plcSubject.subscribe((data: any) => {
-        this.appS.groutingLive = !this.stop;
-        if (this.monitoringMsg.start) {
-          if (data.data[0]) {
-            console.error(data);
-          }
-          if (data.state) {
-            if (data.data[0] && !this.monitoringMsg.save) {
-              this.groutingSave();
-              this.monitoringMsg.save = true;
-              this.monitoringMsg.start = false;
-              this.groutingHoleItem.endDate = new Date();
-              if (this.tt) {
-                clearInterval(this.tt);
-                this.tt = null;
-              }
-            } else if (!data.data[0] && this.monitoringMsg.save) {
-              this.monitoringMsg.save = false;
-            }
-          }
-        }
-        if (!this.liveT) {
-          this.liveData();
-        }
-      });
-    }
-    if (!this.plcsub1) {
-      this.plcsub1 = this.GPLCS.plcSubject1.subscribe((data: any) => {
-        // console.warn('1111', data, data.data[0], !this.monitoringMsg.start);
-        if (data.data[0] && !this.monitoringMsg.start) {
-          if (!this.tt) {
-            this.groutingHoleItem = copyAny(groutingHoleItemBase);
-            /** 压浆开始 */
-            this.liveSvg();
-            this.groutingHoleItem.startDate = new Date();
-          }
-          this.monitoringMsg.start = true;
-        }
-      });
-    }
+    this.PLCS.noOut = true;
   }
   ngOnDestroy() {
+    this.PLCS.noOut = false;
     this.exit();
   }
   exit() {
     console.log('退出');
-    this.appS.groutingLive = false;
-    if (this.plcsub) {
-      this.plcsub.unsubscribe();
-      this.plcsub = null;
-    }
-    if (this.plcsub1) {
-      this.plcsub1.unsubscribe();
-      this.plcsub1 = null;
-    }
+    this.appS.taskLiveState = false;
     if (this.liveT) {
       clearInterval(this.liveT);
       this.liveT = null;
     }
-    if (this.tt) {
-      clearInterval(this.tt);
-      this.tt = null;
+    if (this.svgT) {
+      clearInterval(this.svgT);
+      this.svgT = null;
+    }
+    if (this.plcsub) {
+      this.plcsub.unsubscribe();
+      this.plcsub = null;
     }
   }
   /** 监控启停 */
   operatorLive() {
     this.stop = !this.stop;
     if (this.stop) {
-      this.appS.groutingLive = false;
+      this.appS.taskLiveState = false;
       this.exit();
     } else {
-      this.livePLC();
+      if (this.liveT) {
+        clearInterval(this.liveT);
+      };
     }
   }
   /** 实时数据 */
   liveData() {
-    console.log('实时数据');
-
-    this.liveT = setTimeout(async () => {
-      console.log('132456789实时数据');
-      const arrs = [
-        { channel: 'groutingF03ASCII', address: PLC_D(220), value: 4, outKey: 'out0' },
-        { channel: 'groutingF03ASCII', address: PLC_D(152), value: 2, outKey: 'out1' },
-        { address: PLC_D(200), value: 6, outKey: 'out2' },
-        { address: PLC_D(72), value: 1, outKey: 'out3' },
-        { address: PLC_D(52), value: 2, outKey: 'out4' },
-        { address: PLC_D(120), value: 1, outKey: 'out5' },
-        { channel: 'groutingF01', address: PLC_M(30), value: 8, outKey: 'out6' },
-        { address: PLC_D(520), value: 6, outKey: 'out7' },
-      ];
-      const backData: any = {};
-      let i = 0;
-      for (const item of arrs) {
-        // console.log('保存数据', item);
-        await new Promise((resolve, reject) => {
-          this.e.ipcRenderer.send(item.channel || 'groutingF03', { address: item.address, value: item.value, channel: item.outKey });
-          const t = setTimeout(() => {
-            clearInterval(this.liveT);
-            this.liveT = null;
-            this.e.ipcRenderer.removeAllListeners(item.outKey);
-            console.error('获取数据超时');
-            return;
-          }, 3000);
-          this.e.ipcRenderer.once(item.outKey, (event, data) => {
-            clearTimeout(t);
-            i++;
-            backData[item.outKey] = data;
-            resolve(data);
+    if (this.liveT) {
+      return;
+    }
+    this.liveT = setInterval(async () => {
+      if (this.plcState) {
+        const arrs = [
+          // 完成标志
+          { channel: FC.F01, address: PLC_M(46), value: 1, outKey: 'out8' },
+          // 开始标准
+          { channel: FC.F01, address: PLC_M(50), value: 1, outKey: 'out9' },
+          // 梁号
+          { channel: FC.F03ASCII, address: PLC_D(220), value: 4, outKey: 'out0' },
+          // 孔号
+          { channel: FC.F03ASCII, address: PLC_D(152), value: 2, outKey: 'out1' },
+          // 实时数据
+          { channel: FC.F03, address: PLC_D(200), value: 6, outKey: 'out2' },
+          { channel: FC.F03, address: PLC_D(72), value: 1, outKey: 'out3' },
+          { channel: FC.F03, address: PLC_D(52), value: 2, outKey: 'out4' },
+          { channel: FC.F03, address: PLC_D(120), value: 1, outKey: 'out5' },
+          { channel: FC.F01, address: PLC_M(30), value: 8, outKey: 'out6' },
+          { channel: FC.F03, address: PLC_D(520), value: 6, outKey: 'out7' },
+        ];
+        const backData: any = {};
+        let i = 0;
+        for (const item of arrs) {
+          // console.log('保存数据', item);
+          await new Promise((resolve, reject) => {
+            this.e.ipcRenderer.send(item.channel, { address: item.address, value: item.value, channel: item.outKey });
+            const t = setTimeout(() => {
+              clearInterval(this.liveT);
+              this.liveT = null;
+              this.e.ipcRenderer.removeAllListeners(item.outKey);
+              console.error('获取数据超时');
+              return;
+            }, 3000);
+            this.e.ipcRenderer.once(item.outKey, (event, data) => {
+              clearTimeout(t);
+              i++;
+              backData[item.outKey] = data;
+              resolve(data);
+            });
           });
-        });
-      }
-      console.log(`实时返回的结果`, backData.out6.data);
-      if (i !== arrs.length) {
-        clearInterval(this.liveT);
-        this.liveT = null;
-        console.error('实时数据错误');
-        return;
-      }
+        }
+        if (i !== arrs.length) {
+          clearInterval(this.liveT);
+          this.liveT = null;
+          console.error('实时数据错误');
+          return;
+        }
+        this.groutingStart(backData.out9.data[0]);
+        this.groutingSuccess(backData.out8.data[0]);
         const dosage = backData.out7.float.map(m => Number(m.toFixed(2)));
         this.now = {
           name: backData.out0.str.replace(/\0/g, ''),
@@ -266,13 +238,6 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
           waterBinderRatio: waterBinderRatio(dosage)
         };
         this.mixingData.dosage = backData.out2.float.map(m => Number(m.toFixed(2)));
-        // let count = 0;
-        // this.mixingData.dosage.map((item, i) => {
-        //   if (i > 0) {
-        //     count += item || 0;
-        //   }
-        // });
-        // this.mixingData.waterBinderRatio = Number((this.mixingData.dosage[0] / count).toFixed(2));
         this.mixingData.waterBinderRatio = waterBinderRatio(this.mixingData.dosage);
         this.mixingData.mixingTime = backData.out3.uint16[0];
         /** 搅拌开始 */
@@ -318,17 +283,55 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
         }
         this.groutingHoleItem.intoPulpPressure = (backData.out4.float[0]).toFixed(2);
         this.groutingHoleItem.steadyTime = backData.out5.uint16[0];
-        if (!this.stop) {
-          this.liveData();
-        }
+        this.cdr.detectChanges();
+      } else {
+        console.error('请链接设备');
+        this.cdr.detectChanges();
+      }
     }, 100);
+  }
+  /** 压浆完成 */
+  groutingSuccess(state) {
+    if (state && !this.monitoringMsg.save) {
+      this.groutingSave();
+      this.monitoringMsg.save = true;
+      this.monitoringMsg.start = false;
+      this.groutingHoleItem.endDate = new Date();
+    } else if (state && this.monitoringMsg.save) {
+      this.monitoringMsg.save = false;
+    }
+  }
+  /** 压浆开始 */
+  groutingStart(state) {
+    if (state && !this.monitoringMsg.start) {
+      this.liveSvg();
+      this.monitoringMsg.start = true;
+    }
   }
   /** 确认模板监控 */
   async selectGroutingTemp(id) {
-
     this.templateData = await this.odb.getOneAsync('grouting', (g: GroutingTask) => g.id === id);
     if (this.templateData) {
-      this.livePLC();
+      if ( this.plcState) {
+        this.liveData();
+      } else {
+        if (!this.plcsub) {
+          this.plcsub = this.PLCS.LinkState$.subscribe((state) => {
+            if (state) {
+              this.liveData();
+            } else {
+              if (this.liveT) {
+                clearInterval(this.liveT);
+                this.liveT = null;
+              }
+              if (this.svgT) {
+                clearInterval(this.svgT);
+                this.svgT = null;
+              }
+            }
+          });
+        }
+      }
     }
     this.groutingTemplateShow = false;
     console.log(id);
@@ -336,26 +339,32 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
   /** 压浆曲线监控 */
   liveSvg() {
     console.error('svg');
-
-    this.tt = setInterval(() => {
-      // const pressure = Math.random() * 2;
-      // const pulpvolume = Math.random() * 100;
-      // this.groutingHoleItem.processDatas.date.push(new Date().getTime());
-      // this.groutingHoleItem.processDatas.intoPulpPressure.push(Number((pressure - Math.random()).toFixed(2)));
-      // this.groutingHoleItem.processDatas.outPulpPressure.push(Number((pressure - Math.random()).toFixed(2)));
-      // this.groutingHoleItem.processDatas.intoPulpvolume.push(Number((pulpvolume - Math.random() * 10).toFixed(2)));
-      // this.groutingHoleItem.processDatas.outPulpvolume.push(Number((pulpvolume - Math.random() * 10).toFixed(2)));
-      // if (this.groutingHoleItem.processDatas.date.length > 100) {
-      //   clearInterval(this.tt)
-      // }
-      // console.log(this.groutingHoleItem);
-      // this.groutingHoleItem.processDatas.date.push(new Date().getTime());
-      this.groutingHoleItem.processDatas.intoPulpPressure.push(this.groutingHoleItem.intoPulpPressure);
-      if (this.stop && this.tt) {
-        clearInterval(this.tt);
-        this.tt = null;
-      }
-    }, 1000);
+    if (this.svgT) {
+      return;
+    } else {
+      this.groutingHoleItem = copyAny(groutingHoleItemBase);
+      this.groutingHoleItem.startDate = new Date();
+      this.svgT = setInterval(() => {
+        // const pressure = Math.random() * 2;
+        // const pulpvolume = Math.random() * 100;
+        // this.groutingHoleItem.processDatas.date.push(new Date().getTime());
+        // this.groutingHoleItem.processDatas.intoPulpPressure.push(Number((pressure - Math.random()).toFixed(2)));
+        // this.groutingHoleItem.processDatas.outPulpPressure.push(Number((pressure - Math.random()).toFixed(2)));
+        // this.groutingHoleItem.processDatas.intoPulpvolume.push(Number((pulpvolume - Math.random() * 10).toFixed(2)));
+        // this.groutingHoleItem.processDatas.outPulpvolume.push(Number((pulpvolume - Math.random() * 10).toFixed(2)));
+        // if (this.groutingHoleItem.processDatas.date.length > 100) {
+        //   clearInterval(this.tt)
+        // }
+        // console.log(this.groutingHoleItem);
+        // this.groutingHoleItem.processDatas.date.push(new Date().getTime());
+        this.groutingHoleItem.processDatas.intoPulpPressure.push(this.groutingHoleItem.intoPulpPressure);
+        if (this.stop && this.svgT) {
+          clearInterval(this.svgT);
+          this.svgT = null;
+        }
+        this.cdr.detectChanges();
+      }, 1000);
+    }
   }
 
   /** 压浆完成保存 */

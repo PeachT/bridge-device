@@ -25,6 +25,8 @@ import { Kn2mpaPipe, Mpa2knPipe, HoleNamePipe } from '../pipes/tension.pipe';
 import { ScrollMenuComponent } from './scroll-menu/scroll-menu.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { DynamicLineTensionComponent } from './echarts/dynamic-line-tension/dynamic-line-tension.component';
+import { LinkBaseComponent } from './link-base/link-base.component';
+import { LinkButtonComponent } from './link-button/link-button.component';
 
 
 // pipe
@@ -54,6 +56,8 @@ const COMPONENTS = [
   FormItemComponent,
   DataInOutComponent,
   ScrollMenuComponent,
+  LinkBaseComponent,
+  LinkButtonComponent,
 ];
 const PIPE = [
   ToFixedrPipe,

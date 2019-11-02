@@ -1,0 +1,77 @@
+.plc-state {
+  position: fixed;
+  display: flex;
+  top: 0;
+  right: 0;
+  transition: 1s width;
+  .btng {
+    margin-right: 1px;
+    width: 64px;
+    height: 64px;
+    border-radius: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    .bg {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      border-radius: 64px;
+      border: 1px solid #FFF;
+      background: #a5a5a5;
+      &.error {
+        background: #fd1d1d;
+        animation: stop 1s linear infinite !important;
+      }
+      &.success {
+        background: linear-gradient(to right, #24c6dc, #514a9d);
+        animation: spin 0.5s linear infinite;
+      }
+    }
+    button {
+      position: absolute;
+      width: 55px;
+      height: 55px;
+      border-radius: 55px;
+      padding: 0;
+      z-index: 1;
+      background-color: rgba(0,0,0,0);
+    }
+    .msg {
+      width: 55px;
+      height: 55px;
+      border-radius: 55px;
+      background-color: #FFF;
+      position: relative;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      // justify-content: space-between;
+      padding: 0;
+      span {
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+@keyframes stop {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

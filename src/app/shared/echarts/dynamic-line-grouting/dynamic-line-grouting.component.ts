@@ -52,6 +52,7 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges, AfterVie
   @Input() name: null;
   @Input() show: boolean;
   @Input() satrtDate: number;
+  @Input() subWidth = 220;
   // /** 时间戳 */
   // date: string;
   // /** 进浆压力 */
@@ -93,7 +94,7 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges, AfterVie
     this.widthSub = this.appS.bodySizeSub.subscribe((width: number) => {
         // 这里处理页面变化时的操作
         console.warn(doby.offsetWidth);
-        this.myChart.resize({width: (width - 220)})
+        this.myChart.resize({width: (width - this.subWidth)})
         this.cdr.detectChanges();
     });
   }
@@ -114,7 +115,7 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges, AfterVie
       this.data = data;
     }
     // 基于准备好的dom，初始化echarts实例
-    this.myChart = echarts.init(this.svgDom.nativeElement, null, {width: this.appS.bodyWidth - 220, height: this.height});
+    this.myChart = echarts.init(this.svgDom.nativeElement, null, {width: this.appS.bodyWidth - this.subWidth, height: this.height});
     // 绘制图表
     this.myChart.setOption(
       {

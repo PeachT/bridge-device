@@ -41,8 +41,8 @@ export class AppService {
   public nowRoute = null;
   /** 编辑状态 */
   public edit = false;
-  /** 压浆监控状态 */
-  public groutingLive = false;
+  /** 任务监控状态 */
+  public taskLiveState = false;
   /** 数据导入导出 */
   dataTreatingShow = false;
   /** 调试 */

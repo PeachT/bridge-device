@@ -1,6 +1,6 @@
-<!-- <main class="setting">
+<main class="setting">
   <div style="display: flex; flex-direction: column;">
-    <nz-divider style="min-width: auto;" nzText="设备通信参数" nzOrientation="left"></nz-divider>
+    <nz-divider style="min-width: auto;" [nzText]="'设备通信参数 '+ connStr.heartbeatAddress" nzOrientation="left"></nz-divider>
     <div>
       <app-form-item label="IP">
         <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.ip"/>
@@ -20,17 +20,17 @@
       <app-form-item label="频率">
         <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.hz"/>
       </app-form-item>
+      <app-form-item label="心跳地址" *ngIf="appS.platform === 'debug' || appS.userInfo.jurisdiction > 5">
+        <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.heartbeatAddress"/>
+      </app-form-item>
     </div>
     <button nz-button nzType="primary" (click)="saveConnStr()">保存</button>
-    <button nz-button nzType="primary" (click)="link()">保存测试链接</button>
+    <!-- <button nz-button nzType="primary" (click)="link()">保存测试链接</button>
     <button nz-button nzType="primary" (click)="cancelLink()">取消链接</button>
     <button nz-button nzType="primary" (click)="setD()">设置</button>
     <button nz-button nzType="primary" (click)="setStr()">设置str</button>
     <button nz-button nzType="primary" (click)="setStr1()">设置</button>
     <button nz-button nzType="primary" (click)="setStr2()">设置</button>
-    <button nz-button nzType="primary" (click)="setStr3()">设置</button>
+    <button nz-button nzType="primary" (click)="setStr3()">设置</button> -->
   </div>
-</main> -->
-<div>
-  <link-base [linkName]="'tensionLink'" [heartbeatAddress]="1024"></link-base>
-</div>
+</main>

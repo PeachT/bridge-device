@@ -1,5 +1,5 @@
-export interface TensionLive {
-  state?: boolean;
+export interface TcpLive {
+  state?: string | boolean;
   now?: boolean;
   link?: boolean;
   oldTime?: number
