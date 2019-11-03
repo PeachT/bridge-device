@@ -36,7 +36,7 @@
       </nz-option>
     </nz-select>
   </div>
-  <ul>
+  <ul class="menu-1" [@pageAnimations]="(component$ | async)?.data.length">
     <ng-container *ngFor="let item of (component$ | async)?.data">
       <li class="item" (click)="selectComponent(item.value)"
         *ngIf="componentName === null || componentName === item.value" [ngClass]="{'active': componentName === item.value}">
@@ -48,24 +48,26 @@
     </ng-container>
   </ul>
   <cdk-virtual-scroll-viewport itemSize="50" class="example-viewport">
-    <ul class="menu-2">
+    <ul class="menu-2" [@pageAnimations]="(bridge$ | async)?.data.length">
       <li *cdkVirtualFor="let item of (bridge$ | async)?.data; index as i"
-        [ngClass]="{'active': bridgeId === item.value}" (click)="selectBridge(item.value)" [@pageAnimations]="i"
-        class="li">
-        <div class="state-content">
-          <div class="state">
-            <ng-container *ngFor="let state of item.state">
-              <div *ngIf="state === 0" style="background-color: #d9d9d9"></div>
-              <div *ngIf="state === 1" style="background-color: #45b787"></div>
-              <div *ngIf="state === 2" style="background-color: #51c4d3"></div>
-              <div *ngIf="state === 3" style="background-color: #fcd337"></div>
-              <div *ngIf="state === 4" style="background-color: #f34718"></div>
-            </ng-container>
+         (click)="selectBridge(item.value)"
+        >
+        <div class="li" [ngClass]="{'active': bridgeId === item.value}">
+          <div class="state-content">
+            <div class="state">
+              <ng-container *ngFor="let state of item.state">
+                <div *ngIf="state === 0" style="background-color: #d9d9d9"></div>
+                <div *ngIf="state === 1" style="background-color: #45b787"></div>
+                <div *ngIf="state === 2" style="background-color: #51c4d3"></div>
+                <div *ngIf="state === 3" style="background-color: #fcd337"></div>
+                <div *ngIf="state === 4" style="background-color: #f34718"></div>
+              </ng-container>
+            </div>
           </div>
+          <p>
+            {{item.label}}
+          </p>
         </div>
-        <p>
-          {{item.label}}
-        </p>
       </li>
     </ul>
   </cdk-virtual-scroll-viewport>

@@ -78,7 +78,7 @@
               [disabled]="!(data?.groutingInfo?.length > 0) || !uploading"><i nz-icon nzType="cloud-upload"
                 nzTheme="outline"></i>上传</button>
             <button nz-button nzType="primary" (click)="test()" *ngIf="appS.platform === 'debug'">测试</button>
-            <button nz-button nzType="primary" (click)="downHMI()" *ngIf="data?.id !== null && PLCS.tcp && !appS.edit && holeIndex !== null">张拉</button>
+            <button nz-button nzType="primary" (click)="downHMI()" *ngIf="data?.id !== null && PLCS.plcState && !appS.edit && holeIndex !== null">张拉</button>
             <button nz-button nzType="primary" (click)="downHMITest()" *ngIf="data?.id !== null && appS.platform === 'debug' && holeIndex !== null">测试张拉</button>
           </app-operat>
         </div>

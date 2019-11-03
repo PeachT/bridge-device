@@ -21,7 +21,7 @@
               <!-- <app-form-item label="张拉设备" >
                 <input nz-input [disabled]="!(data.state === 0)" placeholder="张拉设备" [value]="item.get('device').value.name">
               </app-form-item> -->
-              <app-form-item label="设备选择" [errorShow]="false">
+              <app-form-item label="设备选择" >
                 <nz-select style="width: 100%;" nzPlaceHolder="请选择设备" formControlName="deviceId" (ngModelChange)="selectTensionDevice($event, i)">
                   <nz-option [nzValue]="jack.value" [nzLabel]="jack.label" *ngFor="let jack of jackMneu"></nz-option>
                   <nz-option [nzValue]="data.tasks[i].device.id" [nzLabel]="data.tasks[i].device.name" *ngIf="deviceExist(data.tasks[i].device)"></nz-option>

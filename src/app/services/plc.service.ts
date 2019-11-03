@@ -43,6 +43,9 @@ export class PLCService {
   oldTime = 0;
   /** 禁止停止链接 */
   noOut = false;
+  get plcState() {
+    return this.socketInfo.state === 'success';
+  }
 
   constructor(
     private e: ElectronService,

@@ -3,13 +3,40 @@ import { TensionHoleInfo, TensionTask } from 'src/app/models/tension';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { AppService } from 'src/app/services/app.service';
+import { trigger, transition, query, style, animate, group, stagger } from '@angular/animations';
 
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'tension-holes',
   templateUrl: './tension-holes.component.html',
   styleUrls: ['./tension-holes.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('pageAnimations', [
+      transition('* => *', [
+        group([
+          query(':leave', [style({ opacity: 0 })], { optional: true }),
+          query(':enter', [
+            style({ transform: 'translateY(-100%)', opacity: 0 }),
+            stagger(80, [ animate(200, style({ transform: 'translateY(0)', opacity: 1 })) ])
+          ],
+          { optional: true })
+        ])
+      ])
+    ]),
+    trigger('showAnimations', [
+      transition('* => *', [
+        group([
+          query(':leave', [style({ opacity: 0 })], { optional: true }),
+          query(':enter', [
+            style({ transform: 'translateY(-100%)', opacity: 0 }),
+            animate(200, style({ transform: 'translateY(0)', opacity: 1 }))
+          ],
+          { optional: true })
+        ])
+      ])
+    ]),
+  ]
 })
 export class TensionHolesComponent implements OnInit, OnChanges {
   @Input() show = false;

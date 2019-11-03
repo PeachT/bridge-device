@@ -27,13 +27,11 @@ import { goRouter } from './ngrx/actions/router.action';
   animations: [
     trigger('routeAnimation', [
       transition('* => *', [
-        // query(':leave', style({ opacity: 1}), { optional: true }),
         query(':enter', style({ opacity: 0}), { optional: true }),
         group([
-          // query(':leave', animate('.5s ease-in-out', style({opacity: 0})), { optional: true }),
-          query(':enter', animate('.5s ease-in-out', style({opacity: 1})), { optional: true })
+          query(':enter', animate('.3s ease-in-out', style({opacity: 1})), { optional: true }),
         ])
-      ])
+      ]),
     ])
   ]
 })

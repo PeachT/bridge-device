@@ -1,6 +1,6 @@
 <link-button></link-button>
 
-<div style="height: 100%; width: 100%;" [@routeAnimation]="routerStateCode">
+<div style="height: 100%; width: 100%;">
   <router-outlet></router-outlet>
 </div>
 <nz-modal [nzVisible]="appS.powerState" nzTitle="" [nzFooter]="null" [nzMaskClosable]="!appS.powerDelayT" nzClosable="false" (nzOnCancel)="appS.powerState = false">

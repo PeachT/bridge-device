@@ -2,7 +2,7 @@
 <div *ngIf="tensionHoleInfos && tensionHoleInfos.length > 0">
   <!-- <nz-divider style="min-width: auto;" nzText="压浆数据" nzOrientation="left"></nz-divider> -->
   <nz-form-item *ngIf="tensionHoleInfos" style="z-index: 2;">
-    <nz-radio-group [nzButtonStyle]="'solid'" class="hole-groups">
+    <nz-radio-group [nzButtonStyle]="'solid'" class="hole-groups" [@pageAnimations]="tensionHoleInfos.length">
       <label nz-radio-button [nzValue]="item" *ngFor="let item of tensionHoleInfos; index as i"
         (click)="switchHole(i, item)" [ngClass]="{'hole-active': item.name === groupItem?.name}"
         [class]="'hole' + item.state" class="hole">
@@ -13,10 +13,10 @@
       </label>
     </nz-radio-group>
   </nz-form-item>
-  <form nz-form [formGroup]="formData" [hidden]="!groupItem">
+  <form nz-form [formGroup]="formData">
     <div formArrayName="tensionHoleInfos">
       <ng-container *ngFor="let item of tensionHoleInfosFormArray.controls; index as i" [formArrayName]="i">
-        <div style="display: flex;flex-direction: column;" [hidden]="!(item.value.name === groupItem?.name)">
+        <div class="hole-group" [ngClass]="{'active': item.value.name === groupItem?.name}">
           <div>
             <app-form-item label="孔号">
               <input type="text" readonly nz-input placeholder="请输入孔号" formControlName="name">
@@ -32,7 +32,8 @@
             </app-form-item>
           </div>
           <div>
-            <app-add-other [formGroup]="item" [data]="tensionHoleInfos[i]?.otherInfo || []" [edit]="appS.edit"></app-add-other>
+            <app-add-other [formGroup]="item" [data]="tensionHoleInfos[i]?.otherInfo || []" [edit]="appS.edit">
+            </app-add-other>
           </div>
           <div>
             <tension-hole-task [formData]="item" [data]="tensionHoleInfos[i]" [index]="i"></tension-hole-task>

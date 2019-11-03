@@ -21,24 +21,18 @@ import { NzMessageService } from 'ng-zorro-antd';
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('pageAnimations', [
-      transition(':enter', [
+      transition('* => *', [
         group([
-          query('p', [
-            style({ opacity: 0, transform: 'translateX(-100%)' }),
-            stagger(-3, [
-              animate('200ms cubic-bezier(0.35, 0, 0.25, 1)',
-                style({ opacity: 1, transform: 'none' }))
-            ]),
-          ]),
-          query('.state-content', [
-            style({ opacity: 0, transform: 'translateY(-100%)' }),
-            stagger(-3, [
-              animate('0.2s 900ms cubic-bezier(0.35, 0, 0.25, 1)',
-                style({ opacity: 1, transform: 'none' }))
-            ]),
-          ]),
+          query(':leave', [
+            stagger(50, [ animate(300, style({ transform: 'translateX(-100%)' })) ])
+          ], { optional: true }),
+          query(':enter', [
+            style({ transform: 'translateX(-100%)' }),
+            stagger(50, [ animate(300, style({ transform: 'translateX(0)' })) ])
+          ],
+          { optional: true })
         ])
-      ]),
+      ])
     ]),
   ]
 })
@@ -113,7 +107,7 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
     this.projects$ = await this.db.pageData<Project>(
       DbEnum.project,
       p => (this.appS.userInfo.jurisdiction > 5 && p.jurisdiction > 5) ||
-           (this.appS.userInfo.jurisdiction < 5 && p.jurisdiction < 5),
+        (this.appS.userInfo.jurisdiction < 5 && p.jurisdiction < 5),
     );
   }
   /** 获取构建菜单 */
@@ -124,18 +118,18 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
     // tslint:disable-next-line:max-line-length
     this.component$ = from(await (this.db.pageData<any>(
       this.dbName, (o1) => true, { label: 'component', value: 'component' }))).pipe(
-      map(m => {
-        const data: Array<MenuItem> = []
-        from(m.data).pipe(
-          groupBy((g: MenuItem) => g.label),
-          // 为每个分组返回一个数组
-          mergeMap(group => group.pipe(toArray()))
-        ).subscribe(r => {
-          data.push(r[0]);
+        map(m => {
+          const data: Array<MenuItem> = []
+          from(m.data).pipe(
+            groupBy((g: MenuItem) => g.label),
+            // 为每个分组返回一个数组
+            mergeMap(group => group.pipe(toArray()))
+          ).subscribe(r => {
+            data.push(r[0]);
+          })
+          return { data, count: data.length };
         })
-        return { data, count: data.length };
-      })
-    );
+      );
     this.onCrd(this.component$);
   }
   /** 获取梁数据 */
