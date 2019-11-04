@@ -132,24 +132,31 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
     this.getRecordCalculate();
     this.holeNames = holeNameShow(this.holeData.name, this.task.mode);
     this.jackModeStr = JackModeEnum[this.task.mode];
+    this.runLive();
   }
   runLive() {
     if (this.plcState) {
       this.getLiveData();
     }
     if (!this.plcsub) {
-      this.plcsub = this.PLCS.LinkState$.subscribe((state) => {
+      this.plcsub = this.PLCS.LinkError$.subscribe((state) => {
+        // console.log(state);
         if (state) {
           this.getLiveData();
         } else {
           this.stopLive();
         }
+        this.cdr.detectChanges();
       });
     }
   }
 
   ngOnDestroy() {
     this.PLCS.noOut = false;
+    if (this.plcsub) {
+      this.plcsub.unsubscribe();
+      this.plcsub = null;
+    }
     this.stop();
   }
 
@@ -201,7 +208,7 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
     if (this.liveT) {
       return;
     }
-    this.liveT = setInterval(() => {
+    this.liveT = setTimeout(() => {
       if (this.plcState) {
         const channel = 'liveTension';
         const t = setTimeout(() => {
@@ -214,8 +221,10 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
           this.liveData.A2 = r.float.slice(6, 12)
           this.liveData.B1 = r.float.slice(12, 18)
           this.liveData.B2 = r.float.slice(18, 24)
-          clearTimeout(t);
           this.cdr.detectChanges();
+          clearTimeout(t);
+          this.liveT = null;
+          this.getLiveData();
         })
       } else {
         console.log('请链接设备');
@@ -284,9 +293,6 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
       clearInterval(this.liveT);
       this.liveT = null;
     }
-    if (this.plcsub) {
-      this.plcsub.unsubscribe();
-      this.plcsub = null;
-    }
+
   }
 }

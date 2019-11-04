@@ -97,10 +97,13 @@ ipcMain.on('TCPLink', (event, data) => {
 /** 链接tcp */
 ipcMain.on('LinkTCP', (event, data) => {
   if (tcpList[data.uid]) {
-    event.sender.send(`${data.uid}testLink`, {link: true, msg: `${data.uid}>设备已连接`});
-    return;
+    if (tcpList[data.uid].ifClient('LInkTCP')) {
+      event.sender.send(`${data.uid}testLink`, {link: true, state: 'success', msg: `链接中`});
+    } else {
+      event.sender.send(`${data.uid}testLink`, {link: true, state: 'error', msg: `链接有误`});
+    }
   } else {
-    event.sender.send(`${data.uid}testLink`, {link: false, msg: `${data.uid}>创建新链接`});
+    event.sender.send(`${data.uid}testLink`, {link: false, state: 'error', msg: `创建新链接`});
     tcpList[data.uid] = new PLCTcpModbus(data, win);
     IPCOn(data.uid, tcpList[data.uid]);
   }

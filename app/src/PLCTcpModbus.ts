@@ -316,7 +316,7 @@ export class PLCTcpModbus {
    * @returns 正常返回 true 异常返回 false
    * @memberof ModbusTCP
    */
-  public ifClient(FC) {
+  public ifClient(FC: string = null) {
     // console.log(this.dev, '---1111', this.connectionState());
     if (this.connectionState()) {
       return true;
@@ -324,6 +324,7 @@ export class PLCTcpModbus {
       console.log('heartbeat--324', FC);
       this.connection();
     }
+    return false;
   }
   /** 获取当前链接状态 */
   protected connectionState() {

@@ -7,6 +7,7 @@ import { RouterInfo } from 'src/app/models/app';
 import { goRouter } from 'src/app/ngrx/actions/router.action';
 import { NgrxState } from 'src/app/ngrx/reducers';
 import { trigger, transition, query, style, animate, group } from '@angular/animations';
+import { PLCService } from 'src/app/services/plc.service';
 
 @Component({
   selector: "app-header",
@@ -33,6 +34,7 @@ export class HeaderComponent implements OnInit {
     private router: Router,
     public appS: AppService,
     private store$: Store<NgrxState>,
+    public PLCS: PLCService,
     private cdr: ChangeDetectorRef
   ) { }
 

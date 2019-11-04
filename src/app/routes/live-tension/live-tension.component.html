@@ -38,8 +38,9 @@
           <td>{{liveData[key][3] | ToFixedr}}</td>
           <td>{{liveData[key][4] | ToFixedr}}</td>
           <td style="display: flex;">
-            <nz-alert nzType="error" *ngIf="liveData[key][5] >= 70 " [nzMessage]="alarm[liveData[key][5]]"></nz-alert>
-            <nz-alert nzType="info" *ngIf="liveData[key][5] < 70 " [nzMessage]="alarm[liveData[key][5]]"></nz-alert>
+            <nz-alert nzType="error" *ngIf="plcState && liveData[key][5] >= 70 " [nzMessage]="alarm[liveData[key][5]]"></nz-alert>
+            <nz-alert nzType="info" *ngIf="plcState && liveData[key][5] < 70 " [nzMessage]="alarm[liveData[key][5]]"></nz-alert>
+            <nz-alert nzType="error" nzMessage="设备链接有误！！" *ngIf="!plcState"></nz-alert>
           </td>
         </tr>
       </tbody>

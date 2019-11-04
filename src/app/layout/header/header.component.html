@@ -11,13 +11,13 @@
       </div>
     </div>
     <div class="main">
-      <!-- <div class="icon" *ngFor="let item of appS.menus" [ngClass]="{'active': ifUrl(item.url)}" -->
-      <div class="icon" *ngFor="let item of appS.menus" [ngClass]="{'active': item.url === (routerInfo$ | async).url}"
-        (click)="goUrl(item.url)">
-        <!-- <i nz-icon [nzType]="item.icon" nzTheme="outline"></i> -->
-        <i [attr.class]="'iconfont ' + item.icon"></i>
-        <div class="text">{{item.name}}</div>
-      </div>
+      <ng-container *ngFor="let item of appS.menus">
+        <div class="icon" *ngIf="!PLCS.connStr?.uid  || (!item.uid || PLCS.connStr?.uid === item.uid)" [ngClass]="{'active': item.url === (routerInfo$ | async).url}"
+          (click)="goUrl(item.url)">
+          <i [attr.class]="'iconfont ' + item.icon"></i>
+          <div class="text">{{item.name}}</div>
+        </div>
+      </ng-container>
       <div class="icon" (click)="appS.dataTreatingShow = true">
         <i class="iconfont icon-shuju"></i>
         <div class="text">数据</div>

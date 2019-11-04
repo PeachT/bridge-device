@@ -147,6 +147,10 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy() {
     this.PLCS.noOut = false;
+    if (this.plcsub) {
+      this.plcsub.unsubscribe();
+      this.plcsub = null;
+    }
     this.exit();
   }
   exit() {
@@ -160,10 +164,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
       clearInterval(this.svgT);
       this.svgT = null;
     }
-    if (this.plcsub) {
-      this.plcsub.unsubscribe();
-      this.plcsub = null;
-    }
+
   }
   /** 监控启停 */
   operatorLive() {
@@ -182,7 +183,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
     if (this.liveT) {
       return;
     }
-    this.liveT = setInterval(async () => {
+    this.liveT = setTimeout(async () => {
       if (this.plcState) {
         const arrs = [
           // 完成标志
@@ -287,6 +288,8 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
       } else {
         console.error('请链接设备');
         this.cdr.detectChanges();
+        clearInterval(this.liveT);
+        this.liveT = null;
       }
     }, 100);
   }
@@ -316,7 +319,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
         this.liveData();
       } else {
         if (!this.plcsub) {
-          this.plcsub = this.PLCS.LinkState$.subscribe((state) => {
+          this.plcsub = this.PLCS.LinkError$.subscribe((state) => {
             if (state) {
               this.liveData();
             } else {

@@ -78,6 +78,7 @@ export class LinkButtonComponent implements OnInit {
     //   this.crd.detectChanges();
     // });
     this.PLCS.LinkState$.subscribe(r => {
+      // console.log(r);
       this.crd.detectChanges();
     });
   }

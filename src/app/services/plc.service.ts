@@ -26,6 +26,10 @@ export class PLCService {
   private plclink = new Subject();
   // 获得一个Observable;
   LinkState$ = this.plclink.asObservable();
+  /** PLC sub */
+  private plcError = new Subject();
+  // 获得一个Observable;
+  LinkError$ = this.plcError.asObservable();
   // socket 状态信息
   socketInfo = {
     /** 链接状态 */
@@ -69,11 +73,8 @@ export class PLCService {
       this.socketInfo.linkDelay = null;
       this.plclink.next();
       this.e.ipcRenderer.once(`${this.connStr.uid}testLink`, async (event, data) => {
-        if (data.link) {
-          this.socketInfo.state = 'success';
-          this.socketInfo.msg = '链接中';
-        } else {
-        }
+        this.socketInfo.state = data.state;
+        this.socketInfo.msg = data.msg;
       });
     } else {
       this.message.error('没有配置链接数据');
@@ -90,7 +91,7 @@ export class PLCService {
       this.socketInfo.state = data.state;
       this.socketInfo.msg = data.msg;
       this.socketInfo.link = true;
-      this.plclink.next();
+      this.plcError.next(data.state === 'success');
     });
     /** 监听心跳 */
     this.e.ipcRenderer.on(`${this.connStr.uid}heartbeat`, async (event, data) => {
