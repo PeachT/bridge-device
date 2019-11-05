@@ -169,14 +169,15 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
   /** 监控启停 */
   operatorLive() {
     this.stop = !this.stop;
+    this.appS.taskLiveState = this.stop;
     if (this.stop) {
-      this.appS.taskLiveState = false;
       this.exit();
     } else {
       if (this.liveT) {
         clearInterval(this.liveT);
       };
     }
+    this.cdr.detectChanges();
   }
   /** 实时数据 */
   liveData() {
@@ -207,7 +208,8 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
         for (const item of arrs) {
           // console.log('保存数据', item);
           await new Promise((resolve, reject) => {
-            this.e.ipcRenderer.send(item.channel, { address: item.address, value: item.value, channel: item.outKey });
+            // tslint:disable-next-line:max-line-length
+            this.e.ipcRenderer.send(`${this.PLCS.connStr.uid}${item.channel}`, { address: item.address, value: item.value, channel: item.outKey });
             const t = setTimeout(() => {
               clearInterval(this.liveT);
               this.liveT = null;
@@ -223,68 +225,78 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
             });
           });
         }
+        console.log(backData);
+
         if (i !== arrs.length) {
           clearInterval(this.liveT);
           this.liveT = null;
           console.error('实时数据错误');
           return;
         }
-        this.groutingStart(backData.out9.data[0]);
-        this.groutingSuccess(backData.out8.data[0]);
-        const dosage = backData.out7.float.map(m => Number(m.toFixed(2)));
-        this.now = {
-          name: backData.out0.str.replace(/\0/g, ''),
-          holeName: backData.out1.str.replace(/\0/g, ''),
-          dosage,
-          waterBinderRatio: waterBinderRatio(dosage)
-        };
-        this.mixingData.dosage = backData.out2.float.map(m => Number(m.toFixed(2)));
-        this.mixingData.waterBinderRatio = waterBinderRatio(this.mixingData.dosage);
-        this.mixingData.mixingTime = backData.out3.uint16[0];
-        /** 搅拌开始 */
-        if (!this.mixingDataNow.state && backData.out6.data[0]) {
-          this.mixingDataNow.state = true;
-          this.mixingDataNow.date = new Date();
-        }
-        /** 上料完成 */
-        if (this.mixingDataNow.state && !this.mixingDataNow.save && backData.out6.data[6] && this.mixingData.mixingTime > 0) {
-          this.mixingDataNow.time = this.mixingData.mixingTime;
-          this.mixingDataNow.save = true;
-        }
-        /** 搅拌完成 */
-        if (this.mixingDataNow.state && !backData.out6.data[6] && !backData.out6.data[0]) {
-          if (this.mixingDataNow.save) {
-            const mixing: MixingInfo = {
-              /** 用量 */
-              dosage: this.mixingData.dosage,
-              /** 开始时间 */
-              startDate: this.mixingDataNow.date,
-              /** 完成时间 */
-              endDate: new Date(),
-              /** 搅拌时间 */
-              mixingTime: this.mixingDataNow.time,
-              /** 泌水率 */
-              bleedingRate: null,
-              /** 流动度 */
-              fluidity: null,
-              /** 黏稠度 */
-              viscosity: null,
-              /** 水胶比 */
-              waterBinderRatio: this.mixingData.waterBinderRatio,
-              /** 水温 */
-              waterTemperature: null,
-              /** 环境温度 */
-              envTemperature: null,
-            };
-            console.error('搅拌完成', mixing);
-            this.save(mixing, null);
+        try {
+          this.groutingStart(backData.out9.data[0]);
+          this.groutingSuccess(backData.out8.data[0]);
+          const dosage = backData.out7.float.map(m => Number(m.toFixed(2)));
+          this.now = {
+            name: backData.out0.str.replace(/\0/g, ''),
+            holeName: backData.out1.str.replace(/\0/g, ''),
+            dosage,
+            waterBinderRatio: waterBinderRatio(dosage)
+          };
+          this.mixingData.dosage = backData.out2.float.map(m => Number(m.toFixed(2)));
+          this.mixingData.waterBinderRatio = waterBinderRatio(this.mixingData.dosage);
+          this.mixingData.mixingTime = backData.out3.uint16[0];
+          /** 搅拌开始 */
+          if (!this.mixingDataNow.state && backData.out6.data[0]) {
+            this.mixingDataNow.state = true;
+            this.mixingDataNow.date = new Date();
           }
-          this.mixingDataNow.state = false;
-          this.mixingDataNow.save = false;
+          /** 上料完成 */
+          if (this.mixingDataNow.state && !this.mixingDataNow.save && backData.out6.data[6] && this.mixingData.mixingTime > 0) {
+            this.mixingDataNow.time = this.mixingData.mixingTime;
+            this.mixingDataNow.save = true;
+          }
+          /** 搅拌完成 */
+          if (this.mixingDataNow.state && !backData.out6.data[6] && !backData.out6.data[0]) {
+            if (this.mixingDataNow.save) {
+              const mixing: MixingInfo = {
+                /** 用量 */
+                dosage: this.mixingData.dosage,
+                /** 开始时间 */
+                startDate: this.mixingDataNow.date,
+                /** 完成时间 */
+                endDate: new Date(),
+                /** 搅拌时间 */
+                mixingTime: this.mixingDataNow.time,
+                /** 泌水率 */
+                bleedingRate: null,
+                /** 流动度 */
+                fluidity: null,
+                /** 黏稠度 */
+                viscosity: null,
+                /** 水胶比 */
+                waterBinderRatio: this.mixingData.waterBinderRatio,
+                /** 水温 */
+                waterTemperature: null,
+                /** 环境温度 */
+                envTemperature: null,
+              };
+              console.error('搅拌完成', mixing);
+              this.save(mixing, null);
+            }
+            this.mixingDataNow.state = false;
+            this.mixingDataNow.save = false;
+          }
+          this.groutingHoleItem.intoPulpPressure = (backData.out4.float[0]).toFixed(2);
+          this.groutingHoleItem.steadyTime = backData.out5.uint16[0];
+          this.cdr.detectChanges();
+        } catch (error) {
+          console.error('转换数据有误');
+        } finally  {
+          clearInterval(this.liveT);
+          this.liveT = null;
+          this.liveData();
         }
-        this.groutingHoleItem.intoPulpPressure = (backData.out4.float[0]).toFixed(2);
-        this.groutingHoleItem.steadyTime = backData.out5.uint16[0];
-        this.cdr.detectChanges();
       } else {
         console.error('请链接设备');
         this.cdr.detectChanges();
@@ -317,6 +329,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
     if (this.templateData) {
       if ( this.plcState) {
         this.liveData();
+        this.appS.taskLiveState = true;
       } else {
         if (!this.plcsub) {
           this.plcsub = this.PLCS.LinkError$.subscribe((state) => {
@@ -338,6 +351,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
     }
     this.groutingTemplateShow = false;
     console.log(id);
+    this.cdr.detectChanges();
   }
   /** 压浆曲线监控 */
   liveSvg() {

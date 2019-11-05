@@ -1,6 +1,6 @@
 {
   "name": "common-bridge-device",
-  "version": "6.1.10",
+  "version": "6.1.11",
   "main": "./js/main.js",
   "author": {
     "name": "Peach",

@@ -84,7 +84,9 @@ export class PLCTcpModbus {
       this.IPCSendSys(backIPC, {state: 'error', msg: '5s后重试', connectionStr: this.connectionStr});
       setTimeout(() => {
         console.log('erroe--86');
-        this.connection();
+        if (!this.closeState) {
+          this.connection();
+        }
       }, 5000);
       console.log('success = false');
     });
@@ -101,8 +103,9 @@ export class PLCTcpModbus {
           this.heartbeat();
         }).catch((err) => {
           console.log('heartbeat--102');
-
-          this.connection();
+          if (!this.closeState && !this.ifClient('heartbeat')) {
+            this.connection();
+          }
         });
       }
     }, this.connectionStr.hz || 1000);
@@ -117,6 +120,7 @@ export class PLCTcpModbus {
   close(callback: Function) {
     this.client.close((r) => {
       this.closeState = true;
+      this.client = null;
       callback();
     });
   }

@@ -214,18 +214,24 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
         const t = setTimeout(() => {
           this.e.ipcRenderer.removeAllListeners(channel);
         }, 3000);
-        this.e.ipcRenderer.send(`${this.PLCS.connStr.uid}${FC.F03}`, {address: PLC_D(0), value: 52, channel});
-        this.e.ipcRenderer.once(channel, (e, r) => {
-          // console.log('liveTension', r);
-          this.liveData.A1 = r.float.slice(0, 6)
-          this.liveData.A2 = r.float.slice(6, 12)
-          this.liveData.B1 = r.float.slice(12, 18)
-          this.liveData.B2 = r.float.slice(18, 24)
+        try {
+          this.e.ipcRenderer.send(`${this.PLCS.connStr.uid}${FC.F03}`, {address: PLC_D(0), value: 52, channel});
+          this.e.ipcRenderer.once(channel, (e, r) => {
+            // console.log('liveTension', r);
+            this.liveData.A1 = r.float.slice(0, 6)
+            this.liveData.A2 = r.float.slice(6, 12)
+            this.liveData.B1 = r.float.slice(12, 18)
+            this.liveData.B2 = r.float.slice(18, 24)
+
+          })
+        } catch (error) {
+          console.error('数据转换有误！！');
+        } finally {
           this.cdr.detectChanges();
           clearTimeout(t);
           this.liveT = null;
           this.getLiveData();
-        })
+        }
       } else {
         console.log('请链接设备');
         this.cdr.detectChanges();

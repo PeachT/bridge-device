@@ -45,6 +45,7 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
   @Input() component$: Observable<Menu$>;
   componentName: any = null;
   bridge$: Observable<Menu$>;
+  bridges: Array<Menu$>;
   bridgeId: number;
   search = {
     /** 未完成 */
@@ -151,7 +152,7 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
                 return true
               }
             }
-            if (this.search.unDone && t.tensionHoleInfos.find(h => h.tasks.find(f => f.record.state === 0) !== undefined)) {
+            if (this.search.unDone && t.tensionHoleInfos.find(h => h.tasks.find(f => !f.record.state) !== undefined)) {
               return true
             }
             if (this.search.castingDate.length > 0) {
@@ -255,6 +256,7 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
   /** 更新 */
   onCrd(ob) {
     const sub = ob.subscribe(r => {
+      this.bridges = r;
       this.crd.markForCheck();
       sub.unsubscribe();
     })

@@ -51,8 +51,8 @@
             <td [attr.rowspan]="holeNames.span" *ngIf="holeNames.keys.indexOf(item) !== -1">{{holeNames[item]}}</td>
             <td>{{item}}</td>
             <td *ngFor="let stage of knPercentageFormArray.value">
-              <div>{{(tensionKn * (stage / 100)) | ToFixedr}}<sub>kn</sub> </div>
-              <div>{{(tensionKn * (stage / 100)) | kn2mpa: device: item}}<sub>mpa</sub> </div>
+              <div class="kn-color">{{(tensionKn * (stage / 100)) | ToFixedr}}<sub>kn</sub> </div>
+              <div class="mpa-color">{{(tensionKn * (stage / 100)) | kn2mpa: device: item}}<sub>mpa</sub> </div>
             </td>
             <td>
               <div>{{(tensionKn * (stageGroup.get('uploadPercentage').value / 100)) | ToFixedr}}<sub>kn</sub> </div>

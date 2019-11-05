@@ -227,14 +227,14 @@
             {{holeNames[jackName]}}</td>
           <td>{{jackName}}</td>
           <td *ngFor="let mpa of group[jackName].mpa; index as mpai">
-            <div>{{mpa | mpa2kn: data.device: jackName}}<sub>kn</sub></div>
-            <div>{{mpa}}<sub>mpa</sub></div>
-            <div>{{group[jackName].mm[mpai]}}<sub>mm</sub></div>
+            <div class="kn-color">{{mpa | mpa2kn: data.device: jackName}}<sub>kn</sub></div>
+            <div class="mpa-color">{{mpa}}<sub>mpa</sub></div>
+            <div class="mm-color">{{group[jackName].mm[mpai]}}<sub>mm</sub></div>
           </td>
           <td>
-            <div>{{group[jackName].initMpa | mpa2kn: data.device: jackName}}<sub>kn</sub> </div>
-            <div>{{group[jackName].initMpa}}<sub>mpa</sub></div>
-            <div>{{group[jackName].initMm}}<sub>mm</sub></div>
+            <div class="kn-color">{{group[jackName].initMpa | mpa2kn: data.device: jackName}}<sub>kn</sub> </div>
+            <div class="mpa-color">{{group[jackName].initMpa}}<sub>mpa</sub></div>
+            <div class="mm-color">{{group[jackName].initMm}}<sub>mm</sub></div>
           </td>
           <td>
             {{recordCalculate.stage[i][jackName].Sn}}

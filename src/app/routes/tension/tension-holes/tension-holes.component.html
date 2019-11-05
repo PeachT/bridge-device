@@ -16,7 +16,7 @@
   <form nz-form [formGroup]="formData">
     <div formArrayName="tensionHoleInfos">
       <ng-container *ngFor="let item of tensionHoleInfosFormArray.controls; index as i" [formArrayName]="i">
-        <div class="hole-group" [ngClass]="{'active': item.value.name === groupItem?.name}">
+        <div class="hole-group" [ngClass]="{'active': item.value.name === groupItem?.name}" [hidden]=" !(item.value.name === groupItem?.name)">
           <div>
             <app-form-item label="孔号">
               <input type="text" readonly nz-input placeholder="请输入孔号" formControlName="name">
