@@ -4,6 +4,7 @@ import { bf } from './bufferToNumber';
 import { ModbusRTU } from 'modbus-serial/ModbusRTU';
 const Modbus = require('modbus-serial');
 
+
 interface ConnectionStr {
   /** ip */
   ip: string;
@@ -55,7 +56,7 @@ export class PLCTcpModbus {
       return;
     }
     if (!this.cs && this.connectionState()) {
-      this.IPCSendSys(backIPC, {state: 'success', msg: '链接中', connectionStr: this.connectionStr});
+      // this.IPCSendSys(backIPC, {state: 'success', msg: '链接中', connectionStr: this.connectionStr});
       this.heartbeat();
       return;
     }
@@ -68,7 +69,6 @@ export class PLCTcpModbus {
     let state = false;
     // 链接
     await this.client.connectTCP(this.connectionStr.ip, { port: Number(this.connectionStr.port) })
-    // await this.client.connectTCP('192.168.12.12', { port: Number(this.connectionStr.port) })
     /** 链接成功 */
     .then(() => {
       this.cs = false;
@@ -102,8 +102,15 @@ export class PLCTcpModbus {
           this.IPCSend(`${this.connectionStr.uid}heartbeat`, { uint16: data.data });
           this.heartbeat();
         }).catch((err) => {
-          console.log('heartbeat--102');
-          if (!this.closeState && !this.ifClient('heartbeat')) {
+          console.log('heartbeat--102', this.connectionStr.heartbeatAddress);
+          // if (!this.closeState && !this.ifClient('heartbeat')) {
+          //   const backIPC = `${this.connectionStr.uid}connection`;
+          //   this.IPCSendSys(backIPC, {state: 'error', msg: '链接有误', connectionStr: this.connectionStr});
+          //   this.connection();
+          // }
+          if (!this.closeState) {
+            const backIPC = `${this.connectionStr.uid}connection`;
+            this.IPCSendSys(backIPC, {state: 'error', msg: '数据有误', connectionStr: this.connectionStr});
             this.connection();
           }
         });

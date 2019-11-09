@@ -170,7 +170,9 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
   operatorLive() {
     this.stop = !this.stop;
     this.appS.taskLiveState = this.stop;
-    if (this.stop) {
+    console.log(this.appS.taskLiveState);
+
+    if (!this.stop) {
       this.exit();
     } else {
       if (this.liveT) {
@@ -225,7 +227,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
             });
           });
         }
-        console.log(backData);
+        // console.log(backData);
 
         if (i !== arrs.length) {
           clearInterval(this.liveT);
@@ -307,7 +309,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
   }
   /** 压浆完成 */
   groutingSuccess(state) {
-    if (state && !this.monitoringMsg.save) {
+    if (state && !this.monitoringMsg.save && this.monitoringMsg.start) {
       this.groutingSave();
       this.monitoringMsg.save = true;
       this.monitoringMsg.start = false;
@@ -327,9 +329,10 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
   async selectGroutingTemp(id) {
     this.templateData = await this.odb.getOneAsync('grouting', (g: GroutingTask) => g.id === id);
     if (this.templateData) {
-      if ( this.plcState) {
+      if (this.plcState) {
         this.liveData();
         this.appS.taskLiveState = true;
+        this.stop = true;
       } else {
         if (!this.plcsub) {
           this.plcsub = this.PLCS.LinkError$.subscribe((state) => {
@@ -375,7 +378,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
         // console.log(this.groutingHoleItem);
         // this.groutingHoleItem.processDatas.date.push(new Date().getTime());
         this.groutingHoleItem.processDatas.intoPulpPressure.push(this.groutingHoleItem.intoPulpPressure);
-        if (this.stop && this.svgT) {
+        if (this.stop && this.svgT && !this.monitoringMsg.start) {
           clearInterval(this.svgT);
           this.svgT = null;
         }
@@ -393,7 +396,8 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
     for (const item of arrs) {
       // console.log('保存数据', item);
       await new Promise((resolve, reject) => {
-        this.e.ipcRenderer.send('groutingF03', { address: item.address, value: item.value, channel: item.outKey });
+        // tslint:disable-next-line:max-line-length
+        this.e.ipcRenderer.send(`${this.PLCS.connStr.uid}F03`, { address: item.address, value: item.value, channel: item.outKey });
         const t = setTimeout(() => {
           this.e.ipcRenderer.removeAllListeners(item.outKey);
           console.error('获取数据超时');

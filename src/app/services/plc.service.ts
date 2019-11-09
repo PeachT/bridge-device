@@ -1,7 +1,5 @@
-import { Injectable, ChangeDetectorRef } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { ElectronService } from 'ngx-electron';
-import { PLCSocket, testLink } from '../class/PLCSocket';
-import { DbService } from './db.service';
 import { NzMessageService } from 'ng-zorro-antd';
 import { ConnectionStr } from '../models/socketTCP';
 import { TensionTask } from '../models/tension';
@@ -9,7 +7,6 @@ import { Store } from '@ngrx/store';
 import { NgrxState } from '../ngrx/reducers';
 import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
-import { TcpLive } from '../models/tensionLive';
 
 @Injectable({
   providedIn: 'root'
@@ -54,8 +51,6 @@ export class PLCService {
   constructor(
     private e: ElectronService,
     private message: NzMessageService,
-    private store$: Store<NgrxState>,
-    private router: Router,
   ) { }
 
 
@@ -87,7 +82,7 @@ export class PLCService {
   private ipcon() {
     /** 监听链接状态 */
     this.e.ipcRenderer.on(`${this.connStr.uid}connection`, async (event, data) => {
-      console.log(data);
+      // console.log(data);
       this.socketInfo.state = data.state;
       this.socketInfo.msg = data.msg;
       this.socketInfo.link = true;
@@ -95,6 +90,7 @@ export class PLCService {
     });
     /** 监听心跳 */
     this.e.ipcRenderer.on(`${this.connStr.uid}heartbeat`, async (event, data) => {
+      // console.log(data);
       const time = new Date().getTime();
       this.socketInfo.linkDelay = (time - this.oldTime - this.connStr.hz) || time;
       this.oldTime = time;

@@ -14,7 +14,7 @@
     <nz-alert *ngIf="!templateData" nzType="error" nzMessage="请选择模板" (click)="groutingTemplateShow = true"></nz-alert>
     <div class="template">
       <button nz-button nzType="primary" (click)="groutingTemplateShow = true" >{{templateData ? '更换模板' : '选择模板'}}</button>
-      <button nz-button [nzType]="stop ? 'info' : 'danger'" *ngIf="templateData && plcState" (click)="operatorLive()">{{appS.taskLiveState ? '取消监控' : '开始监控'}}</button>
+      <button nz-button [nzType]="stop ? 'info' : 'danger'" *ngIf="templateData" (click)="operatorLive()">{{appS.taskLiveState ? '取消监控' : '开始监控'}}</button>
       <!-- <button nz-button nzType="danger" *ngIf="appS.taskLiveState && !plcState" (click)="appS.taskLiveState = false">停止监控</button> -->
     </div>
   </header>

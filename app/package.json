@@ -1,13 +1,13 @@
 {
   "name": "common-bridge-device",
-  "version": "6.1.11",
+  "version": "6.1.12",
   "main": "./js/main.js",
   "author": {
     "name": "Peach",
     "email": "peachlin@outlook.com",
     "url": "https://github.com/PeachT/"
   },
-  "description": "智能设备",
+  "description": "凌桥智能设备",
   "scripts": {
     "tsc": "tsc"
   },

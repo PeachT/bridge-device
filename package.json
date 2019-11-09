@@ -92,7 +92,7 @@
       }
     ],
     "win": {
-      "icon": "build/icons/all/256x256.ico",
+      "icon": "build/icons/lq/256x256.ico",
       "target": [
         {
           "target": "nsis",
@@ -112,7 +112,7 @@
       "target": [
         "deb"
       ],
-      "icon": "build/icons/all"
+      "icon": "build/icons/lq"
     }
   },
   "keywords": [
