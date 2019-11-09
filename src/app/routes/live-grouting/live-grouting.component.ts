@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { DbService } from 'src/app/services/db.service';
 import { GroutingTask, MixingInfo, GroutingHoleItem, GroutingInfo } from 'src/app/models/grouting';
-import { GroutingService } from 'src/app/services/grouting.service';
 import { Subscription } from 'rxjs';
 import { PLC_D, PLC_M } from 'src/app/models/IPCChannel';
 import { copyAny } from 'src/app/models/base';
@@ -190,20 +189,20 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
       if (this.plcState) {
         const arrs = [
           // 完成标志
-          { channel: FC.F01, address: PLC_M(46), value: 1, outKey: 'out8' },
+          { channel: FC.FC1, address: PLC_M(46), value: 1, outKey: 'out8' },
           // 开始标准
-          { channel: FC.F01, address: PLC_M(50), value: 1, outKey: 'out9' },
+          { channel: FC.FC1, address: PLC_M(50), value: 1, outKey: 'out9' },
           // 梁号
-          { channel: FC.F03ASCII, address: PLC_D(220), value: 4, outKey: 'out0' },
+          { channel: FC.FC3, address: PLC_D(220), value: 4, outKey: 'out0' },
           // 孔号
-          { channel: FC.F03ASCII, address: PLC_D(152), value: 2, outKey: 'out1' },
+          { channel: FC.FC3, address: PLC_D(152), value: 2, outKey: 'out1' },
           // 实时数据
-          { channel: FC.F03, address: PLC_D(200), value: 6, outKey: 'out2' },
-          { channel: FC.F03, address: PLC_D(72), value: 1, outKey: 'out3' },
-          { channel: FC.F03, address: PLC_D(52), value: 2, outKey: 'out4' },
-          { channel: FC.F03, address: PLC_D(120), value: 1, outKey: 'out5' },
-          { channel: FC.F01, address: PLC_M(30), value: 8, outKey: 'out6' },
-          { channel: FC.F03, address: PLC_D(520), value: 6, outKey: 'out7' },
+          { channel: FC.FC3, address: PLC_D(200), value: 6, outKey: 'out2' },
+          { channel: FC.FC3, address: PLC_D(72), value: 1, outKey: 'out3' },
+          { channel: FC.FC3, address: PLC_D(52), value: 2, outKey: 'out4' },
+          { channel: FC.FC3, address: PLC_D(120), value: 1, outKey: 'out5' },
+          { channel: FC.FC1, address: PLC_M(30), value: 8, outKey: 'out6' },
+          { channel: FC.FC3, address: PLC_D(520), value: 6, outKey: 'out7' },
         ];
         const backData: any = {};
         let i = 0;
@@ -222,7 +221,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
             this.e.ipcRenderer.once(item.outKey, (event, data) => {
               clearTimeout(t);
               i++;
-              backData[item.outKey] = data;
+              backData[item.outKey] = data.data;
               resolve(data);
             });
           });
@@ -247,19 +246,19 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
           };
           this.mixingData.dosage = backData.out2.float.map(m => Number(m.toFixed(2)));
           this.mixingData.waterBinderRatio = waterBinderRatio(this.mixingData.dosage);
-          this.mixingData.mixingTime = backData.out3.uint16[0];
+          this.mixingData.mixingTime = backData.out3.int16[0];
           /** 搅拌开始 */
-          if (!this.mixingDataNow.state && backData.out6.data[0]) {
+          if (!this.mixingDataNow.state && backData.out6.int16[0]) {
             this.mixingDataNow.state = true;
             this.mixingDataNow.date = new Date();
           }
           /** 上料完成 */
-          if (this.mixingDataNow.state && !this.mixingDataNow.save && backData.out6.data[6] && this.mixingData.mixingTime > 0) {
+          if (this.mixingDataNow.state && !this.mixingDataNow.save && backData.out6.int16[6] && this.mixingData.mixingTime > 0) {
             this.mixingDataNow.time = this.mixingData.mixingTime;
             this.mixingDataNow.save = true;
           }
           /** 搅拌完成 */
-          if (this.mixingDataNow.state && !backData.out6.data[6] && !backData.out6.data[0]) {
+          if (this.mixingDataNow.state && !backData.out6.int16[6] && !backData.out6.int16[0]) {
             if (this.mixingDataNow.save) {
               const mixing: MixingInfo = {
                 /** 用量 */
@@ -290,7 +289,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
             this.mixingDataNow.save = false;
           }
           this.groutingHoleItem.intoPulpPressure = (backData.out4.float[0]).toFixed(2);
-          this.groutingHoleItem.steadyTime = backData.out5.uint16[0];
+          this.groutingHoleItem.steadyTime = backData.out5.int16[0];
           this.cdr.detectChanges();
         } catch (error) {
           console.error('转换数据有误');

@@ -26,7 +26,7 @@ function FC3(buffer: Buffer) {
         float.push(buffer.readFloatLE(index));
       }
   }
-  return { int16, int32, float };
+  return { int16, int32, float, str: buffer.toString()};
 }
 function ascii2buffer(data: any) {
   const arrUint8 = []

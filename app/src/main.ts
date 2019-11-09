@@ -11,6 +11,8 @@ const ping = require('ping');
 // const { autoUpdater } = require('electron-updater');
 import { autoUpdater } from 'electron-updater';
 import { PLCTcpModbus } from './PLCTcpModbus';
+import { SocketTcp } from './socketTcp';
+import { ConnectionStr } from './Modbus/modle';
 
 
 
@@ -78,90 +80,22 @@ app.on('activate', () => {
 
 
 /** tcp链接集合 */
-const tcpList: {[prop: string]: PLCTcpModbus} = {};
-/** 测试链接tcp */
-ipcMain.on('TCPLink', (event, data) => {
-  if (tcpList[data.uid]) {
-    event.sender.send(`${data.uid}testLink`, {alive: true, link: true, msg: `${data.uid}>设备已连接`});
-    return;
-  } else {
-    ping.promise.probe(data.ip).then((res) => {
-      if (res.alive) {
-        event.sender.send(`${data.uid}testLink`, {alive: true, link: false, msg: `${data.uid}测试链接`});
-      } else {
-        event.sender.send(`${data.uid}testLink`, { alive: false, link: false, msg: `${data.uid}测试链接` });
-      }
-    });
-  }
-});
+const tcpList: {[prop: string]: SocketTcp} = {};
+
 /** 链接tcp */
-ipcMain.on('LinkTCP', (event, data) => {
+ipcMain.on('LinkTCP', (e, data: ConnectionStr) => {
   if (tcpList[data.uid]) {
-    if (tcpList[data.uid].ifClient('LInkTCP')) {
-      event.sender.send(`${data.uid}testLink`, {link: true, state: 'success', msg: `链接中`});
-    } else {
-      event.sender.send(`${data.uid}testLink`, {link: true, state: 'error', msg: `链接有误`});
-    }
+    e.sender.send(`${data.uid}connect`, {link: true, state: 'success', msg: `链接中`});
   } else {
-    event.sender.send(`${data.uid}testLink`, {link: false, state: 'error', msg: `创建新链接`});
-    tcpList[data.uid] = new PLCTcpModbus(data, win);
-    IPCOn(data.uid, tcpList[data.uid]);
+    tcpList[data.uid] = new SocketTcp(data, win);
   }
 });
 /** 取消tcp */
-ipcMain.on('CancelTCP', (event, name) => {
-  tcpList[name].heartbeatStateFunc(false);
-  tcpList[name].close(() => {
-    event.sender.send(`${name}connection`, {success: false, msg: '关闭链接'});
-    ipcMain.removeAllListeners(`${name}F01`);
-    ipcMain.removeAllListeners(`${name}F03`);
-    ipcMain.removeAllListeners(`${name}F03_float`);
-    ipcMain.removeAllListeners(`${name}F05`);
-    ipcMain.removeAllListeners(`${name}F15`);
-    ipcMain.removeAllListeners(`${name}F06`);
-    ipcMain.removeAllListeners(`${name}F016`);
-    ipcMain.removeAllListeners(`${name}F016_float`);
-    ipcMain.removeAllListeners(`${name}F03ASCII`);
-    ipcMain.removeAllListeners(`${name}heartbeatState`);
-    delete tcpList[name];
-  })
+ipcMain.on('CancelLink', async (e, name) => {
+  await tcpList[name].cancelLink();
+  e.sender.send(`${name}CancelLink`);
+  delete tcpList[name];
 });
-
-
-
-/** ipc监听 */
-function IPCOn(d, tcp: PLCTcpModbus) {
-  ipcMain.on(`${d}F01`, (e, arg) => {
-    tcp.F01(arg.address, arg.value, arg.channel);
-  });
-  ipcMain.on(`${d}F03`, (e, arg) => {
-    tcp.F03(arg.address, arg.value, arg.channel);
-  });
-  ipcMain.on(`${d}F03_float`, (e, arg) => {
-    tcp.F03_float(arg.address, arg.value, arg.channel);
-  });
-  ipcMain.on(`${d}F05`, (e, arg) => {
-    tcp.F05(arg.address, arg.value, arg.channel);
-  });
-  ipcMain.on(`${d}F15`, (e, arg) => {
-    tcp.F15(arg.address, arg.value, arg.channel);
-  });
-  ipcMain.on(`${d}F06`, (e, arg) => {
-    tcp.F06(arg.address, arg.value, arg.channel);
-  });
-  ipcMain.on(`${d}F016`, (e, arg) => {
-    tcp.F016(arg.address, arg.value, arg.channel);
-  });
-  ipcMain.on(`${d}F016_float`, (e, arg) => {
-    tcp.F016_float(arg.address, arg.value, arg.channel);
-  });
-  ipcMain.on(`${d}F03ASCII`, (e, arg) => {
-    tcp.F03ASCII(arg.address, arg.value, arg.channel);
-  });
-  ipcMain.on(`${d}heartbeatState`, (e, arg) => {
-    tcp.heartbeatStateFunc(arg.state);
-  });
-}
 
 
 // 主进程监听渲染进程传来的信息

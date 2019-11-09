@@ -210,14 +210,16 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
     }
     this.liveT = setTimeout(() => {
       if (this.plcState) {
-        const channel = 'liveTension';
+        const callpack = 'liveTension';
         const t = setTimeout(() => {
-          this.e.ipcRenderer.removeAllListeners(channel);
+          this.e.ipcRenderer.removeAllListeners(callpack);
         }, 3000);
         try {
-          this.e.ipcRenderer.send(`${this.PLCS.connStr.uid}${FC.F03}`, {address: PLC_D(0), value: 52, channel});
-          this.e.ipcRenderer.once(channel, (e, r) => {
+          this.PLCS.ipc({request: FC.FC3, address: PLC_D(0), value: 52, callpack});
+          // this.e.ipcRenderer.send(`${this.PLCS.connStr.uid}Socket`, {address: PLC_D(0), value: 52, channel: callpack});
+          this.e.ipcRenderer.once(callpack, (e, data) => {
             // console.log('liveTension', r);
+            const r = data.data;
             this.liveData.A1 = r.float.slice(0, 6)
             this.liveData.A2 = r.float.slice(6, 12)
             this.liveData.B1 = r.float.slice(12, 18)

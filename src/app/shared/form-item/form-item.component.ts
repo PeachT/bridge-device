@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { AppService } from 'src/app/services/app.service';
 
 @Component({
   selector: 'app-form-item',
@@ -20,7 +21,9 @@ export class FormItemComponent implements OnInit {
   @Input() errorMsg: any = null;
   /** 显示隐藏验证消息 */
   @Input() errorShow = true;
-  constructor() { }
+  constructor(
+    public appS: AppService,
+  ) { }
 
   ngOnInit() {
     if (this.row) {

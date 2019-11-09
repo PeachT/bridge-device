@@ -11,6 +11,6 @@
     <ng-content select="nz-checkbox-wrapper"></ng-content>
     <ng-content select=".row"></ng-content>
 
-    <div class="tip" *ngIf="errorShow">{{errors | ValidatorError: errorMsg}}</div>
+    <div class="tip" *ngIf="appS?.edit && errorShow">{{errors | ValidatorError: errorMsg}}</div>
   </nz-form-control>
 </div>

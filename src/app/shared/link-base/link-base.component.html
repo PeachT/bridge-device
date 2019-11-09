@@ -1,27 +1,35 @@
 <main class="setting">
   <div style="display: flex; flex-direction: column;">
-    <nz-divider style="min-width: auto;" [nzText]="'设备通信参数 '+ connStr.heartbeatAddress" nzOrientation="left"></nz-divider>
+    <nz-divider style="min-width: auto;" [nzText]="'设备通信参数 '+ connStr.heartbeatAddress" nzOrientation="left">
+    </nz-divider>
     <div>
       <app-form-item label="IP">
-        <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.ip"/>
+        <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.ip" />
       </app-form-item>
       <app-form-item label="端口号">
-          <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.port"/>
+        <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.port" />
       </app-form-item>
       <app-form-item label="PLC地址">
-          <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.address"/>
+        <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.address" />
       </app-form-item>
       <app-form-item label="设备uid">
-          <input nz-input type="text" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.uid"/>
+        <input nz-input type="text" readonly nzSize="large" style="width: 100%;" [(ngModel)]="connStr.uid" />
       </app-form-item>
       <app-form-item label="通信延时">
-          <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.setTimeout"/>
+        <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.setTimeout" />
       </app-form-item>
-      <app-form-item label="频率">
-        <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.hz"/>
+      <app-form-item label="重连延时">
+        <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.toLinkTime" />
+      </app-form-item>
+      <app-form-item label="通信模式">
+        <nz-select style="width: 100%;" nzPlaceHolder="请选择模式" [(ngModel)]="connStr.mode">
+          <nz-option nzValue="tcp" nzLabel="TCP"></nz-option>
+          <nz-option nzValue="ascii" nzLabel="ASCII"></nz-option>
+          <nz-option nzValue="rtu" nzLabel="RTU"></nz-option>
+        </nz-select>
       </app-form-item>
       <app-form-item label="心跳地址" *ngIf="appS.platform === 'debug' || appS.userInfo.jurisdiction > 5">
-        <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.heartbeatAddress"/>
+        <input nz-input type="number" nzSize="large" style="width: 100%;" [(ngModel)]="connStr.heartbeatAddress" />
       </app-form-item>
     </div>
     <button nz-button nzType="primary" (click)="saveConnStr()">保存</button>

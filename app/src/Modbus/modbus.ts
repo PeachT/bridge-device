@@ -1,45 +1,22 @@
 import { Socket } from "net";
 import { asciiRequestCmd } from "./createCMD";
 import { returnData16 } from "./returnData";
+import { ConnectionStr, CallpackData } from "./modle";
 
 
-interface ConnectionStr {
-  /** ip */
-  ip: string;
-  /** 端口号 */
-  port: number;
-  /** PLC地址 */
-  address: number;
-  /** 通信延时 */
-  setTimeout: number;
-  /** 通信模式 */
-  mode: string;
-  /** 心跳地址 */
-  heartbeatAddress: number
-}
 
-interface SendRequestModel {
-  address: number;
-  lengat: number;
-  array: Array<number | boolean>;
-}
-enum FC {
-  FC1 = 1,
-  FC2 = 2,
-  FC3 = 3,
-  FC5 = 5,
-  FC6 = 6,
-  FC15 = 15,
-  FC16 = 16,
-}
-
-// Vue.use(Vuex);
 export class Modbus {
-  private client: Socket;
+  public client: Socket;
   private connectionStr: ConnectionStr;
   private writeState = false;
   private callback: Function;
   private callbackT: any;
+  private tolinkT: any;
+  public connectFunc: Function;
+  public errorFunc: Function;
+  public closeFunc: Function;
+  public toLinkFunc: Function;
+  public heartbeatFunc: Function;
 
   constructor(connstr: ConnectionStr) {
     this.connectionStr = connstr;
@@ -64,24 +41,65 @@ export class Modbus {
     });
     client.on('connect', () => {
       console.log('connect');
+      if (this.connectFunc) {
+        this.connectFunc();
+      }
     });
     client.on('timeout', () => {
       console.log('timeout');
-      this.FC3(this.connectionStr.heartbeatAddress, 1);
+      this.heartbeat();
     });
     client.on('close', (c) => {
       console.log('close', c);
+      this.toLInk();
+      if (this.closeFunc) {
+        this.closeFunc();
+      }
     });
     client.on('error', (r) => {
       console.log('error', r);
       client.destroy();
+      if (this.errorFunc) {
+        this.errorFunc();
+      }
     });
     this.client = client;
   }
 
+  /** to Link */
+  private toLInk() {
+    if (!this.tolinkT && this.connectionStr) {
+      this.tolinkT = setTimeout(() => {
+        if (this.client.destroyed) {
+          console.log('重新链接', new Date().getTime());
+          this.tolinkT = null;
+          this.toLinkFunc();
+          this.connectTCP();
+        }
+      }, this.connectionStr.toLinkTime);
+    }
+  }
+  /** heartbeat */
+  private heartbeat() {
+    console.log('84', this.connectionStr.heartbeatAddress);
+    const t1 = new Date().getTime();
+    this.FC3(this.connectionStr.heartbeatAddress, 1).then(r => {
+      const t = new Date().getTime() - t1;
+      this.heartbeatFunc({r, t})
+    }).catch(r => {
+      const t = new Date().getTime() - t1;
+      this.heartbeatFunc({r, t})
+    });
+  }
   /** 取消链接 */
   cancelLink() {
+    clearTimeout(this.tolinkT);
     this.client.end();
+    this.connectionStr = null;
+    this.client = null;
+    return new Promise((resolve, reject) => {
+      resolve({ success: true, data: '取消链接' });
+    });
   }
   // modbus发送数据拼接
   getCmd(fc: number, address: number, data: any, state: any = null) {
@@ -93,22 +111,27 @@ export class Modbus {
    * @param {Number} address 读取线圈起始地址
    * @param {Number} length 读取线圈数量
    */
-  readCoilStatue(address: number, length: any): Promise<any> {
+  readCoilStatue(address: number, length: any) {
     const cmd = this.getCmd(1, address, length);
     return this.sendRequest(cmd);
   }
-  FC1(address: any, length: any): Promise<any> {
+  FC1(address: any, length: any) {
     return this.readCoilStatue(address, length);
   }
   // FC2 "Read Input Status" 读取输入状态
-  readInputStatue(address: number, quantity: any, next: any) {
+  readInputStatue(address: number, quantity: any) {
     const cmd = this.getCmd(2, address, quantity);
     // 00 00 00 00 00 06 01 03 00 00 00 0A
-    this.sendRequest(cmd);
+    return this.sendRequest(cmd);
+  }
+  FC2(address: any, length: any) {
+    return this.readInputStatue(address, length);
   }
   // FC3 "Read Holding Registers" 读取16位寄存器数据 : 01 03 0C 0064 0065 0066 0067 0068 0069 89
   readRegisters16(address: number, quantity: any) {
     const cmd = this.getCmd(3, address, quantity);
+    console.log('129',cmd);
+
     return this.sendRequest(cmd);
   }
   FC3(address: number, quantity: any) {
@@ -160,7 +183,7 @@ export class Modbus {
   }
 
   /** 发送请求 */
-  sendRequest(cmdStr: string): Promise<{success: boolean, data?: any}> {
+  private sendRequest(cmdStr: string): Promise<CallpackData> {
     return new Promise((resolve, reject) => {
       if (!this.writeState) {
         this.writeState = true;
@@ -182,9 +205,10 @@ export class Modbus {
       }
     });
   }
-  reSend() {
+  private reSend() {
     clearTimeout(this.callbackT);
     this.callbackT = null;
     this.writeState = false;
   }
 }
+

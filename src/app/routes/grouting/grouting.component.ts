@@ -5,7 +5,6 @@ import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
 import { getModelBase, baseEnum } from 'src/app/models/base';
 import { TaskMenuComponent } from 'src/app/shared/task-menu/task-menu.component';
-import { GroutingService } from 'src/app/services/grouting.service';
 import { Project } from 'src/app/models/project';
 import { HttpService } from 'src/app/services/http.service';
 import { uploadingData } from 'src/app/Function/uploading';
@@ -353,7 +352,6 @@ export class GroutingComponent implements OnInit, OnDestroy {
     public odb: DbService,
     private message: NzMessageService,
     public appS: AppService,
-    public GPLCS: GroutingService,
     private http: HttpService,
     private crd: ChangeDetectorRef
   ) {

@@ -3,7 +3,6 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { NzMessageService, NzModalService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
-import { GroutingService } from 'src/app/services/grouting.service';
 import { ElectronService } from 'ngx-electron';
 import { HttpService } from 'src/app/services/http.service';
 import { GroutingTask } from 'src/app/models/grouting';
@@ -39,7 +38,6 @@ export class GroutingMianComponent implements OnInit, OnChanges {
   constructor(
     public db: DbService,
     public appS: AppService,
-    public GPLCS: GroutingService,
     private cdr: ChangeDetectorRef
   ) { }
 
