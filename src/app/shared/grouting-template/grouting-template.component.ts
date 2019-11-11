@@ -5,6 +5,9 @@ import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Project } from 'src/app/models/project';
 import { GroutingTask } from 'src/app/models/grouting';
+import { Menu$ } from 'src/app/models/app';
+import { AppService } from 'src/app/services/app.service';
+import { Menu } from 'src/app/models/menu';
 
 @Component({
   selector: 'app-grouting-template',
@@ -14,17 +17,19 @@ import { GroutingTask } from 'src/app/models/grouting';
 export class GroutingTemplateComponent implements OnInit {
   /** 选择项目 */
   @Input() projectId: number;
-  projectMenu$: Observable<Array<{label: string; value: any;}>>;
+  projectMenu$: Promise<Menu[]>;
   templateMenu$: Observable<Array<{label: string; value: any;}>>;
   data: any = [];
   select = null;
 
   @Output() selectOut = new EventEmitter();
   @Output() cancel = new EventEmitter();
+  temps: Array<{name: string, id: any}>;
 
   constructor(
     private db: DbService,
     private message: NzMessageService,
+    public appS: AppService,
   ) { }
 
   async ngOnInit() {
@@ -32,17 +37,27 @@ export class GroutingTemplateComponent implements OnInit {
       this.getProject();
     }
     console.log(this.data);
+    this.temps = JSON.parse(localStorage.getItem('groutingTemplate'));
   }
   getProject() {
-    this.projectMenu$ = from(this.db.db.project.toArray()).pipe(
-      map(comps => {
-        const arr = [];
-        comps.map((item: Project) => {
-          arr.push({ label: item.name, value: item.id });
-        });
-        return arr;
-      })
-    );
+    const j =  this.appS.userInfo.jurisdiction;
+    this.projectMenu$ =this.db.getMenuData('project', (o1: Project) => {
+      if (j < 8 && o1.jurisdiction !== 8) {
+        return true;
+      }
+      if (j >= 8) {
+        return o1.jurisdiction === 8;
+      }
+    });
+    // this.projectMenu$ = from(this.db.db.project.toArray()).pipe(
+    //   map(comps => {
+    //     const arr = [];
+    //     comps.map((item: Project) => {
+    //       arr.push({ label: item.name, value: item.id });
+    //     });
+    //     return arr;
+    //   })
+    // );
   }
   getTemplate() {
     this.templateMenu$ = from(this.db.db.grouting.filter(f => f.project === this.projectId && f.template).toArray()).pipe(

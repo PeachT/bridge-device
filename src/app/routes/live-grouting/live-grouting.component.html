@@ -85,7 +85,7 @@
             <tbody>
               <ng-container>
                 <tr>
-                  <td>{{ templateData.groutingInfo[0].groups[0].setGroutingPressure }}</td>
+                  <td>{{ templateData.groutingInfo[0].groups[0].setGroutingPressure || ' 0.00' }}</td>
                   <td *ngIf="appS.groutingDevicesInfo.intoPulpPressure" >{{groutingHoleItem?.intoPulpPressure}}</td>
                   <td *ngIf="appS.groutingDevicesInfo.outPulpPressure" >{{groutingHoleItem?.outPulpPressure}}</td>
                   <td *ngIf="appS.groutingDevicesInfo.intoPulpvolume" >{{groutingHoleItem?.intoPulpvolume}}</td>

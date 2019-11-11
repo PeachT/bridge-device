@@ -48,6 +48,7 @@
     "ng-zorro-antd": "^8.4.1",
     "ngx-electron": "^2.2.0",
     "rxjs": "~6.5.3",
+    "sleep-ts": "^0.1.1",
     "ts-md5": "^1.2.7",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"

@@ -1,8 +1,15 @@
 <nz-modal [nzVisible]="true" nzTitle="选择模板" (nzOnCancel)="cancel.emit()" (nzOnOk)="ok()" nzWidth="85%">
   <div class="item">
+    <span >常用模板：</span>
+    <nz-radio-group [(ngModel)]="select" nzSize="large">
+      <label nz-radio nzSize="large" [nzValue]="t.id" *ngFor="let t of temps">{{t.name}}</label>
+    </nz-radio-group>
+  </div>
+<br>
+  <div class="item">
     <span >选择项目：</span>
     <nz-radio-group [(ngModel)]="projectId" (ngModelChange)="selectProject()" nzSize="large">
-      <label nz-radio [nzValue]="c.value" *ngFor="let c of projectMenu$ | async">{{c.label}}</label>
+      <label nz-radio [nzValue]="c.id" *ngFor="let c of projectMenu$ | async">{{c.name}}</label>
     </nz-radio-group>
   </div>
 <br>
