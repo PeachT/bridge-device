@@ -32,7 +32,9 @@ export class Modbus {
     client.setTimeout(connstr.setTimeout);
 
     client.on('data', (data: any) => {
-      console.log('data');
+      if (!data) {
+        console.log('data=', data);
+      }
       this.callback({ success: true, data });
     });
     client.on('drain', () => {
@@ -81,7 +83,6 @@ export class Modbus {
   }
   /** heartbeat */
   private heartbeat() {
-    console.log('84', this.connectionStr.heartbeatAddress);
     const t1 = new Date().getTime();
     this.FC3(this.connectionStr.heartbeatAddress, 1).then(r => {
       const t = new Date().getTime() - t1;
@@ -130,8 +131,6 @@ export class Modbus {
   // FC3 "Read Holding Registers" 读取16位寄存器数据 : 01 03 0C 0064 0065 0066 0067 0068 0069 89
   readRegisters16(address: number, quantity: any) {
     const cmd = this.getCmd(3, address, quantity);
-    console.log('129',cmd);
-
     return this.sendRequest(cmd);
   }
   FC3(address: number, quantity: any) {
@@ -169,7 +168,6 @@ export class Modbus {
   // :0110 119A 0002 04 0028 0028 EE
   writeMultipleRegisters16(address: number, datas: any, state: any = null) {
     const cmd = this.getCmd(16, address, datas, state);
-    console.log('fc16', cmd);
     return this.sendRequest(cmd);
   }
   FC16_int16(address: number, datas: any) {

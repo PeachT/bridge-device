@@ -359,7 +359,9 @@ export class GroutingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.formInit(this.data);
+    setTimeout(() => {
+      this.formInit(this.data);
+    }, 300);
   }
   async getPorject(): Promise<Project> {
     return await this.odb.getOneAsync('project', (p: Project) => p.id === this.menuDom.projectId);

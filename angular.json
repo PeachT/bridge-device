@@ -37,7 +37,8 @@
             ],
             "scripts": [
             ],
-            "es5BrowserSupport": true
+            "es5BrowserSupport": true,
+            "webWorkerTsConfig": "tsconfig.worker.json"
           },
           "configurations": {
             "production": {
@@ -95,6 +96,7 @@
               "src/styles.less"
             ],
             "scripts": [],
+            "webWorkerTsConfig": "tsconfig.worker.json",
             "assets": [
               "src/favicon.ico",
               "src/assets"
@@ -106,7 +108,8 @@
           "options": {
             "tsConfig": [
               "src/tsconfig.app.json",
-              "src/tsconfig.spec.json"
+              "src/tsconfig.spec.json",
+              "tsconfig.worker.json"
             ],
             "exclude": [
               "**/node_modules/**"

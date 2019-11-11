@@ -9,7 +9,7 @@
     <nz-tabset class="task-tabset" (nzSelectChange)="changeTabs($event)" [nzShowPagination]="false">
       <nz-tab nzTitle="基础信息">
         <div class="form-edit">
-          <form nz-form [ngClass]="{'edit-on': appS.edit}" [formGroup]="formData" [hidden]="!formData">
+          <form nz-form [ngClass]="{'edit-on': appS.edit}" [formGroup]="formData" *ngIf="formData">
             <div>
               <app-form-item [row]="true" label="模板" [hidden]="!appS.edit">
                 <nz-switch formControlName="template" nzCheckedChildren="是" nzUnCheckedChildren="否"></nz-switch>
@@ -67,7 +67,7 @@
             [addFilterFun]="addFilterFun"
             [updateFilterFun]="updateFilterFun"
             [coprState]="true"
-            [valid]="formData.valid"
+            [valid]="formData?.valid"
             (outEdit)="onEdit($event)"
             (outEditOk)="editOk($event)"
             (outDelete)="delete()"

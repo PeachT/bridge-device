@@ -42,9 +42,9 @@ export class SocketTcp {
       this.win.webContents.send(`${this.uid}toLink`, {link: false, state: 'error', msg: `重新链接`});
     }
     this.modbus.heartbeatFunc = (data) => {
-      console.log('前台heartbeat', data);
+      // console.log('前台heartbeat', data);
       if (data.r.success) {
-        this.win.webContents.send(`${this.uid}heartbeat`, {link: true, state: 'error', delay: data.t});
+        this.win.webContents.send(`${this.uid}heartbeat`, {link: true, state: 'success', msg: `链接中`, delay: data.t});
       } else {
         this.win.webContents.send(`${this.uid}heartbeat`, {link: false, state: 'error', msg: `数据错误`});
       }
@@ -64,12 +64,19 @@ export class SocketTcp {
     // FC16_float
     ipcMain.on(`${uid}Socket`, async (e: IpcMainEvent, arg: RequestModel) => {
       const callbackData = await tcp[arg.request](arg.address, arg.value);
+      if (!callbackData.data) {
+        console.log('----------------------------------', arg, '----------------------------------------');
+        console.log(callbackData.data)
+      }
       e.sender.send(arg.callpack, callbackData);
     });
   }
   /** 取消链接 */
-  cancelLink() {
-    return this.modbus.cancelLink();
+  async cancelLink() {
+    const cancel = await this.modbus.cancelLink();
+    ipcMain.removeAllListeners(`${this.connectionStr.uid}Socket`);
+    this.modbus = null;
+    return cancel;
   }
 }
 

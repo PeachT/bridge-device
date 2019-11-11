@@ -55,8 +55,8 @@
               <div class="mpa-color">{{(tensionKn * (stage / 100)) | kn2mpa: device: item}}<sub>mpa</sub> </div>
             </td>
             <td>
-              <div>{{(tensionKn * (stageGroup.get('uploadPercentage').value / 100)) | ToFixedr}}<sub>kn</sub> </div>
-              <div>{{(tensionKn * (stageGroup.get('uploadPercentage').value / 100)) | kn2mpa: device: item}}<sub>mpa</sub> </div>
+              <div class="kn-color">{{(tensionKn * (stageGroup.get('uploadPercentage').value / 100)) | ToFixedr}}<sub>kn</sub> </div>
+              <div class="mpa-color">{{(tensionKn * (stageGroup.get('uploadPercentage').value / 100)) | kn2mpa: device: item}}<sub>mpa</sub> </div>
             </td>
             <ng-container [formGroupName]="item">
               <td>

@@ -78,7 +78,7 @@ export class PLCService {
   private ipcon() {
     const uid = this.connStr.uid;
     /** 监听链接状态 */
-    this.e.ipcRenderer.on(`${this.connStr.uid}connect`, async (event, data) => {
+    this.e.ipcRenderer.on(`${uid}connect`, async (event, data) => {
       // console.log(data);
       console.log('监听链接状态');
 
@@ -88,20 +88,21 @@ export class PLCService {
       this.plcError.next(data.state === 'success');
     });
     /** 监听心跳 */
-    this.e.ipcRenderer.on(`${this.connStr.uid}heartbeat`, async (event, data) => {
+    this.e.ipcRenderer.on(`${uid}heartbeat`, async (event, data) => {
       // console.log(data);
-      console.log('监听心跳');
-
+      console.log('监听心跳', data);
+      this.socketInfo.state = data.state;
+      this.socketInfo.msg = data.msg;
       this.oldTime = data.delay;
       this.plclink.next();
     });
     /** 监听关闭连接 */
-    this.e.ipcRenderer.on(`${this.connStr.uid}close`, async (event, data) => {
+    this.e.ipcRenderer.on(`${uid}close`, async (event, data) => {
       console.log('监听关闭连接');
       this.plclink.next();
     });
     /** 监听连接错误 */
-    this.e.ipcRenderer.on(`${this.connStr.uid}error`, async (event, data) => {
+    this.e.ipcRenderer.on(`${uid}error`, async (event, data) => {
       console.log('监听连接错误');
 
       this.socketInfo.state = data.state;
@@ -109,7 +110,7 @@ export class PLCService {
       this.plclink.next();
     });
     /** 监听重新连接 */
-    this.e.ipcRenderer.on(`${this.connStr.uid}toLink`, async (event, data) => {
+    this.e.ipcRenderer.on(`${uid}toLink`, async (event, data) => {
       console.log('监听重新连接');
 
       this.socketInfo.state = data.state;
@@ -125,9 +126,11 @@ export class PLCService {
       this.e.ipcRenderer.once(`${uid}CancelLink`, (e, data) => {
         console.log('取消链接');
 
-        this.e.ipcRenderer.removeAllListeners(`${this.connStr.uid}LinkTCP`);
-        this.e.ipcRenderer.removeAllListeners(`${this.connStr.uid}connection`);
-        this.e.ipcRenderer.removeAllListeners(`${this.connStr.uid}heartbeat`);
+        this.e.ipcRenderer.removeAllListeners(`${uid}connect`);
+        this.e.ipcRenderer.removeAllListeners(`${uid}heartbeat`);
+        this.e.ipcRenderer.removeAllListeners(`${uid}close`);
+        this.e.ipcRenderer.removeAllListeners(`${uid}error`);
+        this.e.ipcRenderer.removeAllListeners(`${uid}toLink`);
         this.socketInfo.link = false;
         this.socketInfo.state = null;
         this.socketInfo.msg = '';

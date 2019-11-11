@@ -23,7 +23,7 @@
               [addFilterFun]="addFilterFun"
               [updateFilterFun]="updateFilterFun"
               [coprState]="true"
-              [valid]="formData.valid"
+              [valid]="formData?.valid"
               (outEdit)="onEdit($event)"
               (outEditOk)="editOk($event)"
               (outDelete)="delete()"

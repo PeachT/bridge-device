@@ -11,6 +11,24 @@ import { waterBinderRatio, getDatetimeS } from 'src/app/Function/unit';
 import { PLCService } from 'src/app/services/plc.service';
 import { FC } from 'src/app/models/socketTCP';
 
+const cmdarrs = [
+  // 完成标志
+  { request: FC.FC1, address: PLC_M(46), value: 1, outKey: 'out8' },
+  // 开始标准
+  { request: FC.FC1, address: PLC_M(50), value: 1, outKey: 'out9' },
+  // 梁号
+  { request: FC.FC3, address: PLC_D(220), value: 4, outKey: 'out0' },
+  // 孔号
+  { request: FC.FC3, address: PLC_D(152), value: 2, outKey: 'out1' },
+  // 实时数据
+  { request: FC.FC3, address: PLC_D(200), value: 6, outKey: 'out2' },
+  { request: FC.FC3, address: PLC_D(72), value: 1, outKey: 'out3' },
+  { request: FC.FC3, address: PLC_D(52), value: 2, outKey: 'out4' },
+  { request: FC.FC3, address: PLC_D(120), value: 1, outKey: 'out5' },
+  { request: FC.FC1, address: PLC_M(30), value: 8, outKey: 'out6' },
+  { request: FC.FC3, address: PLC_D(520), value: 6, outKey: 'out7' },
+];
+
 const groutingHoleItemBase: GroutingHoleItem = {
   /** 压浆方向 */
   direction: null,
@@ -121,6 +139,11 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
   svgT: any;
   /** 停止监控 */
   stop = false;
+  sendData = {
+    Count: 0,
+    index: 0,
+  };
+  backData: any = {};
   /** plc状态 */
   get plcState(): boolean {
     return this.PLCS.socketInfo.state === 'success';
@@ -139,7 +162,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
     private e: ElectronService,
     private message: NzMessageService,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.PLCS.noOut = true;
@@ -187,129 +210,120 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
     }
     this.liveT = setTimeout(async () => {
       if (this.plcState) {
-        const arrs = [
-          // 完成标志
-          { channel: FC.FC1, address: PLC_M(46), value: 1, outKey: 'out8' },
-          // 开始标准
-          { channel: FC.FC1, address: PLC_M(50), value: 1, outKey: 'out9' },
-          // 梁号
-          { channel: FC.FC3, address: PLC_D(220), value: 4, outKey: 'out0' },
-          // 孔号
-          { channel: FC.FC3, address: PLC_D(152), value: 2, outKey: 'out1' },
-          // 实时数据
-          { channel: FC.FC3, address: PLC_D(200), value: 6, outKey: 'out2' },
-          { channel: FC.FC3, address: PLC_D(72), value: 1, outKey: 'out3' },
-          { channel: FC.FC3, address: PLC_D(52), value: 2, outKey: 'out4' },
-          { channel: FC.FC3, address: PLC_D(120), value: 1, outKey: 'out5' },
-          { channel: FC.FC1, address: PLC_M(30), value: 8, outKey: 'out6' },
-          { channel: FC.FC3, address: PLC_D(520), value: 6, outKey: 'out7' },
-        ];
-        const backData: any = {};
-        let i = 0;
-        for (const item of arrs) {
-          // console.log('保存数据', item);
-          await new Promise((resolve, reject) => {
-            // tslint:disable-next-line:max-line-length
-            this.e.ipcRenderer.send(`${this.PLCS.connStr.uid}${item.channel}`, { address: item.address, value: item.value, channel: item.outKey });
-            const t = setTimeout(() => {
-              clearInterval(this.liveT);
-              this.liveT = null;
-              this.e.ipcRenderer.removeAllListeners(item.outKey);
-              console.error('获取数据超时');
-              return;
-            }, 3000);
-            this.e.ipcRenderer.once(item.outKey, (event, data) => {
-              clearTimeout(t);
-              i++;
-              backData[item.outKey] = data.data;
-              resolve(data);
-            });
-          });
-        }
-        // console.log(backData);
-
-        if (i !== arrs.length) {
-          clearInterval(this.liveT);
-          this.liveT = null;
-          console.error('实时数据错误');
-          return;
-        }
-        try {
-          this.groutingStart(backData.out9.data[0]);
-          this.groutingSuccess(backData.out8.data[0]);
-          const dosage = backData.out7.float.map(m => Number(m.toFixed(2)));
-          this.now = {
-            name: backData.out0.str.replace(/\0/g, ''),
-            holeName: backData.out1.str.replace(/\0/g, ''),
-            dosage,
-            waterBinderRatio: waterBinderRatio(dosage)
-          };
-          this.mixingData.dosage = backData.out2.float.map(m => Number(m.toFixed(2)));
-          this.mixingData.waterBinderRatio = waterBinderRatio(this.mixingData.dosage);
-          this.mixingData.mixingTime = backData.out3.int16[0];
-          /** 搅拌开始 */
-          if (!this.mixingDataNow.state && backData.out6.int16[0]) {
-            this.mixingDataNow.state = true;
-            this.mixingDataNow.date = new Date();
-          }
-          /** 上料完成 */
-          if (this.mixingDataNow.state && !this.mixingDataNow.save && backData.out6.int16[6] && this.mixingData.mixingTime > 0) {
-            this.mixingDataNow.time = this.mixingData.mixingTime;
-            this.mixingDataNow.save = true;
-          }
-          /** 搅拌完成 */
-          if (this.mixingDataNow.state && !backData.out6.int16[6] && !backData.out6.int16[0]) {
-            if (this.mixingDataNow.save) {
-              const mixing: MixingInfo = {
-                /** 用量 */
-                dosage: this.mixingData.dosage,
-                /** 开始时间 */
-                startDate: this.mixingDataNow.date,
-                /** 完成时间 */
-                endDate: new Date(),
-                /** 搅拌时间 */
-                mixingTime: this.mixingDataNow.time,
-                /** 泌水率 */
-                bleedingRate: null,
-                /** 流动度 */
-                fluidity: null,
-                /** 黏稠度 */
-                viscosity: null,
-                /** 水胶比 */
-                waterBinderRatio: this.mixingData.waterBinderRatio,
-                /** 水温 */
-                waterTemperature: null,
-                /** 环境温度 */
-                envTemperature: null,
-              };
-              console.error('搅拌完成', mixing);
-              this.save(mixing, null);
+        const item = cmdarrs[this.sendData.index]
+        this.PLCS.ipc({ request: item.request, address: item.address, value: item.value, callpack: item.outKey });
+        // const t = setTimeout(() => {
+        //   clearInterval(this.liveT);
+        //   this.liveT = null;
+        //   this.e.ipcRenderer.removeAllListeners(item.outKey);
+        //   console.error('获取数据超时');
+        //   return;
+        // }, 3000);
+        this.e.ipcRenderer.once(item.outKey, (event, data) => {
+          // console.log(item.outKey, data);
+          // clearTimeout(t);
+          if (data.data === null) {
+            console.error('数据null');
+            this.sendData.Count ++;
+            if (this.sendData.Count >= 6) {
             }
-            this.mixingDataNow.state = false;
-            this.mixingDataNow.save = false;
+          } else {
+            this.sendData.Count = 0;
+            this.sendData.index ++;
+            this.backData[item.outKey] = data.data;
+            if (this.sendData.index === cmdarrs.length) {
+              this.send(this.backData);
+              return;
+            } else {
+            }
           }
-          this.groutingHoleItem.intoPulpPressure = (backData.out4.float[0]).toFixed(2);
-          this.groutingHoleItem.steadyTime = backData.out5.int16[0];
-          this.cdr.detectChanges();
-        } catch (error) {
-          console.error('转换数据有误');
-        } finally  {
           clearInterval(this.liveT);
           this.liveT = null;
           this.liveData();
-        }
+        });
       } else {
+        this.sendData.index = 0;
         console.error('请链接设备');
-        this.cdr.detectChanges();
         clearInterval(this.liveT);
         this.liveT = null;
       }
-    }, 100);
+    }, 10);
+  }
+  /** 请求数据 */
+  async send(backData) {
+    console.log(backData);
+
+    this.sendData.index = 0;
+    try {
+      this.groutingStart(backData.out9);
+      this.groutingSuccess(backData.out8);
+      const dosage = backData.out7.float.map(m => Number(m.toFixed(2)));
+      this.now = {
+        name: backData.out0.str.replace(/\0/g, ''),
+        holeName: backData.out1.str.replace(/\0/g, ''),
+        dosage,
+        waterBinderRatio: waterBinderRatio(dosage)
+      };
+      this.mixingData.dosage = backData.out2.float.map(m => Number(m.toFixed(2)));
+      this.mixingData.waterBinderRatio = waterBinderRatio(this.mixingData.dosage);
+      this.mixingData.mixingTime = backData.out3.int16[0];
+      /** 搅拌开始 */
+      if (!this.mixingDataNow.state && backData.out6[0]) {
+        this.mixingDataNow.state = true;
+        this.mixingDataNow.date = new Date();
+      }
+      /** 上料完成 */
+      if (this.mixingDataNow.state && !this.mixingDataNow.save && backData.out6[6] && this.mixingData.mixingTime > 0) {
+        this.mixingDataNow.time = this.mixingData.mixingTime;
+        this.mixingDataNow.save = true;
+      }
+      /** 搅拌完成 */
+      if (this.mixingDataNow.state && !backData.out6[6] && !backData.out6[0]) {
+        if (this.mixingDataNow.save) {
+          const mixing: MixingInfo = {
+            /** 用量 */
+            dosage: this.mixingData.dosage,
+            /** 开始时间 */
+            startDate: this.mixingDataNow.date,
+            /** 完成时间 */
+            endDate: new Date(),
+            /** 搅拌时间 */
+            mixingTime: this.mixingDataNow.time,
+            /** 泌水率 */
+            bleedingRate: null,
+            /** 流动度 */
+            fluidity: null,
+            /** 黏稠度 */
+            viscosity: null,
+            /** 水胶比 */
+            waterBinderRatio: this.mixingData.waterBinderRatio,
+            /** 水温 */
+            waterTemperature: null,
+            /** 环境温度 */
+            envTemperature: null,
+          };
+          console.error('搅拌完成', mixing);
+          this.save(mixing, null);
+        }
+        this.mixingDataNow.state = false;
+        this.mixingDataNow.save = false;
+      }
+      this.groutingHoleItem.intoPulpPressure = (backData.out4.float[0]).toFixed(2);
+      this.groutingHoleItem.steadyTime = backData.out5.int16[0];
+    } catch (error) {
+      console.error('转换数据有误', backData);
+    } finally {
+      this.cdr.detectChanges();
+      clearInterval(this.liveT);
+      this.liveT = null;
+      this.liveData();
+    }
   }
   /** 压浆完成 */
   groutingSuccess(state) {
-    if (state && !this.monitoringMsg.save && this.monitoringMsg.start) {
-      this.groutingSave();
+    if (state instanceof Array && state[0] === '1' && !this.monitoringMsg.save && this.monitoringMsg.start) {
+      console.warn(state, state instanceof Array);
+      this.groutingSave(0);
       this.monitoringMsg.save = true;
       this.monitoringMsg.start = false;
       this.groutingHoleItem.endDate = new Date();
@@ -319,7 +333,8 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
   }
   /** 压浆开始 */
   groutingStart(state) {
-    if (state && !this.monitoringMsg.start) {
+    if (state instanceof Array && state[0] === '1' && !this.monitoringMsg.start) {
+      console.warn(state, state instanceof Array);
       this.liveSvg();
       this.monitoringMsg.start = true;
     }
@@ -387,69 +402,83 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
   }
 
   /** 压浆完成保存 */
-  async groutingSave() {
-    const arrs = [
-      { address: PLC_D(270), value: 22, outKey: 'out1' },
-    ];
-    const backData: any = {};
-    for (const item of arrs) {
-      // console.log('保存数据', item);
-      await new Promise((resolve, reject) => {
-        // tslint:disable-next-line:max-line-length
-        this.e.ipcRenderer.send(`${this.PLCS.connStr.uid}F03`, { address: item.address, value: item.value, channel: item.outKey });
-        const t = setTimeout(() => {
-          this.e.ipcRenderer.removeAllListeners(item.outKey);
-          console.error('获取数据超时');
-          return;
-        }, 3000);
-        this.e.ipcRenderer.once(item.outKey, (event, data) => {
-          console.log(item, `设置返回的结果`, data);
-          clearTimeout(t);
-          backData[item.outKey] = data;
-          resolve(data);
-        });
-      });
-    }
-    console.error('压浆保存数据', backData);
-    const groutingHoleItem: GroutingHoleItem = {
-      ...this.templateData.groutingInfo[0].groups[0],
-      /** 压浆方向 */
-      // direction: this.templateData.groutingInfo[0].groups[0].direction,
-      // /** 设置压浆压力 */
-      // setGroutingPressure: this.templateData.groutingInfo[0].groups[0].setGroutingPressure,
-      /** 环境温度 */
-      envTemperature: null,
-      /** 浆液温度 */
-      slurryTemperature: null,
-      /** 开始时间 */
-      startDate: this.groutingHoleItem.startDate,
-      /** 完成时间 */
-      endDate: this.groutingHoleItem.endDate,
-      /** 进浆压力 */
-      intoPulpPressure: (backData.out1.float[3]).toFixed(2),
-      /** 回浆压力 */
-      outPulpPressure: null,
-      /** 进浆量 (L) */
-      intoPulpvolume: null,
-      /** 回浆量 (L) */
-      outPulpvolume: null,
-      /** 真空泵压力 */
-      vacuumPumpPressure: null,
-      /** 稳压时间 */
-      steadyTime: backData.out1.uint16[12],
-      /** 通过情况 */
-      passMsg: null,
-      /** 冒浆情况 */
-      slurryEmittingMsg: null,
-      /** 其他说明 */
-      remarks: null,
-      /** 压浆过程数据 */
-      processDatas: this.groutingHoleItem.processDatas,
-      /** 真空过程数据 */
-      vacuumPumpProcessDatas: null,
-      /** 其他数据信息 */
-    };
-    this.save(null, groutingHoleItem);
+  async groutingSave(nu) {
+    // const arrs = [
+    //   { address: PLC_D(270), value: 22, outKey: 'out1' },
+    // ];
+    // const backData: any = {};
+    // for (const item of arrs) {
+    //   // console.log('保存数据', item);
+    //   await new Promise((resolve, reject) => {
+    //     // tslint:disable-next-line:max-line-length
+    //     this.e.ipcRenderer.send(`${this.PLCS.connStr.uid}F03`, { address: item.address, value: item.value, channel: item.outKey });
+    //     const t = setTimeout(() => {
+    //       this.e.ipcRenderer.removeAllListeners(item.outKey);
+    //       console.error('获取数据超时');
+    //       return;
+    //     }, 3000);
+    //     this.e.ipcRenderer.once(item.outKey, (event, data) => {
+    //       console.log(item, `设置返回的结果`, data);
+    //       clearTimeout(t);
+    //       backData[item.outKey] = data.data;
+    //       resolve(data);
+    //     });
+    //   });
+    // }
+    this.PLCS.ipc({ request: FC.FC3, address: PLC_D(270), value: 22, callpack: 'leveGroutingSave' });
+    this.e.ipcRenderer.once('leveGroutingSave', (event, data) => {
+      console.error('压浆保存数据', nu, data.data);
+      if (data.data === null) {
+        this.groutingSave(2);
+        return;
+      }
+      try {
+        const groutingHoleItem: GroutingHoleItem = {
+          ...this.templateData.groutingInfo[0].groups[0],
+          /** 压浆方向 */
+          // direction: this.templateData.groutingInfo[0].groups[0].direction,
+          // /** 设置压浆压力 */
+          // setGroutingPressure: this.templateData.groutingInfo[0].groups[0].setGroutingPressure,
+          /** 环境温度 */
+          envTemperature: null,
+          /** 浆液温度 */
+          slurryTemperature: null,
+          /** 开始时间 */
+          startDate: this.groutingHoleItem.startDate,
+          /** 完成时间 */
+          endDate: this.groutingHoleItem.endDate,
+          /** 进浆压力 */
+          intoPulpPressure: (data.data.float[3]).toFixed(2),
+          /** 回浆压力 */
+          outPulpPressure: null,
+          /** 进浆量 (L) */
+          intoPulpvolume: null,
+          /** 回浆量 (L) */
+          outPulpvolume: null,
+          /** 真空泵压力 */
+          vacuumPumpPressure: null,
+          /** 稳压时间 */
+          steadyTime: data.data.int16[12],
+          /** 通过情况 */
+          passMsg: null,
+          /** 冒浆情况 */
+          slurryEmittingMsg: null,
+          /** 其他说明 */
+          remarks: null,
+          /** 压浆过程数据 */
+          processDatas: this.groutingHoleItem.processDatas,
+          /** 真空过程数据 */
+          vacuumPumpProcessDatas: null,
+          /** 其他数据信息 */
+        };
+        this.save(null, groutingHoleItem);
+        clearInterval(this.liveT);
+        this.liveT = null;
+        this.liveData();
+      } catch (error) {
+        this.groutingSave(1);
+      }
+    })
   }
   /** 数据保存 */
   async save(mixing: MixingInfo, groutingHoleItem: GroutingHoleItem) {

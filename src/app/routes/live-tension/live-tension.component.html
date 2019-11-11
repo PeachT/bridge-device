@@ -33,10 +33,10 @@
         <tr *ngFor="let key of strMode">
           <td class="key">{{key}}</td>
           <td>{{liveData[key][0] | ToFixedr}}</td>
-          <td>{{liveData[key][1] | ToFixedr}}</td>
-          <td>{{liveData[key][2] | ToFixedr}}</td>
-          <td>{{liveData[key][3] | ToFixedr}}</td>
-          <td>{{liveData[key][4] | ToFixedr}}</td>
+          <td class="mpa-color">{{liveData[key][1] | ToFixedr}}</td>
+          <td class="kn-color">{{liveData[key][2] | ToFixedr}}</td>
+          <td class="mpa-color">{{liveData[key][3] | ToFixedr}}</td>
+          <td class="mm-color">{{liveData[key][4] | ToFixedr}}</td>
           <td style="display: flex;">
             <nz-alert nzType="error" *ngIf="plcState && liveData[key][5] >= 70 " [nzMessage]="alarm[liveData[key][5]]"></nz-alert>
             <nz-alert nzType="info" *ngIf="plcState && liveData[key][5] < 70 " [nzMessage]="alarm[liveData[key][5]]"></nz-alert>
@@ -91,13 +91,13 @@
                 </td>
                 <td>{{key}}</td>
                 <td *ngFor="let stage of task.stage.knPercentage">
-                  <div>{{(tensionKn * (stage / 100)) | ToFixedr}}<sub>kn</sub> </div>
-                  <div>{{(tensionKn * (stage / 100)) | kn2mpa: device: key}}<sub>mpa</sub> </div>
+                  <div class="kn-color">{{(tensionKn * (stage / 100)) | ToFixedr}}<sub>kn</sub> </div>
+                  <div class="mpa-color">{{(tensionKn * (stage / 100)) | kn2mpa: device: key}}<sub>mpa</sub> </div>
                 </td>
                 <td>
-                  <div>{{(tensionKn * (task.stage.uploadPercentage / 100)) | ToFixedr}}<sub>kn</sub>
+                  <div class="kn-color">{{(tensionKn * (task.stage.uploadPercentage / 100)) | ToFixedr}}<sub>kn</sub>
                   </div>
-                  <div>
+                  <div class="mpa-color">
                     {{(tensionKn * (task.stage.uploadPercentage / 100)) | kn2mpa: device: key}}<sub>mpa</sub>
                   </div>
                 </td>

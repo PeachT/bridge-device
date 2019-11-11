@@ -76,7 +76,22 @@ export class TensionComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.getComponent();
-    this.formInit();
+    setTimeout(() => {
+      this.formInit();
+    }, 300);
+
+    // if (typeof Worker !== 'undefined') {
+    //   // Create a new
+    //   const worker = new Worker('./CreateFormGroup.worker.ts', { type: 'module' });
+    //   worker.onmessage = ({ data }) => {
+    //     console.error(`web worker: ${data}`);
+    //   };
+    //   worker.postMessage('hello');
+    // } else {
+    //   console.error('web worker');
+    //   // Web Workers are not supported in this environment.
+    //   // You should add a fallback so that your program still executes correctly.
+    // }
   }
   /** 初始化数据 */
   formInit() {
@@ -90,9 +105,9 @@ export class TensionComponent implements OnInit, OnDestroy {
       /** 构建 */
       component: [data.component, [Validators.required]],
       /** 梁长度 */
-      beamLength: [data.beamLength, [Validators.required]],
+      beamLength: [data.beamLength],
       /** 张拉日期 */
-      tensionDate: [data.tensionDate, [Validators.required]],
+      tensionDate: [data.tensionDate],
       /** 浇筑日期 */
       castingDate: [data.castingDate, [Validators.required]],
       /** 张拉顺序 */
