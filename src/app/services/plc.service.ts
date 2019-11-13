@@ -141,12 +141,14 @@ export class PLCService {
   }
   /** ipc */
   ipc(data: RequestModel) {
+    console.log(data);
+
     return new Promise((resolve, reject) => {
       const t = setTimeout(() => {
         reject({ success: false, data: '超时错误' });
       }, this.connStr.setTimeout);
       this.e.ipcRenderer.send(`${this.connStr.uid}Socket`, data);
-      this.e.ipcRenderer.once(data.callpack, (r) => {
+      this.e.ipcRenderer.once(data.callpack, (e, r) => {
         clearTimeout(t);
         resolve({ success: true, data: r });
       })

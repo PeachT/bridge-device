@@ -2,6 +2,7 @@ import { Component, OnInit, Input, OnChanges, SimpleChanges, ChangeDetectorRef, 
 import { FormGroup, FormArray, Validators, FormBuilder, ValidatorFn, AbstractControl } from '@angular/forms';
 import { AppService } from 'src/app/services/app.service';
 import { OtherInfo } from 'src/app/models/common';
+import { otherInfoForm, otherInfoForm_item } from './createFrom';
 
 @Component({
   selector: 'app-add-other',
@@ -30,14 +31,14 @@ export class AddOtherComponent implements OnInit, OnChanges {
   ) { }
 
   ngOnInit() {
-    this.cdr.detectChanges();
+    // this.cdr.detectChanges();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     // console.log('其他数据');
 
-    this.initForm(this.data);
-    this.cdr.detectChanges();
+    // this.initForm(this.data);
+    // this.cdr.detectChanges();
   }
   initForm(data: Array<OtherInfo> = []) {
     // console.log('其他信息', data);
@@ -67,7 +68,8 @@ export class AddOtherComponent implements OnInit, OnChanges {
   /** 添加其他数据 */
   add() {
     const length = this.otherInfoFormArr.value.length;
-    this.otherInfoFormArr.push(this.otherInfoVisionsForm(length));
+    // this.otherInfoFormArr.push(this.otherInfoVisionsForm(length));
+    this.otherInfoFormArr.push(otherInfoForm_item({ key: null, value: null }, length));
   }
   /** 删除其他数据 */
   remove(index: number) {

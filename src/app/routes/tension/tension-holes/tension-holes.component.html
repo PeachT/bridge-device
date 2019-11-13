@@ -1,23 +1,44 @@
-<nz-alert nzType="error" nzMessage="请进行张拉分组分组" *ngIf="!(formData.get('tensionHoleInfos').valid)"></nz-alert>
-<div *ngIf="tensionHoleInfos && tensionHoleInfos.length > 0">
-  <!-- <nz-divider style="min-width: auto;" nzText="压浆数据" nzOrientation="left"></nz-divider> -->
-  <nz-form-item *ngIf="tensionHoleInfos" style="z-index: 2;">
-    <nz-radio-group [nzButtonStyle]="'solid'" class="hole-groups" [@pageAnimations]="tensionHoleInfos.length">
-      <label nz-radio-button [nzValue]="item" *ngFor="let item of tensionHoleInfos; index as i"
-        (click)="switchHole(i, item)" [ngClass]="{'hole-active': item.name === groupItem?.name}"
-        [class]="'hole' + item.state" class="hole">
+<nz-alert nzType="error" nzMessage="请进行张拉分组分组" *ngIf="holeNames?.length === 0"></nz-alert>
+<div *ngIf="holeNames && holeNames?.length > 0">
+  <nz-form-item *ngIf="holeNames" style="z-index: 2;">
+    <nz-radio-group [nzButtonStyle]="'solid'" class="hole-groups" [@pageAnimations]="holeNames?.length">
+      <label nz-radio-button [nzValue]="item" *ngFor="let item of holeNames; index as i" (click)="switchHole(i, item)"
+        [ngClass]="{'hole-active': item.name === groupItem?.name}" [class]="'hole' + groupItem?.state">
         <!-- <i nz-icon nzType="cloud" nzTheme="outline" style="color: #00E676" *ngIf="!item.uploading"></i> -->
         <div *ngIf="item.uploading" class="template">
         </div>
-        {{item.name}}
+        {{item}}
       </label>
     </nz-radio-group>
   </nz-form-item>
-  <form nz-form [formGroup]="formData">
+  <form nz-form [formGroup]="formData" *ngIf="groupIndex !== null">
     <div formArrayName="tensionHoleInfos">
-      <ng-container *ngFor="let item of tensionHoleInfosFormArray.controls; index as i" [formArrayName]="i">
+      <div [formArrayName]="groupIndex">
+        <div>
+          <app-form-item label="孔号">
+            <input type="text" readonly nz-input placeholder="请输入孔号" formControlName="name">
+          </app-form-item>
+          <app-form-item label="张拉工艺">
+            <input type="number" nz-input placeholder="张拉工艺" formControlName="stretchDrawProcess">
+          </app-form-item>
+          <app-form-item label="张拉长度">
+            <input type="number" nz-input placeholder="请输入张拉长度" formControlName="length">
+          </app-form-item>
+          <app-form-item label="钢绞线数量">
+            <input type="number" nz-input placeholder="请输入钢绞线数量" formControlName="steelStrandNum">
+          </app-form-item>
+        </div>
+        <div>
+          <app-add-other [formGroup]="nowFromGroup" [edit]="appS.edit"></app-add-other>
+        </div>
+        <div>
+          <tension-hole-task [formData]="nowFromGroup" [data]="groupItem"></tension-hole-task>
+        </div>
+      </div>
+      <!-- <ng-container *ngFor="let item of tensionHoleInfosFormArray.controls; index as i" [formArrayName]="i">
         <div class="hole-group" [ngClass]="{'active': item.value.name === groupItem?.name}" [hidden]=" !(item.value.name === groupItem?.name)">
           <div>
+            {{item.value.name}}=={{groupItem?.name}}
             <app-form-item label="孔号">
               <input type="text" readonly nz-input placeholder="请输入孔号" formControlName="name">
             </app-form-item>
@@ -32,14 +53,14 @@
             </app-form-item>
           </div>
           <div>
-            <app-add-other [formGroup]="item" [data]="tensionHoleInfos[i]?.otherInfo || []" [edit]="appS.edit">
+            <app-add-other [formGroup]="item" [edit]="appS.edit">
             </app-add-other>
           </div>
           <div>
             <tension-hole-task [formData]="item" [data]="tensionHoleInfos[i]" [index]="i"></tension-hole-task>
           </div>
         </div>
-      </ng-container>
+      </ng-container> -->
     </div>
   </form>
 </div>

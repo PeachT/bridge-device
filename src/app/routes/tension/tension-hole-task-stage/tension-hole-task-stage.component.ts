@@ -7,6 +7,7 @@ import { copyAny } from 'src/app/models/base';
 import { AppService } from 'src/app/services/app.service';
 import { TensionDevice } from 'src/app/models/jack';
 import { DbService } from 'src/app/services/db.service';
+import { knPercentageValidator } from '../CreateFormGroup.worker';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -27,7 +28,7 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
   otherKey = [];
   chsub: Subscription = null;
   /** 张拉顶模式字符串 */
-  strMode: Array<string>;
+  // strMode: Array<string>;
   get stageGroup(): FormGroup {
     return this.formData.controls.stage as FormGroup;
   }
@@ -67,6 +68,9 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
   get device(): TensionDevice {
     return this.formData.controls.device.value;
   }
+  get strMode() {
+    return getModeStr(this.formData.get('mode').value);
+  }
 
   @Output() updateHole = new EventEmitter();
 
@@ -78,11 +82,27 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
   ) { }
 
   ngOnInit() {
+    console.log(this.data, this.strMode);
     this.edit = this.appS.edit;
+    this.initDom();
   }
   ngOnChanges(changes: SimpleChanges) {
-    if (this.data && 'stage' in this.data) {
-      this.createForm(this.data.stage, this.data.mode);
+    // if (this.data && 'stage' in this.data) {
+    //   this.createForm(this.data.stage, this.data.mode);
+    // }
+  }
+  initDom() {
+    const mode = this.data.mode;
+    // this.strMode =
+    this.holeNames = holeNameShow(this.holeName, mode);
+    if (!this.stageNumber) {
+      this.stageNumber = this.knPercentageFormArray.value.length;
+      if (this.formData.value.super) {
+        this.stageNumber --;
+      }
+      if (this.formData.value.mend) {
+        this.stageNumber --;
+      }
     }
   }
 
@@ -110,7 +130,7 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
     };
   }
   createForm(d: TensionStage, mode) {
-    this.strMode = getModeStr(mode);
+    // this.strMode = getModeStr(mode);
     this.holeNames = holeNameShow(this.holeName, mode);
 
     this.stageGroup.addControl('uploadPercentage', this.fb.control(d.uploadPercentage, Validators.required));
@@ -148,7 +168,7 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
   createStageForm(kn: Array<number>, msg: Array<string>, time: Array<number>) {
 
     kn.map((item, index) => {
-      (this.stageGroup.get('knPercentage') as FormArray).push(new FormControl(item,[Validators.required, this.stageValidator(index)]));
+      (this.stageGroup.get('knPercentage') as FormArray).push(new FormControl(item,[Validators.required, knPercentageValidator(index)]));
       (this.stageGroup.get('msg') as FormArray).push(this.fb.control(msg[index]));
       (this.stageGroup.get('time') as FormArray).push(this.fb.control(time[index], Validators.required));
     })

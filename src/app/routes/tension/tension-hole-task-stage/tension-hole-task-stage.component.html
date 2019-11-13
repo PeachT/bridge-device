@@ -15,7 +15,7 @@
         <thead>
           <tr>
             <th colSpan="2">张拉任务</th>
-            <ng-container *ngFor="let item of msgFormArray.getRawValue(); index as i" formArrayName="msg">
+            <ng-container *ngFor="let item of msgFormArray?.getRawValue(); index as i" formArrayName="msg">
               <th [ngClass]="{'twice': item === '阶段二' && twice, 'super': superState && item === '超张拉',
               'mend': mend && item === '补张拉'}">
                 {{item}}
@@ -31,7 +31,7 @@
           <tr>
             <td width="65">孔号</td>
             <td width="65">阶段%</td>
-            <td *ngFor="let item of knPercentageFormArray.controls; index as i" formArrayName="knPercentage">
+            <td *ngFor="let item of knPercentageFormArray?.controls; index as i" formArrayName="knPercentage">
               <div>
                 <app-form-item [row]="true" [errors]="item.errors" [errorShow]="false">
                   <input type="number" nz-input [formControlName]="i" [readonly]="i === 1" (input)="inputStage($event, i)" >

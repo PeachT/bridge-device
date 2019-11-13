@@ -17,7 +17,9 @@ function Dec2Hex(dec: any, num: any) {
  * @returns
  */
 function Hex4Byte(dec: any) {
-  const hexStr = dec.toString(16).padStart(4, '0000').toUpperCase();
+  const decint = dec || 0;
+  // console.log('20', dec, decint);
+  const hexStr = decint.toString(16).padStart(4, '0000').toUpperCase();
   let decSum = 0;
   for (let index = 0; index < hexStr.length; index += 2) {
     decSum += parseInt(`${hexStr[index]}${hexStr[index + 1]}`, 16);

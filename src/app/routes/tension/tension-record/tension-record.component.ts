@@ -35,36 +35,17 @@ export class TensionRecordComponent implements OnInit, OnChanges {
     private fb: FormBuilder,
   ) { }
 
-
   ngOnInit() {
     console.log('123456789');
-
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log('记录记录记录记录记录记录记录记录记录记录记录', this.data);
-    const indata = {data: this.data, holeName: this.holeName };
-
-    if (this.data && this.data.record) {
-      // const worker = new Worker(`./wws`, { type: `module` });
-      // worker.onmessage = ({ data }) => {
-      //   console.log(`page got message:`, data);
-      //   this.strMode =  data.strMode;
-      //   this.holeNames =  data.holeNames;
-      //   this.recordCalculate =  data.recordCalculate;
-      //   console.log(this.strMode, this.holeNames, this.recordCalculate);
-      // };
-      // worker.postMessage(indata);
-
-      this.strMode = getModeStr(this.data.mode);
-      this.holeNames = holeNameShow(this.holeName, this.data.mode);
-      this.recordCalculate = recordCompute(this.data);
-      // this.createForm(this.data.record.groups).map(si => {
-      //   this.groupsFormArray.push(si);
-      // })
-    }
-
-
+    this.strMode = getModeStr(this.data.mode);
+    this.holeNames = holeNameShow(this.holeName, this.data.mode);
+    // console.log('记录记录记录记录记录记录记录记录记录记录记录', this.data);
+    // if (this.data && this.data.record) {
+    //   this.recordCalculate = recordCompute(this.data);
+    // }
   }
   createForm(arrData: Array<OnceRecord> = []): FormGroup[] {
     return arrData.map((d, i) => {

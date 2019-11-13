@@ -18,7 +18,7 @@ import { AppService } from 'src/app/services/app.service';
 export class TensionHoleTaskComponent implements OnInit, OnChanges {
   @ViewChild('stage', null) stageDom: TensionHoleTaskStageComponent;
   @Input() formData: FormGroup;
-  @Input() index: number;
+  // @Input() index: number;
   @Input() data: TensionHoleInfo;
   holeNameLength: number;
   /** 选择设备 */
@@ -50,21 +50,14 @@ export class TensionHoleTaskComponent implements OnInit, OnChanges {
 
   async ngOnInit() {
     await this.getJaskMenu();
-    console.log(this.formData, this.data, this.TaskFormArray, this.tasks);
-    if (this.data && this.data.name) {
-      this.holeNameLength = this.data.name.split('/').length;
-    }
+    // console.log(this.formData, this.data, this.TaskFormArray, this.tasks);
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log('sdfsdaaasdfsdd', this.formData, this.TaskFormArray, this.tasks);
-
-    if (this.tasks) {
-      this.createForm(this.tasks).map((si, i) => {
-        this.TaskFormArray.push(si);
-      });
-      this.cdr.detectChanges();
+    if (this.data && this.data.name) {
+      this.holeNameLength = this.data.name.split('/').length;
     }
+    this.cdr.detectChanges();
   }
   /** 获取设备菜单 */
   async getJaskMenu() {

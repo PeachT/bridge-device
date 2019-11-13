@@ -4,6 +4,7 @@ import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { AppService } from 'src/app/services/app.service';
 import { trigger, transition, query, style, animate, group, stagger } from '@angular/animations';
+import { sleep } from 'sleep-ts';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -51,17 +52,21 @@ export class TensionHolesComponent implements OnInit, OnChanges {
   bid = null;
 
   get tensionHoleInfosFormArray(): FormArray {
-    return this.formData.controls.tensionHoleInfos as FormArray;
+    return this.formData.get('tensionHoleInfos') as FormArray;
+  }
+  get nowFromGroup() {
+    return this.tensionHoleInfosFormArray.at(this.groupIndex);
   }
   get tensionHoleInfos(): Array<TensionHoleInfo> {
-    if (this.data) {
-      return this.data.tensionHoleInfos;
-    }
-    return null;
+    return this.tensionHoleInfosFormArray.value;
+  }
+  get holeNames(): Array<any> {
+    return this.formData.get('sort').value;
   }
   otherKey = [];
   chsub: Subscription = null;
   groupItem: TensionHoleInfo;
+  groupIndex: number = null;
 
   @Output() updateHole = new EventEmitter();
 
@@ -74,12 +79,13 @@ export class TensionHolesComponent implements OnInit, OnChanges {
   ngOnInit() {
   }
   ngOnChanges(changes: SimpleChanges) {
-    console.log('12345789数据变更', changes, this.data.id, this.bid);
+    console.log('12345789数据变更', this.holeNames, this.tensionHoleInfos, this.formData.get('tensionHoleInfos'));
     if (this.data.id !== this.bid) {
       this.bid = this.data.id;
       this.groupItem = null;
     }
-    this.initForm();
+    this.cdr.detectChanges();
+    // this.initForm();
   }
   initForm() {
     this.tensionHoleInfosFormArray.clear();
@@ -118,12 +124,18 @@ export class TensionHolesComponent implements OnInit, OnChanges {
     });
   }
   /** 切换孔 */
-  switchHole(index: number, item: TensionHoleInfo) {
+  switchHole(index: number, name: string) {
     console.log(index);
     if (!this.appS.edit) {
       this.outSelectHole.emit(index);
     }
-    this.groupItem = item;
+    this.groupIndex = index;
+    this.groupItem = this.tensionHoleInfos.find(h => h.name === name);
+    this.redraw();
+    // this.groupItem = item;
+  }
+  redraw() {
+    this.cdr.detectChanges();
   }
 
 }

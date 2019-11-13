@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { GroutingInfo, GroutingTask } from 'src/app/models/grouting';
 import { AppService } from 'src/app/services/app.service';
+import { otherInfoForm } from 'src/app/shared/add-other/createFrom';
 
 @Component({
   // tslint:disable-next-line: component-selector
@@ -74,7 +75,7 @@ export class GroutingRecordComponent implements OnInit, OnChanges {
       /** 压浆状态 */
       state: [data.state],
       /** 其他数据 */
-      otherInfo: this.fb.array([]),
+      otherInfo: otherInfoForm(data.otherInfo)
     });
   }
   /** 切换孔 */

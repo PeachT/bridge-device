@@ -4,6 +4,7 @@ import { Subscription, Observable, fromEvent } from 'rxjs';
 import { GroutingHoleItem } from 'src/app/models/grouting';
 import { AppService } from 'src/app/services/app.service';
 import { debounceTime } from 'rxjs/operators';
+import { otherInfoForm } from 'src/app/shared/add-other/createFrom';
 
 @Component({
   // tslint:disable-next-line: component-selector
@@ -90,7 +91,7 @@ export class GroutingRecordItemComponent implements OnInit, OnChanges {
       remarks: [data.remarks],
       /** 压浆过程数据 */
       processDatas: [data.processDatas],
-      otherInfo: this.fb.array([]),
+      otherInfo: otherInfoForm(data.otherInfo)
     });
   }
 }

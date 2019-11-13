@@ -26,14 +26,18 @@ export class Modbus {
   connectTCP() {
     const client = new Socket();
     const connstr = this.connectionStr;
-    client.setEncoding('utf8');
+    if (connstr.mode === 'ascii') {
+      client.setEncoding('utf8');
+    } else if(connstr.mode === 'tcp') {
+      client.setEncoding('hex');
+    }
     client.setNoDelay(true);
     client.connect(connstr.port, connstr.ip);
     client.setTimeout(connstr.setTimeout);
 
     client.on('data', (data: any) => {
+      // console.log('data=', data);
       if (!data) {
-        console.log('data=', data);
       }
       this.callback({ success: true, data });
     });
@@ -185,6 +189,8 @@ export class Modbus {
     return new Promise((resolve, reject) => {
       if (!this.writeState) {
         this.writeState = true;
+        // console.log('188', cmdStr);
+
         this.client.write(cmdStr);
         this.callbackT = setTimeout(() => {
           this.reSend();

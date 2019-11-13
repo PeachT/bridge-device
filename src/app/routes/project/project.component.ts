@@ -9,6 +9,7 @@ import { nameRepetition } from 'src/app/Validator/async.validator';
 import { AddOtherComponent } from 'src/app/shared/add-other/add-other.component';
 import { uploadingData } from 'src/app/Function/uploading';
 import { upFormData } from 'src/app/Function/uploadingOther';
+import { otherInfoForm } from 'src/app/shared/add-other/createFrom';
 
 
 @Component({
@@ -99,7 +100,7 @@ export class ProjectComponent implements OnInit, OnChanges {
       /** 项目权限 */
       jurisdiction: [data.jurisdiction],
       /** 其他信息 */
-      otherInfo: fb.array([]),
+      otherInfo: otherInfoForm(data.otherInfo),
       /** 上传服务器名称 */
       uploadingName: [data.uploadingName],
       /** 上传方式 */

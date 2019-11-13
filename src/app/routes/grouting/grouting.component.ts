@@ -4,7 +4,6 @@ import { DbService } from 'src/app/services/db.service';
 import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
 import { getModelBase, baseEnum } from 'src/app/models/base';
-import { TaskMenuComponent } from 'src/app/shared/task-menu/task-menu.component';
 import { Project } from 'src/app/models/project';
 import { HttpService } from 'src/app/services/http.service';
 import { uploadingData } from 'src/app/Function/uploading';
@@ -12,6 +11,7 @@ import { GroutingTask, GroutingHoleItem } from 'src/app/models/grouting';
 import { nameRepetition } from 'src/app/Validator/async.validator';
 import { upFormData } from 'src/app/Function/uploadingOther';
 import { ScrollMenuComponent } from 'src/app/shared/scroll-menu/scroll-menu.component';
+import { otherInfoForm } from 'src/app/shared/add-other/createFrom';
 
 @Component({
   selector: 'app-grouting',
@@ -389,7 +389,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
       /** 是否作为模板 */
       template: [data.template],
       /** 其他数据信息 */
-      otherInfo: fb.array([]),
+      otherInfo: otherInfoForm(data.otherInfo),
       /** 施工员 */
       operator: [data.operator],
       /** 监理员 */

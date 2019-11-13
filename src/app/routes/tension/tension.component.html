@@ -36,7 +36,7 @@
               <app-form-item label="浇筑日期" [errors]="formData.get('castingDate').errors">
                  <nz-date-picker readonly formControlName="castingDate" placeholder="浇筑日期" [nzAllowClear]="false"></nz-date-picker>
               </app-form-item>
-              <app-form-item label="张拉日期" [errors]="formData.get('tensionDate').errors">
+              <app-form-item label="张拉日期">
                  <nz-date-picker readonly formControlName="tensionDate" placeholder="张拉日期" [nzAllowClear]="false"></nz-date-picker>
               </app-form-item>
 
@@ -49,9 +49,12 @@
               <app-form-item label="自检员">
                 <input type="text" nz-input placeholder="自检员" formControlName="qualityInspector">
               </app-form-item>
+              <app-form-item label="张拉顺序" [row]="true">
+                <input type="text" readonly nz-input placeholder="张拉顺序" [value]="sortJoin(formData?.get('sort').value)">
+              </app-form-item>
             </div>
             <div>
-              <app-add-other [formGroup]="formData" [data]="data?.otherInfo || []" [edit]="appS.edit"></app-add-other>
+              <app-add-other [formGroup]="formData" [edit]="appS.edit"></app-add-other>
             </div>
             <div>
               <tension-holes [data]="data" [formData]="formData" #holes (outSelectHole)="holeIndex = $event"></tension-holes>
@@ -93,3 +96,8 @@
 </app-left>
 <app-delete-modal *ngIf="deleteShow" (outDelete)="deleteOk($event)"></app-delete-modal>
 <tension-manual-group *ngIf="mamualGroupState" (outCancel)="manualGroupCancel()" (outOK)="manualGroupOk($event)"[holes]="nowComponentHoleInfo"></tension-manual-group>
+<nz-modal [(nzVisible)]="downState" nzTitle="下载数据" (nzOnCancel)="downState = false" (nzOnOk)="downHMI()" nzMaskClosable>
+  <nz-alert nzType="error" [nzMessage]="item" *ngFor="let item of downMsg"></nz-alert>
+  <nz-progress [nzPercent]="(upProgress / 8) * 100" nzType="circle" [nzWidth]="80"></nz-progress>
+</nz-modal>
+

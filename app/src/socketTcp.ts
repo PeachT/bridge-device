@@ -49,9 +49,9 @@ export class SocketTcp {
         this.win.webContents.send(`${this.uid}heartbeat`, {link: false, state: 'error', msg: `数据错误`});
       }
     }
-    this.IPCOn(this.uid, this.modbus);
+    this.IPCOn();
   }
-  IPCOn(uid: string, tcp: Modbus) {
+  IPCOn() {
     // cancelLink
     // FC1
     // FC2
@@ -62,11 +62,11 @@ export class SocketTcp {
     // FC16_int16
     // FC16_int32
     // FC16_float
-    ipcMain.on(`${uid}Socket`, async (e: IpcMainEvent, arg: RequestModel) => {
-      const callbackData = await tcp[arg.request](arg.address, arg.value);
+    ipcMain.on(`${this.uid}Socket`, async (e: IpcMainEvent, arg: RequestModel) => {
+      const callbackData = await this.modbus[arg.request](arg.address, arg.value);
+      console.log(callbackData.data)
       if (!callbackData.data) {
         console.log('----------------------------------', arg, '----------------------------------------');
-        console.log(callbackData.data)
       }
       e.sender.send(arg.callpack, callbackData);
     });

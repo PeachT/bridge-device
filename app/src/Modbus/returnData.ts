@@ -14,7 +14,22 @@ function FC2(buffer: Buffer) {
 }
 
 // 处理获取的寄存器数据
-function FC3(buffer: Buffer) {
+function FC3Ascii(buffer: Buffer) {
+  const int16 = [];
+  const int32 = [];
+  const float = [];
+  buffer.swap16();
+  for (let index = 0; index < buffer.length; index += 2) {
+      int16.push(buffer.readInt16LE(index));
+      if (buffer.length % 4 === 0 && index % 4 === 0) {
+        int32.push(buffer.readInt32LE(index));
+        float.push(buffer.readFloatLE(index));
+      }
+  }
+  return { int16, int32, float, str: buffer.toString()};
+}
+// 处理获取的寄存器数据
+function FC3TCP(buffer: Buffer) {
   const int16 = [];
   const int32 = [];
   const float = [];
@@ -62,7 +77,7 @@ export function returnData16(data: any, mode: string) {
     fc = parseInt(data.slice(3, 5), 16); // 操作命令
     datas = ascii2buffer(Array.from(data.slice(7, -4)));
   } else if (mode === 'tcp') {
-    const buffer = Buffer.from(data);
+    const buffer = Buffer.from(data, 'hex');
     fc = parseInt(buffer[7].toString(), 16); // 操作命令
     datas = buffer.slice(9);
   } else if (mode === 'rtu') {
@@ -73,7 +88,12 @@ export function returnData16(data: any, mode: string) {
     case 2:
       return FC2(datas);
     case 3:
-      return FC3(datas);
+      if (mode === 'ascii') {
+        return FC3Ascii(datas);
+      } else if (mode === 'tcp') {
+        return FC3TCP(datas);
+      }
+      return null;
     case 5:
     case 6:
     case 15:

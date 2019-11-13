@@ -27,7 +27,7 @@ export interface TensionTask extends TaskBase {
   /** 浇筑日期 */
   castingDate: Date;
   /** 张拉顺序 */
-  sort?: string;
+  sort?: Array<string>;
   /** 设备编号 */
   deviceNo?: number;
   /** 是否作为模板 */
