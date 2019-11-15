@@ -99,7 +99,8 @@ export class DynamicLineTensionComponent implements OnInit, OnChanges, AfterView
     } else {
       // console.log('data变更', this.data);
       this.series = this.strMode.map(name => {
-        this.maxs = [...this.maxs, ...this.data[name][this.key]]
+        this.maxs.push(Math.max(...this.data[name][this.key]));
+        // this.maxs = [...this.maxs, ...this.data[name][this.key]]
         return {
           name,
           type: 'line',

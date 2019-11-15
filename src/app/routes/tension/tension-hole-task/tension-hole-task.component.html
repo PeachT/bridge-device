@@ -49,7 +49,7 @@
               <tension-hole-task-stage [formData]="item" [data]="tasks[i]" [holeName]="data.name" [state]="data.state" #stage></tension-hole-task-stage>
             </div>
             <div>
-              <tension-record [formData]="item.get('record')" [data]="tasks[i]" [holeName]="data.name"></tension-record>
+              <tension-record *ngIf="tasks[i].record.groups?.length > 0" [formData]="item.get('record')" [data]="tasks[i]" [holeName]="data.name"></tension-record>
             </div>
           </ng-container>
         </ng-container>

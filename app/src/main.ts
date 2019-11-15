@@ -94,7 +94,7 @@ ipcMain.on('LinkTCP', (e, data: ConnectionStr) => {
 ipcMain.on('CancelLink', async (e, name) => {
   await tcpList[name].cancelLink();
   e.sender.send(`${name}CancelLink`);
-  delete tcpList[name];
+  tcpList[name] = null;
 });
 
 

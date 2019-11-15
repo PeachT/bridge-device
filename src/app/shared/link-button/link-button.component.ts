@@ -67,7 +67,7 @@ export class LinkButtonComponent implements OnInit {
     public appS: AppService,
     public PLCS: PLCService,
     // private store$: Store<NgrxState>,
-    private crd: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit() {
@@ -79,7 +79,7 @@ export class LinkButtonComponent implements OnInit {
     // });
     this.PLCS.LinkState$.subscribe(r => {
       // console.log(r);
-      this.crd.detectChanges();
+      this.cdr.detectChanges();
     });
   }
   cancelLink() {

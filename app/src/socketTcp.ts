@@ -19,6 +19,7 @@ export class SocketTcp {
   private uid: string;
   private modbus: Modbus;
   private win: BrowserWindow;
+  private uuid = new Date().getTime();
 
   constructor(connstr: ConnectionStr, win: BrowserWindow) {
     this.connectionStr = connstr;
@@ -42,7 +43,7 @@ export class SocketTcp {
       this.win.webContents.send(`${this.uid}toLink`, {link: false, state: 'error', msg: `重新链接`});
     }
     this.modbus.heartbeatFunc = (data) => {
-      // console.log('前台heartbeat', data);
+      console.log('前台heartbeat', this.uuid);
       if (data.r.success) {
         this.win.webContents.send(`${this.uid}heartbeat`, {link: true, state: 'success', msg: `链接中`, delay: data.t});
       } else {
@@ -74,8 +75,15 @@ export class SocketTcp {
   /** 取消链接 */
   async cancelLink() {
     const cancel = await this.modbus.cancelLink();
+    this.win.webContents.send(`${this.uid}close`, {link: false, state: 'error', msg: `关闭连接`});
     ipcMain.removeAllListeners(`${this.connectionStr.uid}Socket`);
+    this.modbus.closeFunc = null;
+    this.modbus.connectFunc = null;
+    this.modbus.errorFunc = null;
+    this.modbus.toLinkFunc = null;
+    this.modbus.heartbeatFunc = null;
     this.modbus = null;
+    console.log('close sotp');
     return cancel;
   }
 }

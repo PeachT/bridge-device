@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { TensionTask, ManualGroup, TensionHoleInfo } from 'src/app/models/tension';
+import { TensionTask, ManualGroup, TensionHoleInfo, GroupsName } from 'src/app/models/tension';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { NzMessageService } from 'ng-zorro-antd';
@@ -17,11 +17,12 @@ import { ScrollMenuComponent } from 'src/app/shared/scroll-menu/scroll-menu.comp
 import { PLCService } from 'src/app/services/plc.service';
 import { stringUnicode2Int16 } from 'src/app/Function/convertData';
 import { FC } from 'src/app/models/socketTCP';
-import { PLC_D } from 'src/app/models/IPCChannel';
+import { PLC_D, PLC_M } from 'src/app/models/IPCChannel';
 import { Router } from '@angular/router';
 import { tensionBase } from 'src/app/models/tensionBase';
 import { createForm, holeGroupForm_item, holeForm_item } from './CreateFormGroup.worker';
 import { sleep } from 'sleep-ts';
+import { ifHMIData } from 'src/app/Function/tensionHMI';
 
 @Component({
   selector: 'app-tension',
@@ -56,12 +57,14 @@ export class TensionComponent implements OnInit, OnDestroy {
   /** 下载进度 */
   upProgress = 0;
   downMsg: Array<string> = [];
+  /** 当前选择张拉孔 */
+  gourpItem: GroupsName;
   /** 添加数据判断 */
   addFilterFun = (o1: any, o2: any) => o1.name === o2.name
-    && o1.component === o2.component && o1.project === o2.project
+    && o1.component === o2.component && o1.project === o2.project;
   /** 修改数据判断 */
   updateFilterFun = (o1: TensionTask, o2: TensionTask) => o1.name === o2.name
-    && o1.component === o2.component && o1.project === o2.project && o1.id !== o2.id
+    && o1.component === o2.component && o1.project === o2.project && o1.id !== o2.id;
   /** 菜单梁状态 */
   menuStateFunc = (g: TensionTask) => {
     // console.log(g);
@@ -69,6 +72,7 @@ export class TensionComponent implements OnInit, OnDestroy {
       return item.state
     })
   }
+
 
 
 
@@ -280,116 +284,14 @@ export class TensionComponent implements OnInit, OnDestroy {
     }
     this.downState = true;
     this.upProgress = 0;
-    console.log('下载的数据', this.data.tensionHoleInfos[this.holeIndex]);
-    const task = this.data.tensionHoleInfos[this.holeIndex].tasks[0];
-    const stage = this.data.tensionHoleInfos[this.holeIndex].tasks[0].stage.knPercentage;
-
-    getModeStr(task.mode).map(n => {
-      const mpa0 = kn2Mpa((task.tensionKn * (stage[0] / 100)), task.device, n);
-      const mpa1 = kn2Mpa((task.tensionKn * (stage[stage.length -1] / 100)), task.device, n);
-      if (mpa0 < 0.5) {
-        this.downMsg.push(`${n}初张拉压力过低`)
-      }
-      if (mpa1 > 55) {
-        this.downMsg.push(`${n}终张拉压力过高`)
-      }
-      if (task.stage[n].theoryMm < 1) {
-        this.downMsg.push(`${n}理论伸长量设置太小`)
-      }
-      if (task.stage[n].wordMm < 0.1) {
-        this.downMsg.push(`${n}工作长度设置太小`)
-      }
-      if (task.stage[n].reboundMm < 0.1) {
-        this.downMsg.push(`${n}回缩量设置太小`)
-      }
-    })
-    task.stage.time.find(t => {
-      if (t < 5) {
-        this.downMsg.push('持荷时间设置有误！')
-        return;
-      }
-    })
-    if (this.downMsg.length > 0) {
+    const r = ifHMIData(this.data, this.holeIndex);
+    if (r.state) {
+      this.downMsg = r.downMsg;
       this.message.error('数据设置有误');
       return;
     }
-    const HMIData = HMIstage(this.data, this.holeIndex);
-    console.log(HMIData);
-    const cmdarrs = [
-      { request: FC.FC16_int16, address: PLC_D(2000), value: HMIData.unicode.slice(0, 40)},
-      { request: FC.FC16_int16, address: PLC_D(2040), value: HMIData.unicode.slice(40)},
-      { request: FC.FC16_float, address: PLC_D(2082), value: HMIData.d2082},
-      { request: FC.FC16_float, address: PLC_D(2108), value: HMIData.percentage},
-      { request: FC.FC16_float, address: PLC_D(2124), value: HMIData.A1},
-      { request: FC.FC16_float, address: PLC_D(2198), value: HMIData.A2},
-      { request: FC.FC16_float, address: PLC_D(2272), value: HMIData.B1},
-      { request: FC.FC16_float, address: PLC_D(2346), value: HMIData.B2},
-      { request: FC.FC16_float, address: PLC_D(2460), value: HMIData.reboundWord},
-    ];
-
-    // tslint:disable-next-line:prefer-for-of
-    for (let index = 0; index < cmdarrs.length; index++) {
-      const item = cmdarrs[index]
-      await this.PLCS.ipc({
-        request: item.request,
-        address: item.address,
-        value: item.value,
-        callpack: 'tensionup'
-      }).then(r => console.log(r));
-      if (!this.next()) {
-        return;
-      }
-      console.log('456');
-    }
-    console.log('123');
-
-    // await this.PLCS.ipc({
-    //   request: FC.FC16_int16, address: PLC_D(2000),
-    //   value: HMIData.unicode.slice(0, 40),
-    //   callpack: 'tensionuphmi2000'
-    // }).then(r => console.log(r));
-    // await this.PLCS.ipc({
-    //   request: FC.FC16_int16, address: PLC_D(2040),
-    //   value: HMIData.unicode.slice(40),
-    //   callpack: 'tensionuphmi2000'
-    // }).then(r => console.log(r));
-    // await this.PLCS.ipc({
-    //   request: FC.FC16_float, address: PLC_D(2082),
-    //   value: HMIData.d2082,
-    //   callpack: 'tensionuphmi2082'
-    // }).then(r => console.log(r));
-    // await this.PLCS.ipc({
-    //   request: FC.FC16_float, address: PLC_D(2108),
-    //   value: HMIData.percentage,
-    //   callpack: 'tensionuphmi2108'
-    // }).then(r => console.log(r));
-    // await this.PLCS.ipc({
-    //   request: FC.FC16_float, address: PLC_D(2124),
-    //   value: HMIData.A1,
-    //   callpack: 'tensionuphmi2124'
-    // }).then(r => console.log(r));
-    // await this.PLCS.ipc({
-    //   request: FC.FC16_float, address: PLC_D(2198),
-    //   value: HMIData.A2,
-    //   callpack: 'tensionuphmi2198'
-    // }).then(r => console.log(r));
-    // await this.PLCS.ipc({
-    //   request: FC.FC16_float, address: PLC_D(2272),
-    //   value: HMIData.B1,
-    //   callpack: 'tensionuphmi2272'
-    // }).then(r => console.log(r));
-    // await this.PLCS.ipc({
-    //   request: FC.FC16_float, address: PLC_D(2346),
-    //   value: HMIData.B2,
-    //   callpack: 'tensionuphmi2346'
-    // }).then(r => console.log(r));
-    // await this.PLCS.ipc({
-    //   request: FC.FC16_float, address: PLC_D(2460),
-    //   value: HMIData.reboundWord,
-    //   callpack: 'tensionuphmi2460'
-    // }).then(r => console.log(r));
-
-    this.PLCS.data = this.data;
+    this.upProgress = 1;
+    this.PLCS.taskId = this.data.id;
     this.PLCS.holeIndex = this.holeIndex;
     this.downState = false;
     this.router.navigate(['/live-tension']);
@@ -402,7 +304,7 @@ export class TensionComponent implements OnInit, OnDestroy {
     return this.downState;
   }
   downHMITest() {
-    this.PLCS.data = this.data;
+    this.PLCS.taskId = this.data.id;
     this.PLCS.holeIndex = this.holeIndex;
     this.router.navigate(['/live-tension']);
   }
@@ -571,5 +473,12 @@ export class TensionComponent implements OnInit, OnDestroy {
       this.formData.controls.name.updateValueAndValidity();
       this.cdr.detectChanges();
     }, 10);
+  }
+  /** 切换孔 */
+  switchGorup(data) {
+    this.holeIndex = data.index;
+    this.gourpItem = data.item;
+    console.log(data);
+
   }
 }

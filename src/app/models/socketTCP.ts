@@ -59,7 +59,7 @@ export interface RequestModel {
   /** 操作首地址 */
   address: number;
   /** 操作数据 */
-  value: Array<number | boolean> | number;
+  value: Array<number | boolean> | number | boolean;
   /** 请求名称 */
   request?: string;
   /** 返回名称 */

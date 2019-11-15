@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
 export class PLCService {
   // tcp: PLCSocket;
   /** 张拉数据 */
-  data: TensionTask;
+  taskId: number;
   /** 张拉孔 */
   holeIndex: number;
   /** 链接字符串 */
@@ -111,7 +111,7 @@ export class PLCService {
     });
     /** 监听重新连接 */
     this.e.ipcRenderer.on(`${uid}toLink`, async (event, data) => {
-      console.log('监听重新连接');
+      // console.log('监听重新连接');
 
       this.socketInfo.state = data.state;
       this.socketInfo.msg = data.msg;
@@ -141,7 +141,7 @@ export class PLCService {
   }
   /** ipc */
   ipc(data: RequestModel) {
-    console.log(data);
+    // console.log(data);
 
     return new Promise((resolve, reject) => {
       const t = setTimeout(() => {

@@ -57,7 +57,7 @@
               <app-add-other [formGroup]="formData" [edit]="appS.edit"></app-add-other>
             </div>
             <div>
-              <tension-holes [data]="data" [formData]="formData" #holes (outSelectHole)="holeIndex = $event"></tension-holes>
+              <tension-holes [data]="data" [formData]="formData" #holes (outSelectHole)="switchGorup($event)"></tension-holes>
             </div>
           </form>
           <div class="edit" *ngIf="!appS.edit"></div>
@@ -80,9 +80,11 @@
             <button nz-button nzType="primary" (click)="upload()"
               [disabled]="!(data?.groutingInfo?.length > 0) || !uploading"><i nz-icon nzType="cloud-upload"
                 nzTheme="outline"></i>上传</button>
-            <button nz-button nzType="primary" (click)="test()" *ngIf="appS.platform === 'debug'">测试</button>
-            <button nz-button nzType="primary" (click)="downHMI()" [disabled]="!(PLCS.connStr?.uid === 'tensionLink')" *ngIf="data?.id !== null && PLCS.plcState && !appS.edit && holeIndex !== null">张拉</button>
-            <button nz-button nzType="primary" (click)="downHMITest()" [disabled]="!(PLCS.connStr?.uid === 'tensionLink')" *ngIf="data?.id !== null && appS.platform === 'debug' && holeIndex !== null">测试张拉</button>
+            <button nz-button nzType="primary" (click)="downHMI()"
+              [disabled]="!(PLCS.connStr?.uid === 'tensionLink') || !(gourpItem.state !== 2)"
+              *ngIf="data?.id !== null && PLCS.plcState && !appS.edit && holeIndex !== null">张拉</button>
+            <button nz-button nzType="primary" (click)="test()" *ngIf="appS.userInfo.jurisdiction === 9">测试</button>
+            <button nz-button nzType="primary" (click)="downHMITest()" *ngIf="appS.userInfo.jurisdiction === 9">测试张拉</button>
           </app-operat>
         </div>
       </nz-tab>
@@ -95,9 +97,18 @@
   </div>
 </app-left>
 <app-delete-modal *ngIf="deleteShow" (outDelete)="deleteOk($event)"></app-delete-modal>
-<tension-manual-group *ngIf="mamualGroupState" (outCancel)="manualGroupCancel()" (outOK)="manualGroupOk($event)"[holes]="nowComponentHoleInfo"></tension-manual-group>
-<nz-modal [(nzVisible)]="downState" nzTitle="下载数据" (nzOnCancel)="downState = false" (nzOnOk)="downHMI()" nzMaskClosable>
-  <nz-alert nzType="error" [nzMessage]="item" *ngFor="let item of downMsg"></nz-alert>
-  <nz-progress [nzPercent]="(upProgress / 8) * 100" nzType="circle" [nzWidth]="80"></nz-progress>
+<tension-manual-group *ngIf="mamualGroupState" (outCancel)="manualGroupCancel()" (outOK)="manualGroupOk($event)" [holes]="nowComponentHoleInfo"></tension-manual-group>
+<nz-modal [(nzVisible)]="downState" nzTitle="下载数据" (nzOnCancel)="downState = false" [nzFooter]="null" nzMaskClosable="false" nzWidth="90%">
+  <div style="display: flex; flex-direction: column; flex-direction: column;">
+    <h1 style="margin-bottom: 15px;" *ngIf="downMsg.length === 0">{{upProgress === 0 ? '数据校验...' : '校验完成'}}</h1>
+    <h1 style="margin-bottom: 15px; color: brown;" *ngIf="downMsg.length > 0">数据有误</h1>
+    <div style="display: flex; flex-wrap: wrap;">
+      <nz-alert nzType="error" [nzMessage]="item" *ngFor="let item of downMsg" style="margin: 0 10px 10px 0;"></nz-alert>
+    </div>
+    <!-- <div style="display: flex; align-items: center;">
+      <nz-progress [nzPercent]="(upProgress / 9) * 100" nzType="circle" [nzWidth]="80"></nz-progress>
+      <h1 style="margin-left: 25px;" *ngIf="downMsg.length === 0">{{upProgress < 9 ? '正在下载任务...' : '下载完成'}}</h1>
+    </div> -->
+  </div>
 </nz-modal>
 

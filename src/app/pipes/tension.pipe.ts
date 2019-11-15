@@ -16,7 +16,7 @@ export class Kn2mpaPipe implements PipeTransform {
 @Pipe({ name: 'mpa2kn' })
 export class Mpa2knPipe implements PipeTransform {
   transform(value: number, jack: TensionDevice, jackName: string): number {
-    if (typeof(value) === 'string') {
+    if (!value) {
       return value;
     }
     if (jack.equation) {

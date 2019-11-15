@@ -12,6 +12,7 @@ export class Modbus {
   private callback: Function;
   private callbackT: any;
   private tolinkT: any;
+  private uuid = new Date().getTime();
   public connectFunc: Function;
   public errorFunc: Function;
   public closeFunc: Function;
@@ -52,12 +53,20 @@ export class Modbus {
       }
     });
     client.on('timeout', () => {
-      console.log('timeout');
-      this.heartbeat();
+      console.log('timeout', this.uuid);
+      if (this.connectionStr) {
+        this.heartbeat();
+      }
     });
     client.on('close', (c) => {
       console.log('close', c);
-      this.toLInk();
+      if (this.connectionStr) {
+        this.toLInk();
+      } else {
+        client.destroy();
+        this.connectionStr = null;
+        this.client = null;
+      }
       if (this.closeFunc) {
         this.closeFunc();
       }
@@ -87,19 +96,22 @@ export class Modbus {
   }
   /** heartbeat */
   private heartbeat() {
-    const t1 = new Date().getTime();
-    this.FC3(this.connectionStr.heartbeatAddress, 1).then(r => {
-      const t = new Date().getTime() - t1;
-      this.heartbeatFunc({r, t})
-    }).catch(r => {
-      const t = new Date().getTime() - t1;
-      this.heartbeatFunc({r, t})
-    });
+    if (this.connectionStr) {
+      const t1 = new Date().getTime();
+      this.FC3(this.connectionStr.heartbeatAddress, 1).then(r => {
+        const t = new Date().getTime() - t1;
+        this.heartbeatFunc({r, t})
+      }).catch(r => {
+        const t = new Date().getTime() - t1;
+        this.heartbeatFunc({r, t})
+      });
+    }
   }
   /** 取消链接 */
   cancelLink() {
     clearTimeout(this.tolinkT);
     this.client.end();
+    this.client.destroy();
     this.connectionStr = null;
     this.client = null;
     return new Promise((resolve, reject) => {

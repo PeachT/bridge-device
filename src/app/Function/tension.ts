@@ -1,5 +1,5 @@
 import { TensionDevice } from '../models/jack';
-import { TensionHoleTask, RecordCompute, TensionTask, TensionStage, TensionHoleInfo } from '../models/tension';
+import { TensionHoleTask, RecordCompute, TensionTask, TensionStage, TensionHoleInfo, GroupsName } from '../models/tension';
 import { getDatetimeS, getJSDate } from './unit';
 import { stringUnicode2Int16 } from './convertData';
 // 张拉模式  =42为4顶两端 =41为4顶单端  =21为2顶A1A2单端 =22为2顶A1B1单端 =23为2顶A1A2两端
@@ -85,25 +85,25 @@ export function recordCompute(data: TensionHoleTask, length: number = null) {
       // 伸长量偏差DR=(LZ-LL)/LL
       // 力筋回缩量Sn=(LK-LM)-(1-σ0/σk)LQ
       const dl = length === null ? group[name].mm.length - 1 : length;
-      const L0 = group[name].mm[0];
-      const L1 = group[name].mm[1];
-      const LK = group[name].mm[dl];
+      const L0 = Number(group[name].mm[0]);
+      const L1 = Number(group[name].mm[1]);
+      const LK = Number(group[name].mm[dl]);
 
-      const σ0 = group[name].mpa[0];
-      const σk = group[name].mpa[dl];
-      const LM = group[name].initMm;
+      const σ0 = Number(group[name].mpa[0]);
+      const σk = Number(group[name].mpa[dl]);
+      const LM = Number(group[name].initMm);
 
-      const LL = data.stage[name].theoryMm;
-      const LQ = data.stage[name].wordMm;
-      const NS = data.stage[name].reboundMm;
+      const LL = Number(data.stage[name].theoryMm);
+      const LQ = Number(data.stage[name].wordMm);
+      const NS = Number(data.stage[name].reboundMm);
       const LZ = Number((LK - (2 * L0) + L1 - LQ - NS).toFixed(2));
       const DR = Number(((LZ - LL) / LL).toFixed(2));
       let Sn = NaN;
       if (LM) {
         Sn = Number(((LK - LM) - (1 - σ0 / σk) * LQ).toFixed(2))	;
       }
-      console.log();
-      console.log();
+      // console.log(LK, L0, L1, LQ, NS);
+      // console.log(LZ, DR, Sn);
       stage[name] = {LZ, DR, Sn};
       if (data.mode === 42 || data.mode === 23) {
         if (name.indexOf('A') > -1) {
@@ -124,7 +124,7 @@ export function recordCompute(data: TensionHoleTask, length: number = null) {
   if (data.mode === 42 || data.mode === 23) {
     const ALL = data.stage.A1.theoryMm;
     const ADR = Number(((ALZ - ALL) / ALL * 100).toFixed(2));
-    console.log(ALZ, ALL, ADR, (ALZ - ALL), ((ALZ - ALL) / ALL));
+    // console.log(ALZ, ALL, ADR, (ALZ - ALL), ((ALZ - ALL) / ALL));
 
     rc.A1LZ = Number((ALZ).toFixed(2));
     rc.A1DR = Number((ADR).toFixed(2));
@@ -334,3 +334,17 @@ export function HMIstage(data: TensionTask, index: number) {
   return {percentage: stageP, time: stageTime, ...jn, reboundWord, d2082};
 }
 
+export function createGroupsName(data: TensionTask): Array<GroupsName> {
+  console.log(data.tensionHoleInfos);
+
+  return data.tensionHoleInfos.map(m => {
+    let state = 0;
+    const length = m.tasks.length - 1;
+    if (m.tasks[length].record && m.tasks[length].record.groups) {
+      state = m.tasks[length].record.state;
+    }
+    console.log(m.tasks);
+
+    return { name: m.name, state, uploading: m.uploading}
+  });
+}

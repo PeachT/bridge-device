@@ -5,6 +5,7 @@ import { NzMessageService, NzModalService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
 import { FormGroup } from '@angular/forms';
 import { getModelBase } from 'src/app/models/base';
+import { PLCService } from 'src/app/services/plc.service';
 
 @Component({
   selector: 'app-operat',
@@ -37,10 +38,15 @@ export class OperatComponent implements OnInit, OnChanges, DoCheck {
     private db: DbService,
     public appS: AppService,
     private modalService: NzModalService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private PLCS: PLCService,
   ) { }
 
   ngOnInit() {
+    // this.PLCS.LinkState$.subscribe(r => {
+    //   console.log(r);
+    //   this.cdr.detectChanges();
+    // });
   }
   ngOnChanges(changes: SimpleChanges) {
     console.log(this.valid);

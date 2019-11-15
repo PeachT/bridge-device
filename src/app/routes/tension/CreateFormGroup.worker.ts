@@ -19,7 +19,7 @@ export function createForm(data: TensionTask): Promise<FormGroup> {
         /** 梁长度 */
         beamLength: [data.beamLength, [Validators.required]],
         /** 张拉日期 */
-        tensionDate: [data.tensionDate, [Validators.required]],
+        tensionDate: [data.tensionDate],
         /** 浇筑日期 */
         castingDate: [data.castingDate, [Validators.required]],
         /** 张拉顺序 */
@@ -77,6 +77,13 @@ export function holeGroupForm(datas: Array<TensionHoleTask>) {
   return form;
 }
 export function holeGroupForm_item(data: TensionHoleTask) {
+  let record = fb.group({});
+  if (data.record && data.record.groups && data.record.groups.length > 0) {
+    record = fb.group({
+      state: [data.record.state],
+      groups: recordForm(data.record.groups, data.mode)
+    });
+  }
   return fb.group({
     /** 二次张拉 */
     twice: [data.twice],
@@ -94,10 +101,7 @@ export function holeGroupForm_item(data: TensionHoleTask) {
     stage: stageForm(data.stage, data.mode),
     otherInfo: otherInfoForm(data.otherInfo),
     /** 张拉记录 */
-    record: fb.group({
-      state: [data.record.state || null],
-      groups: recordForm(data.record.groups, data.mode)
-    }),
+    record
   })
 }
 

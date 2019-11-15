@@ -1,13 +1,13 @@
-<nz-alert nzType="error" nzMessage="请进行张拉分组分组" *ngIf="holeNames?.length === 0"></nz-alert>
-<div *ngIf="holeNames && holeNames?.length > 0">
-  <nz-form-item *ngIf="holeNames" style="z-index: 2;">
-    <nz-radio-group [nzButtonStyle]="'solid'" class="hole-groups" [@pageAnimations]="holeNames?.length">
-      <label nz-radio-button [nzValue]="item" *ngFor="let item of holeNames; index as i" (click)="switchHole(i, item)"
-        [ngClass]="{'hole-active': item.name === groupItem?.name}" [class]="'hole' + groupItem?.state">
+<nz-alert nzType="error" nzMessage="请进行张拉分组分组" *ngIf="groupsName?.length === 0"></nz-alert>
+<div *ngIf="groupsName && groupsName?.length > 0">
+  <nz-form-item *ngIf="groupsName" style="z-index: 2;">
+    <nz-radio-group [nzButtonStyle]="'solid'" class="hole-groups" [@pageAnimations]="groupsName?.length" nzSize="large">
+      <label nz-radio-button [nzValue]="item" *ngFor="let item of groupsName; index as i" (click)="switchHole(i, item)"
+        [ngClass]="{'hole-active': item.name === groupItem?.name}" [class]="'hole' + item.state">
         <!-- <i nz-icon nzType="cloud" nzTheme="outline" style="color: #00E676" *ngIf="!item.uploading"></i> -->
         <div *ngIf="item.uploading" class="template">
         </div>
-        {{item}}
+        {{item.name}}
       </label>
     </nz-radio-group>
   </nz-form-item>

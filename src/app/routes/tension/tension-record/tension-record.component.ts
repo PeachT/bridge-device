@@ -43,9 +43,11 @@ export class TensionRecordComponent implements OnInit, OnChanges {
     this.strMode = getModeStr(this.data.mode);
     this.holeNames = holeNameShow(this.holeName, this.data.mode);
     // console.log('记录记录记录记录记录记录记录记录记录记录记录', this.data);
-    // if (this.data && this.data.record) {
-    //   this.recordCalculate = recordCompute(this.data);
-    // }
+    if (this.data && this.data.record) {
+      this.recordCalculate = recordCompute(this.data);
+    }
+    console.log('记录', this.recordCalculate);
+
   }
   createForm(arrData: Array<OnceRecord> = []): FormGroup[] {
     return arrData.map((d, i) => {

@@ -214,3 +214,5 @@ export interface ManualGroup {
   mode: number;
   hole: Array<string>;
 }
+
+export interface GroupsName { name: string; state: number; uploading: boolean; }

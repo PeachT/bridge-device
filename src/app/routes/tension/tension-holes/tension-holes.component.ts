@@ -1,10 +1,11 @@
 import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { TensionHoleInfo, TensionTask } from 'src/app/models/tension';
+import { TensionHoleInfo, TensionTask, GroupsName } from 'src/app/models/tension';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { AppService } from 'src/app/services/app.service';
 import { trigger, transition, query, style, animate, group, stagger } from '@angular/animations';
 import { sleep } from 'sleep-ts';
+import { createGroupsName } from 'src/app/Function/tension';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -50,6 +51,7 @@ export class TensionHolesComponent implements OnInit, OnChanges {
   @Output() outSelectHole = new EventEmitter();
   /** 上一次数据id */
   bid = null;
+  groupsName: Array<GroupsName>;
 
   get tensionHoleInfosFormArray(): FormArray {
     return this.formData.get('tensionHoleInfos') as FormArray;
@@ -60,9 +62,9 @@ export class TensionHolesComponent implements OnInit, OnChanges {
   get tensionHoleInfos(): Array<TensionHoleInfo> {
     return this.tensionHoleInfosFormArray.value;
   }
-  get holeNames(): Array<any> {
-    return this.formData.get('sort').value;
-  }
+  // get holeNames(): Array<any> {
+  //   return this.formData.get('sort').value;
+  // }
   otherKey = [];
   chsub: Subscription = null;
   groupItem: TensionHoleInfo;
@@ -79,11 +81,12 @@ export class TensionHolesComponent implements OnInit, OnChanges {
   ngOnInit() {
   }
   ngOnChanges(changes: SimpleChanges) {
-    console.log('12345789数据变更', this.holeNames, this.tensionHoleInfos, this.formData.get('tensionHoleInfos'));
+    console.log('12345789数据变更', this.groupsName, this.tensionHoleInfos, this.formData.get('tensionHoleInfos'));
     if (this.data.id !== this.bid) {
       this.bid = this.data.id;
       this.groupItem = null;
     }
+    this.groupsName = createGroupsName(this.data);
     this.cdr.detectChanges();
     // this.initForm();
   }
@@ -124,13 +127,13 @@ export class TensionHolesComponent implements OnInit, OnChanges {
     });
   }
   /** 切换孔 */
-  switchHole(index: number, name: string) {
+  switchHole(index: number, item: GroupsName) {
     console.log(index);
     if (!this.appS.edit) {
-      this.outSelectHole.emit(index);
+      this.outSelectHole.emit({index, item});
     }
     this.groupIndex = index;
-    this.groupItem = this.tensionHoleInfos.find(h => h.name === name);
+    this.groupItem = this.tensionHoleInfos.find(h => h.name === item.name);
     this.redraw();
     // this.groupItem = item;
   }
