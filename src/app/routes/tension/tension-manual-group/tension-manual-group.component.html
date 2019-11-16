@@ -2,29 +2,9 @@
   (nzOnOk)="Ok()">
   <div style="display: flex; flex-direction: column;">
     <div>
-      <!-- <app-form-item label="设备选择" [errorShow]="false">
-        <nz-select style="width: 100%;" nzPlaceHolder="请选择设备" [(ngModel)]="selectJack">
-          <nz-option [nzValue]="item.value" [nzLabel]="item.label" *ngFor="let item of jackMneu$ | async">
-          </nz-option>
-        </nz-select>
-      </app-form-item>
-
-      <app-form-item label="张拉模式" [errorShow]="false">
-        <nz-select style="width: 100%;" [(ngModel)]="selectMode" (ngModelChange)="modeChange()">
-          <nz-option [nzDisabled]="!(residueNumber >= 2)" [nzValue]="42" nzLabel="4顶两端"></nz-option>
-          <nz-option [nzDisabled]="!(residueNumber >= 4)" [nzValue]="41" nzLabel="4顶单端"></nz-option>
-          <nz-option [nzDisabled]="!(residueNumber >= 2)" [nzValue]="21" nzLabel="A1|A2单端"></nz-option>
-          <nz-option [nzDisabled]="!(residueNumber >= 1)" [nzValue]="23" nzLabel="A1|A2两端"></nz-option>
-          <nz-option [nzDisabled]="!(residueNumber >= 1)" [nzValue]="24" nzLabel="B1|B2两端"></nz-option>
-          <nz-option [nzDisabled]="!(residueNumber >= 2)" [nzValue]="22" nzLabel="A1|B1单端"></nz-option>
-          <nz-option [nzDisabled]="!(residueNumber >= 1)" [nzValue]="25" nzLabel="A1|B1两端"></nz-option>
-          <nz-option [nzDisabled]="!(residueNumber >= 1)" [nzValue]="11" nzLabel="A1单端"></nz-option>
-          <nz-option [nzDisabled]="!(residueNumber >= 1)" [nzValue]="12" nzLabel="B1单端"></nz-option>
-        </nz-select>
-      </app-form-item> -->
       <app-form-item label="设备选择" [errorShow]="false" [row]="true">
         <nz-radio-group [(ngModel)]="selectJack">
-          <label nz-radio [nzValue]="item.value" *ngFor="let item of jackMneu$ | async">{{item.label}}</label>
+          <label nz-radio [nzValue]="item.value" *ngFor="let item of appS.jackMneu">{{item.label}}</label>
         </nz-radio-group>
       </app-form-item>
       <app-form-item label="张拉模式" [errorShow]="false" [row]="true">

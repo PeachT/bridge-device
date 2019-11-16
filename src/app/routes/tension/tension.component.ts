@@ -23,6 +23,7 @@ import { tensionBase } from 'src/app/models/tensionBase';
 import { createForm, holeGroupForm_item, holeForm_item } from './CreateFormGroup.worker';
 import { sleep } from 'sleep-ts';
 import { ifHMIData } from 'src/app/Function/tensionHMI';
+import { MenuItem } from 'src/app/models/app';
 
 @Component({
   selector: 'app-tension',
@@ -60,6 +61,7 @@ export class TensionComponent implements OnInit, OnDestroy {
   /** 当前选择张拉孔 */
   gourpItem: GroupsName;
   /** 添加数据判断 */
+
   addFilterFun = (o1: any, o2: any) => o1.name === o2.name
     && o1.component === o2.component && o1.project === o2.project;
   /** 修改数据判断 */
@@ -89,22 +91,17 @@ export class TensionComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.getComponent();
-    // setTimeout(() => {
-    // }, 300);
     this.formInit();
-
-    // if (typeof Worker !== 'undefined') {
-    //   // Create a new
-    //   const worker = new Worker('./CreateFormGroup.worker.ts', { type: 'module' });
-    //   worker.onmessage = ({ data }) => {
-    //     console.error(`web worker: ${data}`);
-    //   };
-    //   worker.postMessage('hello');
-    // } else {
-    //   console.error('web worker');
-    //   // Web Workers are not supported in this environment.
-    //   // You should add a fallback so that your program still executes correctly.
-    // }
+    this.getJaskMenu();
+  }
+  /** 获取设备菜单 */
+  async getJaskMenu() {
+    this.appS.jackMneu = [];
+    await this.db.db.jack.each(item => {
+      this.appS.jackMneu.push({ label: item.name, value: item.id })
+      console.warn('获取设备菜单', item);
+    })
+    this.cdr.markForCheck();
   }
   sortJoin(data) {
     if (data) {
@@ -116,38 +113,6 @@ export class TensionComponent implements OnInit, OnDestroy {
   /** 初始化数据 */
   formInit() {
     const data = this.data;
-    // const fb = new FormBuilder();
-    // this.formData = fb.group({
-    //   id: [data.id],
-    //   project: [data.project],
-    //   /** 梁号 */
-    //   name: [data.name, [Validators.required]],
-    //   /** 构建 */
-    //   component: [data.component, [Validators.required]],
-    //   /** 梁长度 */
-    //   beamLength: [data.beamLength],
-    //   /** 张拉日期 */
-    //   tensionDate: [data.tensionDate],
-    //   /** 浇筑日期 */
-    //   castingDate: [data.castingDate, [Validators.required]],
-    //   /** 张拉顺序 */
-    //   sort: [data.sort],
-    //   /** 设备编号 */
-    //   deviceNo: [data.deviceNo],
-    //   /** 是否作为模板 */
-    //   template: [data.template],
-    //   /** 其他数据信息 */
-    //   otherInfo: fb.array([]),
-    //   /** 施工员 */
-    //   operator: [data.operator],
-    //   /** 监理员 */
-    //   supervisors: [data.supervisors],
-    //   /** 自检员 */
-    //   qualityInspector: [data.qualityInspector],
-    //   tensionHoleInfos: fb.array([], [Validators.required]),
-    // });
-
-    // this.formData.setValue(data);
     createForm(data).then(c => {
       this.formData = c;
       console.log('初始化数据', data, !data.id && data.name);
@@ -378,6 +343,13 @@ export class TensionComponent implements OnInit, OnDestroy {
   }
   /** 创建分组数据 */
   manualGroupOk(groupInfo: Array<ManualGroup>) {
+    if (groupInfo === null) {
+      groupInfo = [
+        {deviceId: 1, mode: 42, hole: ['N1', 'N2']},
+        {deviceId: 1, mode: 42, hole: ['N3', 'N4']},
+        {deviceId: 1, mode: 23, hole: ['N5']},
+      ];
+    }
     this.mamualGroupState = false;
     console.log(groupInfo);
     let device: TensionDevice = null;
@@ -452,7 +424,7 @@ export class TensionComponent implements OnInit, OnDestroy {
       if (groupInfo.length === sort.length) {
         this.formData.get('sort').setValue(sort);
         this.data.tensionHoleInfos = this.formData.get('tensionHoleInfos').value;
-        console.log(this.data,  this.formData.get('tensionHoleInfos').value);
+        console.log(this.data, sort, this.formData);
         this.holesDom.getGroupsName(this.data);
       }
     });

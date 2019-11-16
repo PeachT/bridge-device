@@ -6,6 +6,8 @@ import { DbService } from 'src/app/services/db.service';
 import { TensionDevice } from 'src/app/models/jack';
 import { NzMessageService } from 'ng-zorro-antd';
 import { ManualGroup } from 'src/app/models/tension';
+import { MenuItem } from 'src/app/models/app';
+import { AppService } from 'src/app/services/app.service';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -17,7 +19,6 @@ import { ManualGroup } from 'src/app/models/tension';
 export class TensionManualGroupComponent implements OnInit {
   @Input() holes: Array<string>;
 
-  jackMneu$: Observable<Array<{ label: string; value: any; }>>;
   selectJack = null;
   selectMode = null;
   strMode: any;
@@ -31,25 +32,13 @@ export class TensionManualGroupComponent implements OnInit {
   @Output() outCancel = new EventEmitter();
   constructor(
     private db: DbService,
-    private message: NzMessageService
+    private message: NzMessageService,
+    public appS: AppService,
   ) { }
 
   ngOnInit() {
-    this.getJaskMenu();
     this.residue = this.holes;
     this.residueNumber = this.holes.length
-  }
-
-  getJaskMenu() {
-    this.jackMneu$ = from(this.db.db.jack.toArray()).pipe(
-      map(comps => {
-        const arr = [];
-        comps.map((item: TensionDevice) => {
-          arr.push({ label: item.name, value: item.id });
-        });
-        return arr;
-      })
-    );
   }
   /** 取消 */
   cancel() {

@@ -2,7 +2,7 @@
 <div *ngIf="groupsName && groupsName?.length > 0">
     <nz-form-item *ngIf="groupsName" style="z-index: 2;">
       <nz-radio-group [nzButtonStyle]="'solid'" class="hole-groups" [@pageAnimations]="groupsName?.length" nzSize="large">
-        <label nz-radio-button [nzValue]="item" *ngFor="let item of groupsName; index as i" (click)="switchHole(i, item)"
+        <label nz-radio-button [nzValue]="item" *ngFor="let item of groupsName; index as i" (click)="switchHole(i)"
           [ngClass]="{'hole-active': item.name === groupItem?.name}" [class]="'hole' + item.state">
           <!-- <i nz-icon nzType="cloud" nzTheme="outline" style="color: #00E676" *ngIf="!item.uploading"></i> -->
           <div *ngIf="item.uploading" class="template">
@@ -11,10 +11,10 @@
         </label>
       </nz-radio-group>
     </nz-form-item>
-  <form nz-form [formGroup]="formData" *ngIf="groupIndex !== null">
+  <form nz-form [formGroup]="formData" *ngIf="groupIndex !== null" @showAnimations >
     <div formArrayName="tensionHoleInfos">
       <div [formArrayName]="groupIndex">
-        <div style="display: flow-root;">
+        <div style="display: flow-root;" >
           <app-form-item label="孔号">
             <input type="text" readonly nz-input placeholder="请输入孔号" formControlName="name">
           </app-form-item>

@@ -172,7 +172,7 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
                 return true
               }
             }
-            if (this.search.unDone && t.tensionHoleInfos.find(h => h.tasks.find(f => f.record && !f.record.state) !== undefined)) {
+            if (this.search.unDone && t.tensionHoleInfos.find(h => h.tasks.find(f => !f.record || !f.record.state) !== undefined)) {
               return true
             }
             if (this.search.castingDate.length > 0) {

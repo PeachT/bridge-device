@@ -7,6 +7,8 @@ import { DbService } from 'src/app/services/db.service';
 import { map } from 'rxjs/operators';
 import { TensionDevice } from 'src/app/models/jack';
 import { AppService } from 'src/app/services/app.service';
+import { Menu$ } from 'src/app/models/app';
+import { MenuItem } from 'electron';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -23,7 +25,6 @@ export class TensionHoleTaskComponent implements OnInit, OnChanges {
   holeNameLength: number;
   /** 选择设备 */
   tensionDeviceId: Array<number> = [];
-  jackMneu: Array<{ label: string; value: any; }> = [];
 
   get tasks(): Array<TensionHoleTask> {
     if (this.data) {
@@ -49,8 +50,6 @@ export class TensionHoleTaskComponent implements OnInit, OnChanges {
   ) { }
 
   async ngOnInit() {
-    await this.getJaskMenu();
-    // console.log(this.formData, this.data, this.TaskFormArray, this.tasks);
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -59,15 +58,7 @@ export class TensionHoleTaskComponent implements OnInit, OnChanges {
     }
     this.cdr.detectChanges();
   }
-  /** 获取设备菜单 */
-  async getJaskMenu() {
-    this.jackMneu = [];
-    await this.db.db.jack.each(item => {
-      this.jackMneu.push({ label: item.name, value: item.id })
-      console.warn('获取设备菜单', item);
-    })
-    this.cdr.markForCheck();
-  }
+
   createForm(arrData: Array<TensionHoleTask> = []): FormGroup[] {
     this.tensionDeviceId = [];
     return arrData.map(d => {
@@ -108,7 +99,7 @@ export class TensionHoleTaskComponent implements OnInit, OnChanges {
   }
   /** ifDevice */
   deviceExist(device: TensionDevice) {
-    return this.jackMneu.find(f => f.label === device.name && f.value === device.id) === undefined;
+    return this.appS.jackMneu.find(f => f.label === device.name && f.value === device.id) === undefined;
   }
 }
 

@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { LoginUser } from '../models/user.models';
 import { ElectronService } from 'ngx-electron';
 import { NzMessageService } from 'ng-zorro-antd';
+import { MenuItem } from '../models/app';
 
 @Injectable({ providedIn: 'root' })
 export class AppService {
@@ -24,7 +25,7 @@ export class AppService {
   uploadingData = JSON.parse(localStorage.getItem('uploadingData'));
   /** 软件信息 */
   public info = {
-    version: '6.2.13',
+    version: '6.2.14',
     unit: {
       name: '凌桥',
       tel: '联系技术员',
@@ -75,6 +76,8 @@ export class AppService {
   // 获得一个Observable;
   bodySizeSub = this.bodySize.asObservable();
   routerStateCode = 'active';
+  /** 顶菜单 */
+  jackMneu: Array<MenuItem>;
 
   constructor(
     private router: Router,

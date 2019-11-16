@@ -18,7 +18,7 @@
               </app-form-item>
               <app-form-item label="设备选择" >
                 <nz-select style="width: 100%;" nzPlaceHolder="请选择设备" formControlName="deviceId" (ngModelChange)="selectTensionDevice($event, i)">
-                  <nz-option [nzValue]="jack.value" [nzLabel]="jack.label" *ngFor="let jack of jackMneu"></nz-option>
+                  <nz-option [nzValue]="jack.value" [nzLabel]="jack.label" *ngFor="let jack of appS.jackMneu"></nz-option>
                   <nz-option [nzValue]="data.tasks[i].device.id" [nzLabel]="data.tasks[i].device.name" *ngIf="deviceExist(data.tasks[i].device)"></nz-option>
                 </nz-select>
               </app-form-item>

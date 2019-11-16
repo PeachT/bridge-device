@@ -29,10 +29,10 @@ import { createGroupsName } from 'src/app/Function/tension';
     trigger('showAnimations', [
       transition('* => *', [
         group([
-          query(':leave', [style({ opacity: 0 })], { optional: true }),
+          query(':leave', [style({ opacity: .5 })], { optional: true }),
           query(':enter', [
-            style({ transform: 'translateY(-100%)', opacity: 0 }),
-            animate(200, style({ transform: 'translateY(0)', opacity: 1 }))
+            style({opacity: .5 }),
+            animate(200, style({ opacity: 1 }))
           ],
           { optional: true })
         ])
@@ -81,17 +81,13 @@ export class TensionHolesComponent implements OnInit, OnChanges {
   ngOnInit() {
   }
   ngOnChanges(changes: SimpleChanges) {
-    console.log('12345789数据变更', this.groupsName, this.tensionHoleInfos, this.formData.get('tensionHoleInfos'));
-    if (this.data.id !== this.bid) {
-      this.bid = this.data.id;
-      this.groupItem = null;
-    }
-    this.getGroupsName();
     // this.initForm();
+    this.getGroupsName();
   }
   getGroupsName(data = this.data) {
-    console.log(data);
+    console.log('12345789数据变更', this.groupsName, this.tensionHoleInfos, this.formData.get('tensionHoleInfos'));
     this.groupsName = createGroupsName(data);
+    this.switchHole(0);
     this.cdr.detectChanges();
   }
   initForm() {
@@ -131,15 +127,17 @@ export class TensionHolesComponent implements OnInit, OnChanges {
     });
   }
   /** 切换孔 */
-  switchHole(index: number, item: GroupsName) {
+  switchHole(index: number) {
     console.log(index);
-    if (!this.appS.edit) {
-      this.outSelectHole.emit({index, item});
-    }
-    this.groupIndex = index;
-    this.groupItem = this.tensionHoleInfos.find(h => h.name === item.name);
-    this.redraw();
-    // this.groupItem = item;
+    this.groupIndex = null;
+    setTimeout(() => {
+      this.groupIndex = index;
+      this.groupItem = this.tensionHoleInfos[index];
+      if (!this.appS.edit) {
+        this.outSelectHole.emit({index, item: this.groupsName[index]});
+      }
+      this.redraw();
+    }, 0);
   }
   redraw() {
     this.cdr.detectChanges();

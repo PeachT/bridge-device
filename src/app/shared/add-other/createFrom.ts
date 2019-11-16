@@ -3,7 +3,7 @@ import { OtherInfo } from 'src/app/models/common';
 import { Validators, ValidatorFn, AbstractControl, FormBuilder } from '@angular/forms';
 
 const fb = new FormBuilder();
-export function otherInfoForm(data: Array<OtherInfo>) {
+export function otherInfoForm(data: Array<OtherInfo> = []) {
   const formArr = fb.array([]);
   data.map((item, i) => {
     formArr.push(otherInfoForm_item(item, i))
