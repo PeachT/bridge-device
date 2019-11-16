@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { DbService, DbEnum } from 'src/app/services/db.service';
-import { Observable, from } from 'rxjs';
-import { map, groupBy, mergeMap, toArray } from 'rxjs/operators';
+import { Observable, from, Subject } from 'rxjs';
+import { map, groupBy, mergeMap, toArray, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Comp } from 'src/app/models/component';
 import { GroutingTask } from 'src/app/models/grouting';
 import { Menu$, MenuItem } from 'src/app/models/app';
@@ -45,7 +45,7 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
   @Input() component$: Observable<Menu$>;
   componentName: any = null;
   bridge$: Observable<Menu$>;
-  bridges: Array<Menu$>;
+  bridges: Menu$;
   bridgeId: number;
   search = {
     /** 未完成 */
@@ -55,17 +55,20 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
     /** 完成时间 */
     doneDate: [],
     /** 浇筑完成 */
-    castingDate: []
+    castingDate: [],
+    name: null
   }
   ranges1 = { 本周: [startOfWeek(new Date()), endOfWeek(new Date())], 本月: [startOfMonth(new Date()), endOfMonth(new Date())] };
-
+  private searchTerms = new Subject<string>();
   @Output() menuChange = new EventEmitter();
+  bridgeSearchName: any[];
+  visible = false;
 
   constructor(
     private db: DbService,
     public appS: AppService,
     private activatedRoute: ActivatedRoute,
-    private crd: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef,
     private message: NzMessageService
   ) { }
 
@@ -89,6 +92,23 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
         console.warn('没有菜单数据', data);
       }
     });
+    /** 梁号搜索 */
+    this.searchTerms
+      .pipe(
+        // 请求防抖 300毫秒
+        debounceTime(350),
+        distinctUntilChanged())
+      .subscribe(name => {
+        // 此处进行httpClient的请求
+        // term是用户输入的值
+        if (name) {
+          this.bridgeSearchName = this.bridges.data.filter(f => f.label.indexOf(name) > -1);
+        } else {
+          this.bridgeSearchName = [];
+        }
+        console.log(name,this.bridgeSearchName);
+        this.cdr.detectChanges();
+      });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -142,7 +162,7 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
         if (this.projectId === g.project && g.component === this.componentName) {
           if (this.dbName === 'tension') {
             const t = g as TensionTask;
-            if (this.search.done && t.tensionHoleInfos.find(h => h.tasks.find(f => f.record.state > 0) !== undefined)) {
+            if (this.search.done && t.tensionHoleInfos.find(h => h.tasks.find(f => f.record && f.record.state > 0) !== undefined)) {
               if (this.search.doneDate.length > 0) {
                 // tslint:disable-next-line:max-line-length
                 if (t.tensionHoleInfos[0].tasks.find(f => f.record.groups.length > 0 && cmp3Date(this.search.doneDate, f.record.groups[0].startDate))) {
@@ -152,7 +172,7 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
                 return true
               }
             }
-            if (this.search.unDone && t.tensionHoleInfos.find(h => h.tasks.find(f => !f.record.state) !== undefined)) {
+            if (this.search.unDone && t.tensionHoleInfos.find(h => h.tasks.find(f => f.record && !f.record.state) !== undefined)) {
               return true
             }
             if (this.search.castingDate.length > 0) {
@@ -220,6 +240,8 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
   }
   /** 选择梁 */
   async selectBridge(id) {
+    console.log(id);
+
     if (this.appS.edit) {
       this.message.error('请完成编辑');
       return;
@@ -257,8 +279,11 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
   onCrd(ob) {
     const sub = ob.subscribe(r => {
       this.bridges = r;
-      this.crd.markForCheck();
+      this.cdr.markForCheck();
       sub.unsubscribe();
     })
+  }
+  nameSearch(value: string) {
+    this.searchTerms.next(value);
   }
 }

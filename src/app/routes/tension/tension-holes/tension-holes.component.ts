@@ -86,9 +86,13 @@ export class TensionHolesComponent implements OnInit, OnChanges {
       this.bid = this.data.id;
       this.groupItem = null;
     }
-    this.groupsName = createGroupsName(this.data);
-    this.cdr.detectChanges();
+    this.getGroupsName();
     // this.initForm();
+  }
+  getGroupsName(data = this.data) {
+    console.log(data);
+    this.groupsName = createGroupsName(data);
+    this.cdr.detectChanges();
   }
   initForm() {
     this.tensionHoleInfosFormArray.clear();

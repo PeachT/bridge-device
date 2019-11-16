@@ -99,7 +99,7 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
   /** 选择张拉孔数据 */
   oldHoleIndex: number;
   /** 下载进度 */
-  upProgress = 0;
+  downProgress = 0;
   /** 下载状态 */
   downState = false;
   groupNames: Array<GroupsName>;
@@ -124,6 +124,9 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
     castingDate: null,
     vidoe: false
   };
+  /** 未张拉组 */
+  tensionNot: any[] = [];
+  downErrorCount: any;
   /** plc状态 */
   get plcState(): boolean {
     return this.PLCS.plcState;
@@ -268,7 +271,7 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
   async getLiveData() {
     // console.log(this.downState, this.tensionSuccess, this.liveData.downOk);
 
-    if (this.sendState || ((this.downState || this.tensionSuccess) && !this.liveData.downOk) || this.liveData.runPLCState) {
+    if (this.sendState || ((this.downState || this.tensionSuccess) && !this.liveData.downOk)) {
       return;
     }
     if (!this.plcState) {
@@ -278,78 +281,86 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
     }
     const callpack = 'liveTension';
     this.sendState = true;
-    try {
-      await this.PLCS.ipc({request: FC.FC3, address: PLC_D(0), value: 52, callpack}).then((data: any) => {
+    // try {
+    //   await this.PLCS.ipc({request: FC.FC3, address: PLC_D(0), value: 52, callpack}).then((data: any) => {
+    //     this.resetLivedata(data.data.data);
+    //   });
+    // } catch (error) {
+    //   console.error('数据转换有误！！');
+    // } finally {
+    // }
+    // this.sendState = false;
+    // await sleep(10);
+    // this.cdr.detectChanges();
+    // this.getLiveData();
 
-        // this.e.ipcRenderer.once(callpack, (e, data) => {
-          const r = data.data.data;
-          // console.log('liveTension', r);
-          this.liveData.A1 = r.float.slice(0, 6).map(m => m.toFixed(2));
-          this.liveData.A2 = r.float.slice(6, 12).map(m => m.toFixed(2));
-          this.liveData.B1 = r.float.slice(12, 18).map(m => m.toFixed(2));
-          this.liveData.B2 = r.float.slice(18, 24).map(m => m.toFixed(2));
-          this.liveData.time = Math.round(r.float[25]);
-          const state = Math.round(this.liveData[this.strMode[0]][5]);
-          // console.log(state);
+    this.PLCS.ipcs({request: FC.FC3, address: PLC_D(0), value: 52, callpack}, data => {
+      this.resetLivedata(data.data.data);
+      this.sendState = false;
+      this.cdr.detectChanges();
+      setTimeout(() => {
+        this.getLiveData();
+      }, 50);
+    })
+  }
+  resetLivedata(r) {
+      // const r = data.data.data;
+      this.liveData.A1 = r.float.slice(0, 6).map(m => m.toFixed(2));
+      this.liveData.A2 = r.float.slice(6, 12).map(m => m.toFixed(2));
+      this.liveData.B1 = r.float.slice(12, 18).map(m => m.toFixed(2));
+      this.liveData.B2 = r.float.slice(18, 24).map(m => m.toFixed(2));
+      this.liveData.time = Math.round(r.float[25]);
+      const state = Math.round(this.liveData[this.strMode[0]][5]);
+      // console.log(state);
 
-          if (this.liveData.run) {
-            this.showCSV();
-          }
-          /** 下载完成 */
-          if (state === 60) {
-            this.liveData.downOk = true;
-            this.upProgress = 0;
-            this.downShow = false;
-          }
-          if (state === 2 && !this.liveData.run) {
-            this.appS.taskLiveState = true;
-            this.record.startDate = new Date();
-            this.liveData.run = true;
-            this.liveData.stage = 0;
-            this.saveCSV();
-          }else if (!this.liveData.stageActive && ([6,7, 10,11, 14,15, 18,19, 22,21, 26,27].indexOf(state) > -1) ) {
-            this.liveData.stageActive = true;
-            this.liveData.stage++;
-            // this.record.time[this.liveData.stage] = this.task.stage.time[this.liveData.stage];
-          } else if([9, 13, 17, 21, 25, 29].indexOf(state) > -1) {
-            this.liveData.stageActive = false;
-          }
+      if (this.liveData.run) {
+        this.showCSV();
+      }
+      /** 下载完成 */
+      if (state === 60) {
+        this.liveData.downOk = true;
+        this.downProgress = 0;
+        this.downShow = false;
+      }
+      if (state === 2 && !this.liveData.run) {
+        this.appS.taskLiveState = true;
+        this.record.startDate = new Date();
+        this.liveData.run = true;
+        this.liveData.stage = 0;
+        this.saveCSV();
+      }else if (!this.liveData.stageActive && ([6,7, 10,11, 14,15, 18,19, 22,21, 26,27].indexOf(state) > -1) ) {
+        this.liveData.stageActive = true;
+        this.liveData.stage++;
+        // this.record.time[this.liveData.stage] = this.task.stage.time[this.liveData.stage];
+      } else if([9, 13, 17, 21, 25, 29].indexOf(state) > -1) {
+        this.liveData.stageActive = false;
+      }
 
-          /** 张拉完成 */
-          if ((state === 9 && this.task.twice)
-            // tslint:disable-next-line:max-line-length
-            || ((state === 13 || state === 17 || state === 21 || state === 25 || state === 29) && this.liveData.stage === this.task.stage.time.length -1)
-          ) {
-            this.liveData.success = true;
-          }
-          /** 卸荷 */
-          if(state === 30 && !this.liveData.unState) {
-            this.liveData.unState = true;
-          }
-          if (this.liveData.unState) {
-            this.upload();
-          }
-          if (state === 33) {
-            this.liveData.unState = false;
-          }
-          if (state === 35 && !this.liveData.saveSate) {
-            this.liveData = liveDataInit();
-            this.liveData.saveSate = true;
-            this.liveData.run = false;
-            console.error(this.liveData);
+      /** 张拉完成 */
+      if ((state === 9 && this.task.twice)
+        // tslint:disable-next-line:max-line-length
+        || ((state === 13 || state === 17 || state === 21 || state === 25 || state === 29) && this.liveData.stage === this.task.stage.time.length -1)
+      ) {
+        this.liveData.success = true;
+      }
+      /** 卸荷 */
+      if(state === 30 && !this.liveData.unState) {
+        this.liveData.unState = true;
+      }
+      if (this.liveData.unState) {
+        this.upload();
+      }
+      if (state === 33) {
+        this.liveData.unState = false;
+      }
+      if (state === 35 && !this.liveData.saveSate) {
+        this.liveData = liveDataInit();
+        this.liveData.saveSate = true;
+        this.liveData.run = false;
+        console.error(this.liveData);
 
-            this.saveData();
-          }
-        // })
-      });
-    } catch (error) {
-      console.error('数据转换有误！！');
-    } finally {
-    }
-    this.sendState = false;
-    await sleep(10);
-    this.cdr.detectChanges();
-    this.getLiveData();
+        this.saveData();
+      }
   }
   test() {
     if (this.liveData.state) {
@@ -465,15 +476,7 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
       this.data = data;
       this.groupNames = createGroupsName(this.data);
     }
-    // this.liveData.saveSate = false;
-    this.tensionSuccess = true;
-    this.downShow = true;
-    this.appS.taskLiveState = true;
-    if (this.holeIndex < this.data.tensionHoleInfos.length - 1 ) {
-      this.startAutoDown();
-    } else {
-      this.createNewData();
-    }
+    this.nextGroup();
   }
   startAutoDown() {
     if (!this.autoDownCount) {
@@ -488,24 +491,28 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
         }
         this.cdr.detectChanges();
       }, 1000);
-      this.switchHole(this.holeIndex + 1, true);
+
     }
   }
-  manualSwitchHole() {
+  /** 下一组 */
+  nextGroup(state = true) {
+    this.tensionSuccess = true;
     this.downShow = true;
-    if (this.holeIndex <= this.data.tensionHoleInfos.length - 1)
-    {
-      if (!this.autoDownCount) {
-        this.autoDownT = setInterval(() => {
-          this.autoDownCount++;
-          if (this.autoDownCount >= 10) {
-            clearInterval(this.autoDownT);
-            this.cancelAutoDown();
-            this.selectOk();
-          }
-          this.cdr.detectChanges();
-        }, 1000);
-        this.switchHole(this.holeIndex + 1, true);
+    this.appS.taskLiveState = false;
+    this.tensionNot = [];
+    if (this.holeIndex < this.data.tensionHoleInfos.length - 1 && state) {
+      this.switchHole(this.holeIndex + 1);
+      this.startAutoDown();
+    } else {
+      this.groupNames.map((m, i)=> {
+        if (m.state !== 2) {
+          this.tensionNot.push(m);
+        }
+      })
+      if (this.tensionNot.length === 0) {
+        this.createNewData();
+      } else if(!state) {
+        this.tensionNot = [];
       }
     }
   }
@@ -561,7 +568,7 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
     }
     this.downErrorMsg = [];
     this.downState = true;
-    this.upProgress = 0;
+    this.downProgress = 0;
     console.log('下载的数据', this.data.tensionHoleInfos[this.holeIndex]);
     const task = this.data.tensionHoleInfos[this.holeIndex].tasks[0];
     const stage = this.data.tensionHoleInfos[this.holeIndex].tasks[0].stage.knPercentage;
@@ -609,7 +616,7 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
       { request: FC.FC16_float, address: PLC_D(2460), value: HMIData.reboundWord},
       { request: FC.FC16_float, address: PLC_D(2498), value: [1.0]},
     ];
-
+    this.downErrorCount = 0;
     // tslint:disable-next-line:prefer-for-of
     for (let index = 0; index < cmdarrs.length; index++) {
       if (!this.downState) {
@@ -624,10 +631,18 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
         callpack: 'tensionup'
       }).then(r => console.log(r)).catch(r => {
         console.error('下载错误');
-        this.holeIndex = this.oldHoleIndex;
-        this.strMode = getModeStr(this.task.mode);
-        this.downState = false;
-        this.downErrorMsg.push('下载错误');
+        // this.holeIndex = this.oldHoleIndex;
+        // this.strMode = getModeStr(this.task.mode);
+        // this.downState = false;
+        index = 0;
+        this.downErrorCount ++;
+        this.downProgress = 0;
+        if (this.downErrorCount > 5) {
+          this.downState = false;
+          this.message.error('尝试下载多次失败，请手动下载');
+          this.downErrorMsg.push('尝试下载多次失败，请手动下载');
+          this.downErrorCount = 0;
+        }
         return;
       });
       if (!this.next()) {
@@ -638,15 +653,15 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
     this.oldHoleIndex = this.holeIndex;
     this.exitDown();
   }
-  /** 下载下一组数据 */
+  /** 下载下一阶段数据 */
   async next() {
-    this.upProgress++;
+    this.downProgress++;
     this.cdr.detectChanges();
     await sleep(5);
     return this.downState;
   }
   exitDown() {
-
+    this.appS.edit = false;
     this.downState = false;
     this.tensionSuccess = false;
     this.getLiveData();
@@ -663,19 +678,16 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
   }
   /** 启动PLC */
   runPLC() {
+    if (this.liveData.runPLCState) {
+      return;
+    }
     this.liveData.runPLCState = true;
-    this.runPLCT = setTimeout(() => {
-      this.PLCS.ipc({request: FC.FC16_float, address: PLC_D(2498), value: [2.0], callpack: 'runPLC'}).then(r => {
-        // this.runPLCState = false;
+    this.PLCS.ipcs({request: FC.FC16_float, address: PLC_D(2498), value: [2.0], callpack: 'runPLC'}, r => {
+      console.log('启动张拉', r);
+      setTimeout(() => {
         this.liveData.runPLCState = false;
-        clearTimeout(this.runPLCT);
-        this.runPLCT = null;
-        this.getLiveData();
-      }).catch(f => {
-        console.error('启动错误');
-        this.runPLC();
-      });
-    }, 50);
+      }, 1000);
+    });
   }
   showTest() {
     this.liveData.stage++;
@@ -724,6 +736,7 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
     }
   }
   createNewData() {
+    this.tensionNot = [];
     this.newData = copyAny(this.data);
     delete this.newData.id;
     this.newData.tensionDate = null;

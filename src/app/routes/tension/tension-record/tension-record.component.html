@@ -194,38 +194,31 @@
 </form> -->
 <div *ngIf="data?.record?.groups && recordCalculate">
   <ng-container *ngFor="let group of data.record.groups; index as i">
+      <nz-alert nzType="info" [nzMessage]="'张拉时间：' + (group.startDate | date: 'yyyy-MM-dd HH:mm:ss') + '~' + (group.endDate | date: 'yyyy-MM-dd HH:mm:ss')"></nz-alert>
+    <div></div>
     <table class="gridtable">
       <thead>
         <tr>
-          <th colSpan="2">张拉记录</th>
+          <th width="100">孔号</th>
+          <th width="100">顶</th>
           <ng-container *ngFor="let msg of group.msg; index as msgi">
             <th [ngClass]="{'twice': msg === '阶段二' && twice, 'super': superState && msg === '超张拉',
               'mend': mend && msg === '补张拉'}">
-              {{msg}}
+              {{msg}}|{{group.knPercentage[msgi]}}%
             </th>
           </ng-container>
-          <th width="100">卸荷</th>
+          <th width="100">卸荷|{{group.uploadPercentage}}%</th>
           <th width="100">力筋回缩量</th>
           <th width="100">伸长量mm</th>
           <th width="100">偏差率%</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td width="65">孔号</td>
-          <td width="65">阶段%</td>
-          <td *ngFor="let kn of group.knPercentage; index as kni">
-            {{kn}}
-          </td>
-          <td>
-            {{group.uploadPercentage}}
-          </td>
-        </tr>
         <tr *ngFor="let jackName of strMode; index as keyi">
-          <td [attr.rowspan]="holeNames.span"
+          <td class="key" [attr.rowspan]="holeNames.span"
             *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
             {{holeNames[jackName]}}</td>
-          <td>{{jackName}}</td>
+          <td class="key" >{{jackName}}</td>
           <td *ngFor="let mpa of group[jackName].mpa; index as mpai">
             <div class="kn-color">{{mpa | mpa2kn: data.device: jackName}}<sub>kn</sub></div>
             <div class="mpa-color">{{mpa}}<sub>mpa</sub></div>

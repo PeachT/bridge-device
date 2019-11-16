@@ -2,30 +2,23 @@
   <!-- <div>{{component$ | async | json}}</div> -->
   <div class="search">
     <div class="item">
-      <label nz-checkbox [(ngModel)]="search.done" (click)="onSerach()">已</label>
-      <label nz-checkbox [(ngModel)]="search.unDone" (click)="onSerach()">未</label>
+      <label nz-checkbox [(ngModel)]="search.done" (nzCheckedChange)="onSerach()">已</label>
+      <label nz-checkbox [(ngModel)]="search.unDone" (nzCheckedChange)="onSerach()">未</label>
       <span
         nz-popover
         nzPopoverTitle="高级筛选"
         [nzPopoverContent]="contentTemplate"
         nzPopoverPlacement="rightTop"
         nzPopoverTrigger="click"
+        [(nzVisible)]="visible"
       ><i nz-icon nzType="funnel-plot" nzTheme="outline"></i>筛选</span>
     </div>
     <div class="item1">
       <span
-      nz-popover
-      nzPopoverTitle="高级筛选"
-      [nzPopoverContent]="contentTemplate"
-      nzPopoverPlacement="rightTop"
-      nzPopoverTrigger="click"
+      (click)="visible=!visible"
       [ngStyle]="{'text-decoration': !search.done ? 'line-through' : 'none'}">已：{{search.doneDate[0] || null | date: 'yyyy-MM-dd ~ '}}{{search.doneDate[1] || null | date: 'yyyy-MM-dd'}}</span>
       <span
-      nz-popover
-      nzPopoverTitle="高级筛选"
-      [nzPopoverContent]="contentTemplate"
-      nzPopoverPlacement="rightTop"
-      nzPopoverTrigger="click"
+      (click)="visible=!visible"
       >筑：{{search.castingDate[0] || null | date: 'yyyy-MM-dd ~ '}}{{search.castingDate[1] || null | date: 'yyyy-MM-dd'}}</span>
     </div>
   </div>
@@ -74,10 +67,24 @@
 </div>
 <ng-template #contentTemplate>
   <div>
+    <div>
+        <nz-select
+        style="width: 100%;"
+        [(ngModel)]="search.name"
+        nzPlaceHolder="输入梁号"
+        nzAllowClear
+        nzShowSearch
+        [nzServerSearch]="true"
+        (nzOnSearch)="nameSearch($event)"
+        (ngModelChange)="selectBridge($event); visible = false;"
+      >
+        <nz-option *ngFor="let item of bridgeSearchName" [nzValue]="item.value" [nzLabel]="item.label"></nz-option>
+      </nz-select>
+    </div>
     <div class="range-picker-content">
       <p>任务状态：</p>
-      <label nz-checkbox [(ngModel)]="search.done" (click)="onSerach()">已完成</label>
-      <label nz-checkbox [(ngModel)]="search.unDone" (click)="onSerach()">未完成</label>
+      <label nz-checkbox [(ngModel)]="search.done" (nzCheckedChange)="onSerach()">已完成</label>
+      <label nz-checkbox [(ngModel)]="search.unDone" (nzCheckedChange)="onSerach()">未完成</label>
     </div>
     <br>
     <div class="range-picker-content">

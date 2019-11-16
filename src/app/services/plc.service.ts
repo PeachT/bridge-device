@@ -44,6 +44,9 @@ export class PLCService {
   oldTime = 0;
   /** 禁止停止链接 */
   noOut = false;
+  /** 发送 */
+  private ipcSends: Array<{cmd: RequestModel, callback: Function}> = [];
+  private ipcState: boolean;
   get plcState() {
     return this.socketInfo.state === 'success';
   }
@@ -153,5 +156,24 @@ export class PLCService {
         resolve({ success: true, data: r });
       })
     })
+  }
+  async ipcs(cmd: RequestModel, callback: Function) {
+    if (cmd) {
+      this.ipcSends.unshift({cmd, callback});
+      // console.log(this.ipcSends, cmd.callpack);
+    }
+    if (this.ipcState && this.ipcSends.length > 0) {
+      return;
+    }
+    this.ipcState = true;
+    const cmdItem = this.ipcSends.pop();
+    const r = await this.ipc(cmdItem.cmd);
+    if (cmdItem.callback) {
+      cmdItem.callback(r);
+    }
+    this.ipcState = false;
+    if (this.ipcSends.length > 0) {
+      this.ipcs(null, null);
+    }
   }
 }

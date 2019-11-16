@@ -305,7 +305,9 @@ export class TensionComponent implements OnInit, OnDestroy {
   }
   downHMITest() {
     this.PLCS.taskId = this.data.id;
-    this.PLCS.holeIndex = this.holeIndex;
+    this.PLCS.holeIndex = 0;
+    this.PLCS.socketInfo.link = true;
+    this.PLCS.socketInfo.state = 'success'
     this.router.navigate(['/live-tension']);
   }
 
@@ -387,10 +389,10 @@ export class TensionComponent implements OnInit, OnDestroy {
       if (!device || device.id !== g.deviceId) {
         device = await this.db.db.jack.filter(f => f.id === g.deviceId).first();
       }
-      const jacks: any = {}
+      const jacks: any = {};
       getModeStr(g.mode).map(key => {
-        jacks[key] = { reboundMm: 3.5, wordMm: 5, theoryMm: 0 }
-      })
+        jacks[key] = { reboundMm: 3.5, wordMm: 5, theoryMm: 0 };
+      });
       const tensionHoleInfo: TensionHoleInfo = {
         /** 孔号 */
         name: holeName,
@@ -447,25 +449,13 @@ export class TensionComponent implements OnInit, OnDestroy {
         ]
       };
       (this.formData.get('tensionHoleInfos') as FormArray).push(holeForm_item(tensionHoleInfo));
+      if (groupInfo.length === sort.length) {
+        this.formData.get('sort').setValue(sort);
+        this.data.tensionHoleInfos = this.formData.get('tensionHoleInfos').value;
+        console.log(this.data,  this.formData.get('tensionHoleInfos').value);
+        this.holesDom.getGroupsName(this.data);
+      }
     });
-    this.formData.get('sort').setValue(sort);
-    this.data.tensionHoleInfos = this.formData.get('tensionHoleInfos').value;
-    this.holesDom.redraw();
-    // this.successGroup(holeItem);
-  }
-  /** 分组完成更新数据 */
-  successGroup(group) {
-    // tslint:disable-next-line:forin
-    for (const i in this.formData.controls) {
-      console.log(
-        this.formData.controls[i].valid,
-        i
-      );
-    }
-    console.log(group);
-    this.data.tensionHoleInfos = group;
-    this.holesDom.initForm();
-    // this.nameValueAndValidity();
   }
   nameValueAndValidity() {
     setTimeout(() => {

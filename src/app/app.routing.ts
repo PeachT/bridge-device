@@ -47,18 +47,6 @@ const routes: Routes = [
         data: { title: "压浆" },
         canDeactivate: [GlobalEditGuard]
       },
-      // {
-      //   path: "manual",
-      //   loadChildren: () =>
-      //     import("./routes/manual/manual.module").then(m => m.ManualModule),
-      //   data: { title: "手动" }
-      // },
-      // {
-      //   path: "setting",
-      //   loadChildren: () =>
-      //     import("./routes/setting/setting.module").then(m => m.SettingModule),
-      //   data: { title: "设置" }
-      // },
       {
         path: "tension-setting",
         loadChildren: () =>

@@ -24,7 +24,7 @@ export class AppService {
   uploadingData = JSON.parse(localStorage.getItem('uploadingData'));
   /** 软件信息 */
   public info = {
-    version: '6.1.12',
+    version: '6.2.13',
     unit: {
       name: '凌桥',
       tel: '联系技术员',

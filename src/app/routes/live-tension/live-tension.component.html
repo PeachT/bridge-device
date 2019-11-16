@@ -14,11 +14,13 @@
     </div>
     <nz-alert nzType="error" nzMessage="设备链接有误！！" *ngIf="!plcState"></nz-alert>
     <nz-alert nzType="error" nzMessage="没有张拉任务" *ngIf="!PLCS.taskId"></nz-alert>
-    <button nz-button nzType="primary" (click)="switchHole(holeIndex)" *ngIf="!liveData.run">更换张拉组</button>
-    <button nz-button nzType="primary" (click)="runPLC()" *ngIf="!liveData.run" [disabled]="!liveData.downOk" [nzLoading]="liveData.runPLCState">开始张拉</button>
-    <button nz-button nzType="primary" (click)="showTest()" *ngIf="appS.userInfo.jurisdiction === 9">下一阶段</button>
-    <button nz-button nzType="primary" (click)="manualSwitchHole()" *ngIf="appS.userInfo.jurisdiction === 9">下一组</button>
-    <button nz-button nzType="primary" (click)="createNewData()" *ngIf="appS.userInfo.jurisdiction === 9">测试复制</button>
+    <button nzShape="round" nz-button nzType="primary" (click)="nextGroup(false)" *ngIf="!liveData.run">更换张拉组</button>
+    <button nzShape="round" class="btn-c-19be6b" nz-button nzType="primary" (click)="runPLC()" *ngIf="!liveData.run" [disabled]="!liveData.downOk"
+      [nzLoading]="liveData.runPLCState">开始张拉</button>
+    <button nzShape="round" nz-button nzType="primary" (click)="showTest()" *ngIf="appS.userInfo.jurisdiction === 9">下一阶段</button>
+    <button nzShape="round" nz-button nzType="primary" (click)="nextGroup()"
+      *ngIf="appS.userInfo.jurisdiction === 9">下一组</button>
+    <button nzShape="round" nz-button nzType="primary" (click)="createNewData()" *ngIf="appS.userInfo.jurisdiction === 9">测试复制</button>
     <!-- <button nz-button nzType="primary" (click)="test()" [disabled]="!plcState"
       *ngIf="appS.platform === 'debug'">{{ liveData.state ? '停止' : '开始'}}</button> -->
 
@@ -40,27 +42,37 @@
       <tbody>
         <tr *ngFor="let key of strMode; index as i">
           <td class="key">{{key}}</td>
-          <td >
+          <td>
             <div>{{(task.tensionKn * (task.stage.knPercentage[liveData.stage] / 100)) | kn2mpa: task.device: key}}</div>
             <div class="mpa-color">{{liveData[key][0]}}</div>
           </td>
-          <td >
+          <td>
             <div>{{(task.tensionKn * (task.stage.knPercentage[liveData.stage] / 100)) | ToFixedr}}</div>
             <div class="kn-color">{{liveData[key][1]}}</div>
           </td>
           <td class="mpa-color">{{liveData[key][2]}}</td>
           <td class="mm-color">{{liveData[key][3]}}</td>
-          <td class="mm-color">{{liveData[key][4]}}</td>
-          <td >
+          <td class="mm-color">
+
+            <div>
+              {{liveData[key][4]}}
+            </div>
+          </td>
+          <td>
             <div style="display: flex;">
-              <nz-alert nzType="error" *ngIf="plcState && liveData[key][5] >= 70 " [nzMessage]="alarm[liveData[key][5] | ToFixedr: 0]">
+              <nz-alert nzType="error" *ngIf="plcState && liveData[key][5] >= 70 "
+                [nzMessage]="alarm[liveData[key][5] | ToFixedr: 0]">
               </nz-alert>
-              <nz-alert nzType="info" *ngIf="plcState && liveData[key][5] < 70 " [nzMessage]="alarm[liveData[key][5] | ToFixedr: 0]">
+              <nz-alert nzType="info" *ngIf="plcState && liveData[key][5] < 70 "
+                [nzMessage]="alarm[liveData[key][5] | ToFixedr: 0]">
               </nz-alert>
               <nz-alert nzType="error" nzMessage="设备链接有误！！" *ngIf="!plcState"></nz-alert>
             </div>
           </td>
-          <td class="key" [attr.rowspan]="strMode.length" *ngIf="i === 0">{{liveData.time}}</td>
+          <td class="key" [attr.rowspan]="strMode.length" *ngIf="i === 0">
+            <div>{{task.stage.time[liveData.stage]}}</div>
+            <div>{{liveData.time}}</div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -75,74 +87,15 @@
         <div id="task">
           <h1 *ngIf="!data">没有数据</h1>
           <nz-divider nzText="任务数据"></nz-divider>
-          <table class="gridtable" *ngIf="data">
-            <thead>
-              <tr>
-                <th>孔号</th>
-                <th>顶</th>
-                <ng-container *ngFor="let item of task.stage.msg; index as i">
-                  <th [ngClass]="{
-                      'twice': item === '阶段二' && task.twice, 'super': task.superState && item === '超张拉',
-                      'mend': task.mend && item === '补张拉'
-                    }">
-                    <span class="stage-active" *ngIf="liveData.stage === i"></span>
-                    <span class="text">{{item}}|{{task.stage.knPercentage[i]}}%</span>
-                  </th>
-                </ng-container>
-                <th width="100">卸荷|{{task.stage.uploadPercentage}}%</th>
-                <th width="100">回缩量mm</th>
-                <th width="100">工作长度mm</th>
-                <th width="100">理论申长量mm</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let key of strMode; index as keyi">
-                <td class="key" [attr.rowspan]="holeNames.span" *ngIf="holeNames.keys.indexOf(key) !== -1">{{holeNames[key]}}
-                </td>
-                <td class="key" >{{key}}</td>
-                <td *ngFor="let stage of task.stage.knPercentage">
-                  <div class="kn-color">{{(task.tensionKn * (stage / 100)) | ToFixedr}}<sub>Kn</sub> </div>
-                  <div class="mpa-color">{{(task.tensionKn * (stage / 100)) | kn2mpa: task.device: key}}<sub>MPa</sub> </div>
-                </td>
-                <td>
-                  <div class="kn-color">{{(task.tensionKn * (task.stage.uploadPercentage / 100)) | ToFixedr}}<sub>Kn</sub>
-                  </div>
-                  <div class="mpa-color">
-                    {{(task.tensionKn * (task.stage.uploadPercentage / 100)) | kn2mpa: task.device: key}}<sub>MPa</sub>
-                  </div>
-                </td>
-                <ng-container>
-                  <td>
-                    {{task.stage[key].reboundMm}}
-                  </td>
-                  <td>
-                    {{task.stage[key].wordMm}}
-                  </td>
-                  <td [attr.rowspan]="holeNames.span" *ngIf="holeNames.keys.indexOf(key) !== -1">
-                    {{task.stage[key].theoryMm}}
-                  </td>
-                </ng-container>
-              </tr>
-              <tr>
-                <td colSpan="2">保压时间s</td>
-                <td *ngFor="let item of task.stage.time; index as i">
-                  {{item}}
-                </td>
-                <td>
-                  {{task.stage.uploadDelay}}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <ng-container *ngTemplateOutlet="taskTemp"></ng-container>
         </div>
         <div id="record" *ngIf="record && strMode">
           <nz-divider nzText="记录"></nz-divider>
           <table class="gridtable">
             <thead>
               <tr>
-                <!-- <th colSpan="2">张拉记录</th> -->
-                <th>孔号</th>
-                <th>顶</th>
+                <th width="100">孔号</th>
+                <th width="100">顶</th>
                 <th *ngFor="let msg of record.msg; index as msgi" [ngClass]="{
                       'twice': msg === '阶段二' && twice, 'super': superState && msg === '超张拉',
                       'mend': mend && msg === '补张拉'
@@ -157,29 +110,21 @@
               </tr>
             </thead>
             <tbody>
-              <!-- <tr>
-                <td width="65">孔号</td>
-                <td width="65">阶段%</td>
-                <td *ngFor="let kn of record.knPercentage; index as kni">
-                  {{kn}}
-                </td>
-                <td>
-                  {{record.uploadPercentage}}
-                </td>
-              </tr> -->
               <tr *ngFor="let jackName of strMode; index as keyi">
                 <td class="key" [attr.rowspan]="holeNames.span"
                   *ngIf="(holeNames.span === 2 && jackName.indexOf('1') > -1) || holeNames.span === 1">
                   {{holeNames[jackName]}}</td>
-                <td class="key" >{{jackName}}</td>
+                <td class="key">{{jackName}}</td>
                 <td *ngFor="let mpa of record.knPercentage; index as mpai">
-                  <div class="kn-color">{{record[jackName].mpa[mpai] || 'NaN' | mpa2kn: task.device: jackName}}<sub>Kn</sub>
+                  <div class="kn-color">
+                    {{record[jackName].mpa[mpai] || 'NaN' | mpa2kn: task.device: jackName}}<sub>Kn</sub>
                   </div>
                   <div class="mpa-color">{{record[jackName].mpa[mpai] || 'NaN'}}<sub>MPa</sub></div>
                   <div class="mm-color">{{record[jackName].mm[mpai] || 'NaN'}}<sub>mm</sub></div>
                 </td>
                 <td>
-                  <div class="kn-color">{{record[jackName]?.initMpa | mpa2kn: task.device: jackName}}<sub>Kn</sub> </div>
+                  <div class="kn-color">{{record[jackName]?.initMpa | mpa2kn: task.device: jackName}}<sub>Kn</sub>
+                  </div>
                   <div class="mpa-color">{{record[jackName]?.initMpa}}<sub>MPa</sub></div>
                   <div class="mm-color">{{record[jackName]?.initMm}}<sub>mm</sub></div>
                 </td>
@@ -199,7 +144,6 @@
                 <td colSpan="2">保压时间s</td>
                 <td *ngFor="let time of record.time; index as timei">
                   {{time}}
-                  <!-- {{timei === liveData.stage ? task.stage.time[timei] - liveData.time : 0}} -->
                 </td>
                 <td>
                   {{record.uploadDelay}}
@@ -211,12 +155,11 @@
         <div id="csv" *ngIf="record && strMode">
           <nz-divider nzText="曲线"></nz-divider>
           <echarts-dynamic-line-tension [key]="'mpa'" [text]="'压力'" [strMode]="strMode" *ngIf="true" [subWidth]="0"
-            [data]="record.datas" [live]="record.datas[strMode[0]].mpa.length"
-            [satrtDate]="liveData.sratrTime">
+            [data]="record.datas" [live]="record.datas[strMode[0]].mpa.length" [satrtDate]="liveData.sratrTime">
           </echarts-dynamic-line-tension>
           <echarts-dynamic-line-tension [key]="'mm'" [text]="'位移'" [strMode]="strMode" *ngIf="true" [subWidth]="0"
-            [data]="record.datas" [live]="record.datas[strMode[0]].mpa.length"
-            [satrtDate]="liveData.sratrTime"></echarts-dynamic-line-tension>
+            [data]="record.datas" [live]="record.datas[strMode[0]].mpa.length" [satrtDate]="liveData.sratrTime">
+          </echarts-dynamic-line-tension>
         </div>
       </div>
     </div>
@@ -238,12 +181,14 @@
     <i nz-icon nzType="line-chart" nzTheme="outline"></i>曲线
   </button>
 </ng-template>w
-<nz-modal [(nzVisible)]="downShow" *ngIf="downShow" [nzTitle]="'数据处理&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;构建:' + data.component + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;梁号:' + holeData.name" [nzFooter]="btng" (nzOnCancel)="cancel()" [nzMaskClosable]="false" nzWidth="90%">
-  <div *ngIf="!tensionSuccessAll">
-    <div *ngIf="this.autoDownT && upProgress !== 10">
+<nz-modal [(nzVisible)]="downShow" *ngIf="downShow"
+  [nzTitle]="'数据处理&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;构建:' + data.component + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;梁号:' + holeData.name"
+  [nzFooter]="btng" (nzOnCancel)="cancel()" [nzMaskClosable]="false" nzWidth="90%">
+  <div *ngIf="!tensionSuccessAll && tensionNot.length === 0">
+    <div *ngIf="this.autoDownT && downProgress !== 10">
       <h1>{{10 - autoDownCount}}s后自动下载【{{holeData.name}}】</h1>
     </div>
-    <div *ngIf="!this.downState && upProgress !== 10">
+    <div *ngIf="!this.downState && downProgress !== 10">
       <nz-form-item>
         <nz-radio-group [nzButtonStyle]="'solid'" class="hole-groups" nzSize="large">
           <label nz-radio-button [nzValue]="item" *ngFor="let item of groupNames; index as i" (click)="switchHole(i)"
@@ -253,93 +198,112 @@
           </label>
         </nz-radio-group>
       </nz-form-item>
-      <table class="gridtable" *ngIf="data">
-        <thead>
-          <tr>
-            <th>孔号</th>
-            <th>顶</th>
-            <ng-container *ngFor="let item of task.stage.msg; index as i">
-              <th [ngClass]="{
-                  'twice': item === '阶段二' && task.twice, 'super': task.superState && item === '超张拉',
-                  'mend': task.mend && item === '补张拉'
-                }">
-                <span class="stage-active" *ngIf="liveData.stage === i"></span>
-                <span class="text">{{item}}|{{task.stage.knPercentage[i]}}%</span>
-              </th>
-            </ng-container>
-            <th width="100">卸荷|{{task.stage.uploadPercentage}}%</th>
-            <th width="100">回缩量mm</th>
-            <th width="100">工作长度mm</th>
-            <th width="100">理论申长量mm</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let key of strMode; index as keyi">
-            <td class="key" [attr.rowspan]="holeNames.span" *ngIf="holeNames.keys.indexOf(key) !== -1">{{holeNames[key]}}
-            </td>
-            <td class="key" >{{key}}</td>
-            <td *ngFor="let stage of task.stage.knPercentage">
-              <div class="kn-color">{{(task.tensionKn * (stage / 100)) | ToFixedr}}<sub>Kn</sub> </div>
-              <div class="mpa-color">{{(task.tensionKn * (stage / 100)) | kn2mpa: task.device: key}}<sub>MPa</sub> </div>
-            </td>
-            <td>
-              <div class="kn-color">{{(task.tensionKn * (task.stage.uploadPercentage / 100)) | ToFixedr}}<sub>Kn</sub>
-              </div>
-              <div class="mpa-color">
-                {{(task.tensionKn * (task.stage.uploadPercentage / 100)) | kn2mpa: task.device: key}}<sub>MPa</sub>
-              </div>
-            </td>
-            <ng-container>
-              <td>
-                {{task.stage[key].reboundMm}}
-              </td>
-              <td>
-                {{task.stage[key].wordMm}}
-              </td>
-              <td [attr.rowspan]="holeNames.span" *ngIf="holeNames.keys.indexOf(key) !== -1">
-                {{task.stage[key].theoryMm}}
-              </td>
-            </ng-container>
-          </tr>
-          <tr>
-            <td colSpan="2">保压时间s</td>
-            <td *ngFor="let item of task.stage.time; index as i">
-              {{item}}
-            </td>
-            <td>
-              {{task.stage.uploadDelay}}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <ng-container *ngTemplateOutlet="taskTemp"></ng-container>
     </div>
-    <div *ngIf="downState || upProgress === 10" style="display: flex; flex-direction: column;">
-        <div style="display: flex; flex-wrap: wrap;">
-          <nz-alert nzType="error" [nzMessage]="item" *ngFor="let item of downErrorMsg" style="margin: 0 10px 10px 0;"></nz-alert>
-        </div>
-        <div style="display: flex; align-items: center;">
-          <nz-progress [nzPercent]="(upProgress / 10) * 100" nzType="circle" [nzWidth]="80"></nz-progress>
-          <h1 style="margin-left: 25px;" *ngIf="downErrorMsg?.length === 0">{{upProgress < 9 ? '正在下载任务...' : '下载完成，等待设备处理。'}}</h1>
-        </div>
+    <div *ngIf="downState || downProgress === 10" style="display: flex; flex-direction: column;">
+      <div style="display: flex; flex-wrap: wrap;">
+        <nz-alert nzType="error" [nzMessage]="item" *ngFor="let item of downErrorMsg" style="margin: 0 10px 10px 0;">
+        </nz-alert>
+      </div>
+      <div style="display: flex; align-items: center;">
+        <nz-progress [nzPercent]="(downProgress / 10) * 100" nzType="circle" [nzWidth]="80"></nz-progress>
+        <h1 style="margin-left: 25px;" *ngIf="downErrorMsg?.length === 0">
+          {{downProgress < 9 ? '正在下载任务...' : '下载完成，等待设备处理。'}}</h1>
+      </div>
     </div>
   </div>
-  <div *ngIf="tensionSuccessAll">
+  <div *ngIf="tensionSuccessAll && tensionNot.length === 0">
     <h1>复制一条新梁</h1>
     <div style="display: flow-root;">
       <app-form-item label="梁号" [row]="true" [errors]="newDataValidation.name">
         <input type="text" nz-input placeholder="请输入梁号" [(ngModel)]="newData.name" (input)="newInput()">
       </app-form-item>
       <app-form-item label="浇筑日期" [errors]="newDataValidation.castingDate">
-        <nz-date-picker readonly [(ngModel)]="newData.castingDate" placeholder="浇筑日期" (ngModelChange)="newInput()" [nzAllowClear]="false"></nz-date-picker>
+        <nz-date-picker readonly [(ngModel)]="newData.castingDate" placeholder="浇筑日期" (ngModelChange)="newInput()"
+          [nzAllowClear]="false"></nz-date-picker>
       </app-form-item>
     </div>
+  </div>
+  <div *ngIf="tensionNot.length > 0">
+    <div style="display: flex;flex-wrap: wrap;align-items: center; margin-bottom: 25px;">
+      未完成张拉组：
+      <nz-alert nzType="info" [nzMessage]="item.name" *ngFor="let item of tensionNot"></nz-alert>
+    </div>
+    <button nz-button nzSize="large" nzShape="round" nzType="primary" (click)="tensionNot = [];">继续张拉： {{data.name}}</button>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button nz-button nzSize="large" nzShape="round" (click)="createNewData()" >复制下一条梁</button>
   </div>
 </nz-modal>
 
 
 <ng-template #btng>
   <button nz-button nzSize="large" nzShape="round" nzType="primary" (click)="selectOk()"
-    *ngIf="!tensionSuccessAll && !(upProgress === 10)" [disabled]="task.record?.state === 2" [nzLoading]="downState">下载任务</button>
-  <button nz-button nzSize="large" nzShape="round" nzType="danger" *ngIf="tensionSuccessAll" [routerLink]="['tension']">跳转到任务</button>
-  <button nz-button nzSize="large" nzShape="round" *ngIf="tensionSuccessAll" [disabled]="!newDataValidation.vidoe" (click)="newSave()">保存</button>
+    *ngIf="!tensionSuccessAll && !(downProgress === 10)" [disabled]="task.record?.state === 2"
+    [nzLoading]="downState">{{downErrorCount > 0 ? '重试' + downErrorCount : '下载任务'}}</button>
+  <button nz-button nzSize="large" nzShape="round" nzType="danger" *ngIf="tensionSuccessAll"
+    [routerLink]="['tension']">跳转到任务</button>
+  <button nz-button nzSize="large" nzShape="round" *ngIf="tensionSuccessAll" [disabled]="!newDataValidation.vidoe"
+    (click)="newSave()">保存</button>
+</ng-template>
+
+<ng-template #taskTemp>
+  <table class="gridtable" *ngIf="data">
+    <thead>
+      <tr>
+        <th width="100">孔号</th>
+        <th width="100">顶</th>
+        <ng-container *ngFor="let item of task.stage.msg; index as i">
+          <th [ngClass]="{
+                  'twice': item === '阶段二' && task.twice, 'super': task.superState && item === '超张拉',
+                  'mend': task.mend && item === '补张拉'
+                }">
+            <span class="stage-active" *ngIf="liveData.stage === i"></span>
+            <span class="text">{{item}}|{{task.stage.knPercentage[i]}}%</span>
+          </th>
+        </ng-container>
+        <th width="100">卸荷|{{task.stage.uploadPercentage}}%</th>
+        <th width="100">回缩量mm</th>
+        <th width="100">工作长度mm</th>
+        <th width="100">理论申长量mm</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let key of strMode; index as keyi">
+        <td class="key" [attr.rowspan]="holeNames.span" *ngIf="holeNames.keys.indexOf(key) !== -1">{{holeNames[key]}}
+        </td>
+        <td class="key">{{key}}</td>
+        <td *ngFor="let stage of task.stage.knPercentage">
+          <div class="kn-color">{{(task.tensionKn * (stage / 100)) | ToFixedr}}<sub>Kn</sub> </div>
+          <div class="mpa-color">{{(task.tensionKn * (stage / 100)) | kn2mpa: task.device: key}}<sub>MPa</sub> </div>
+        </td>
+        <td>
+          <div class="kn-color">{{(task.tensionKn * (task.stage.uploadPercentage / 100)) | ToFixedr}}<sub>Kn</sub>
+          </div>
+          <div class="mpa-color">
+            {{(task.tensionKn * (task.stage.uploadPercentage / 100)) | kn2mpa: task.device: key}}<sub>MPa</sub>
+          </div>
+        </td>
+        <ng-container>
+          <td>
+            {{task.stage[key].reboundMm}}
+          </td>
+          <td>
+            {{task.stage[key].wordMm}}
+          </td>
+          <td [attr.rowspan]="holeNames.span" *ngIf="holeNames.keys.indexOf(key) !== -1">
+            {{task.stage[key].theoryMm}}
+          </td>
+        </ng-container>
+      </tr>
+      <tr>
+        <td colSpan="2">保压时间s</td>
+        <td *ngFor="let item of task.stage.time; index as i">
+          {{item}}
+        </td>
+        <td>
+          {{task.stage.uploadDelay}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </ng-template>
