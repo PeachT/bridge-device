@@ -26,6 +26,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { DynamicLineTensionComponent } from './echarts/dynamic-line-tension/dynamic-line-tension.component';
 import { LinkBaseComponent } from './link-base/link-base.component';
 import { LinkButtonComponent } from './link-button/link-button.component';
+import { ServiceAppUpdateComponent } from './service-app-update/service-app-update.component';
 
 
 // pipe
@@ -56,6 +57,7 @@ const COMPONENTS = [
   ScrollMenuComponent,
   LinkBaseComponent,
   LinkButtonComponent,
+  ServiceAppUpdateComponent,
 ];
 const PIPE = [
   ToFixedrPipe,

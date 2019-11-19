@@ -98,38 +98,40 @@ ipcMain.on('CancelLink', async (e, name) => {
 });
 
 
-// 主进程监听渲染进程传来的信息
+// 更新监听
 ipcMain.on('update', (e, arg) => {
   console.log('update');
-  updateHandle();
+  // 执行自动更新检查
+  autoUpdater.checkForUpdates();
+});
+// 下载监听
+ipcMain.on('downApp', (e, arg) => {
+  autoUpdater.downloadUpdate();
 });
 
 // 检测更新，在你想要检查更新的时候执行，renderer事件触发后的操作自行编写
 function updateHandle() {
-  const message = {
-    error: '检查更新出错',
-    checking: '正在检查更新……',
-    updateAva: '检测到新版本，正在下载……',
-    updateNotAva: '现在使用的就是最新版本，不用更新',
-  };
   const os = require('os');
+  autoUpdater.autoDownload = false;
   // http://localhost:5500/up/ 更新文件所在服务器地址
-  autoUpdater.setFeedURL('http://localhost:5500/up/');
-  autoUpdater.on('error', (error) => {
-    sendUpdateMessage(message.error);
+  autoUpdater.setFeedURL('http://47.107.59.12/upDateApp/');
+  autoUpdater.on('error', (info) => {
+    sendUpdateMessage({msg: 'error', info});
   });
-  autoUpdater.on('checking-for-update', () => {
-    sendUpdateMessage(message.checking);
+  autoUpdater.on('checking-for-update', (info) => {
+    sendUpdateMessage({msg: 'checking', r: info});
   });
   autoUpdater.on('update-available', (info) => {
-    sendUpdateMessage(message.updateAva);
+    sendUpdateMessage({msg: 'updateAva', info});
   });
   autoUpdater.on('update-not-available', (info) => {
-    sendUpdateMessage(message.updateNotAva);
+    sendUpdateMessage({msg: 'updateNotAva', info});
   });
 
   // 更新下载进度事件
   autoUpdater.on('download-progress', (progressObj) => {
+    console.log('down...');
+
     win.webContents.send('downloadProgress', progressObj);
   });
   // 下载完成事件
@@ -140,15 +142,14 @@ function updateHandle() {
     });
     win.webContents.send('isUpdateNow');
   });
-
-  // 执行自动更新检查
-  autoUpdater.checkForUpdates();
 }
+/** 监听事件 */
+updateHandle();
 
 // 通过main进程发送事件给renderer进程，提示更新信息
 // win = new BrowserWindow()
 function sendUpdateMessage(text) {
-  win.webContents.send('message', text);
+  win.webContents.send('update-message', text);
 }
 
 /**

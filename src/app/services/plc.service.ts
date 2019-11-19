@@ -44,6 +44,8 @@ export class PLCService {
   oldTime = 0;
   /** 禁止停止链接 */
   noOut = false;
+  /** 心跳状态 */
+  heartbeatState = false;
   /** 发送 */
   private ipcSends: Array<{cmd: RequestModel, callback: Function}> = [];
   private ipcState: boolean;
@@ -69,7 +71,7 @@ export class PLCService {
       this.socketInfo.state = '';
       this.socketInfo.msg = '尝试链接';
       this.socketInfo.linkDelay = null;
-      this.plclink.next();
+      this.plclink.next(false);
     } else {
       this.message.error('没有配置链接数据');
     }
@@ -88,29 +90,30 @@ export class PLCService {
       this.socketInfo.state = data.state;
       this.socketInfo.msg = data.msg;
       this.socketInfo.link = true;
-      this.plcError.next(data.state === 'success');
+      this.plclink.next(data.state === 'success');
     });
     /** 监听心跳 */
     this.e.ipcRenderer.on(`${uid}heartbeat`, async (event, data) => {
       // console.log(data);
+      this.heartbeatState = true;
       console.log('监听心跳', data);
       this.socketInfo.state = data.state;
       this.socketInfo.msg = data.msg;
       this.oldTime = data.delay;
-      this.plclink.next();
+      this.plclink.next(data.link);
     });
     /** 监听关闭连接 */
     this.e.ipcRenderer.on(`${uid}close`, async (event, data) => {
       console.log('监听关闭连接');
-      this.plclink.next();
+      this.plclink.next(false);
     });
     /** 监听连接错误 */
     this.e.ipcRenderer.on(`${uid}error`, async (event, data) => {
       console.log('监听连接错误');
-
+      this.heartbeatState = false;
       this.socketInfo.state = data.state;
       this.socketInfo.msg = data.msg;
-      this.plclink.next();
+      this.plclink.next(false);
     });
     /** 监听重新连接 */
     this.e.ipcRenderer.on(`${uid}toLink`, async (event, data) => {
@@ -118,7 +121,7 @@ export class PLCService {
 
       this.socketInfo.state = data.state;
       this.socketInfo.msg = data.msg;
-      this.plclink.next();
+      this.plclink.next(false);
     });
   }
   /** 取消链接 */
@@ -138,16 +141,16 @@ export class PLCService {
         this.socketInfo.state = null;
         this.socketInfo.msg = '';
         this.connStr = null;
-        this.plclink.next();
+        this.plclink.next(false);
       })
     }
   }
   /** ipc */
   ipc(data: RequestModel) {
     // console.log(data);
-
     return new Promise((resolve, reject) => {
       const t = setTimeout(() => {
+        console.log(data.callpack);
         reject({ success: false, data: '超时错误' });
       }, this.connStr.setTimeout);
       this.e.ipcRenderer.send(`${this.connStr.uid}Socket`, data);

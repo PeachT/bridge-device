@@ -99,7 +99,7 @@ export class DynamicLineGroutingComponent implements OnInit, OnChanges, AfterVie
     });
   }
   ngOnChanges(changes: SimpleChanges) {
-    console.log('数据变更ngOnChanges', this.data);
+    // console.log('数据变更ngOnChanges', this.data);
     this.carterSvg();
     this.cdr.detectChanges();
     // this.update();

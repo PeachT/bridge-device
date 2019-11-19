@@ -39,6 +39,7 @@ export class LeftMenuComponent implements OnInit {
       return true;
     }
     this.appS.leftMenu = id;
+    this.appS.editId = id;
     this.selectId = id;
     const data = await this.db.getFirstId(this.dbName, id);
     console.log(data);

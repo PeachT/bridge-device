@@ -2,7 +2,7 @@
   <header>
     <!-- {{appS.taskLiveState}} -- {{PLCS.tcp?.linkMsg?.state}} -->
     <div class="state" *ngIf="plcState && templateData">
-      <nz-alert  [nzType]="appS.taskLiveState ? 'success' : 'error'" [nzMessage]="appS.taskLiveState ? '正在监控中' : '监控已停止'"></nz-alert>
+      <nz-alert  [nzType]="!PLCS.heartbeatState ? 'success' : 'error'" [nzMessage]="!PLCS.heartbeatState ? '正在监控中' : '监控已停止'"></nz-alert>
     </div>
     <div class="live" >
       <!-- <h2>监控压浆：</h2> -->

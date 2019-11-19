@@ -1,11 +1,13 @@
 <div class="main">
   <!-- <img [src]="appS.info.unit.logo" alt="没有图标" srcset=""> -->
-  <nz-avatar [nzSize]="164" nzShape="square" [nzSrc]="appS.info.unit.logo"></nz-avatar>
+  <nz-avatar style="width:auto; height: 256px;" nzShape="square" [nzSrc]="appS.info.unit.logo"></nz-avatar>
   <!-- <img src="\assets\img\logo.png" alt="" srcset=""> -->
   <h1>{{appS.info.unit.name}}智能设备{{appS.platformName}}</h1>
   <h3>联系方式： {{appS.info.unit.tel}}</h3>
   <h3>软件版本： <span style="color: #40a9ff;"> {{appS.info.version}} </span>
-    <button nz-button nzType="dashed" (click)="onUpdate()">更 新</button>
+    <!-- <button nz-button nzType="dashed" (click)="onUpdate()">更 新</button> -->
+    <button nz-button nzType="dashed" (click)="onServiceUpdate()">在线更新</button>
+    <!-- <button nz-button nzType="dashed" (click)="testsetDownInfo()" *ngIf="appS.userInfo.jurisdiction === 9">测试</button> -->
   </h3>
   <div *ngIf="appS?.userInfo?.jurisdiction === 9">
     <input type="text" #intext>
@@ -24,6 +26,8 @@
     </div>
   </div>
 </div>
+
+
 
 
 <nz-modal [nzVisible]="update.state" nzWidth="85%" nzMaskClosable="false" nzClosable="false" [nzFooter]="modalFooter"
@@ -72,9 +76,7 @@
       </button>
     </div>
   </div>
-  <ng-template #modalFooter>
-    <button nz-button nzType="primary" *ngIf="!update.start" (click)="onCancel()">取 消</button>
-  </ng-template>
-
-
 </nz-modal>
+<ng-template #modalFooter>
+  <button nz-button nzType="primary" *ngIf="!update.start" (click)="onCancel()">取 消</button>
+</ng-template>

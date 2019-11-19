@@ -1,0 +1,36 @@
+<nz-modal [(nzVisible)]="serviceUpdate.state" nzWidth="85%" nzMaskClosable="false"
+  (nzOnCancel)="colseModal()" [nzFooter]="serviceDownAppFooter" [nzTitle]="'当前版本：' + appS.info.version">
+  <button nz-button nzType="dashed" (click)="testsetDownInfo()" *ngIf="appS.userInfo?.jurisdiction === 9">测试</button>
+  <button nz-button nzType="dashed" (click)="showNotification()" *ngIf="appS.userInfo?.jurisdiction === 9">测试弹出</button>
+  <div *ngIf="!serviceUpdate.start">
+    <nz-alert *ngIf="serviceUpdate.msg === 'checking'" nzType="info" [nzMessage]="updateMessage[serviceUpdate.msg]"
+      nzShowIcon></nz-alert>
+    <nz-alert *ngIf="serviceUpdate.msg === 'updateAva'" nzType="success" [nzMessage]="updateMessage[serviceUpdate.msg]"
+      [nzDescription]="'检测到版本：' + serviceUpdate.info.version" nzShowIcon></nz-alert>
+    <nz-alert *ngIf="serviceUpdate.msg === 'updateNotAva'" nzType="erroe" [nzMessage]="updateMessage[serviceUpdate.msg]"
+      [nzDescription]="'检测到版本：' + serviceUpdate.info.version" nzShowIcon></nz-alert>
+    <nz-alert *ngIf="serviceUpdate.msg === 'error'" nzType="warning" [nzMessage]="updateMessage[serviceUpdate.msg]"
+      [nzDescription]="serviceUpdate.info | json" nzShowIcon></nz-alert>
+  </div>
+  <div style="display: flex; align-items: center;" *ngIf="serviceUpdate.start">
+    <nz-progress [nzPercent]="serviceUpdate.downInfo.percent" nzType="circle" [nzWidth]="80"></nz-progress>
+    <div style="display: flex; flex-direction:column; margin-left: 25px;">
+      <h1 style="margin: 0;">
+        {{serviceUpdate.downInfo.percent < 100 ? '正在下载任务  ' + serviceUpdate.downInfo.bytesPerSecond +'/s': '下载完成'}}
+        &nbsp;&nbsp;&nbsp; 剩余时间：{{serviceUpdate.downInfo.remainingTime}}
+      </h1>
+      <p style="margin: 0;">{{serviceUpdate.downInfo.total}} / {{serviceUpdate.downInfo.downSize}}</p>
+    </div>
+  </div>
+</nz-modal>
+<ng-template #serviceDownAppFooter>
+  <button nz-button nzType="primary" *ngIf="serviceUpdate.msg === 'updateAva'" [disabled]="serviceUpdate.start"
+    (click)="startServiceUpdata()">下 载</button>
+</ng-template>
+
+<ng-template #notificationTemp>
+  <h2 style="color: #1890ff;">发现有新版本可用！</h2>
+  <div style="display: flex; justify-content: flex-end;">
+    <button nz-button (click)="showInfo();">查 看</button>
+  </div>
+</ng-template>

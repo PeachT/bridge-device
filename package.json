@@ -89,7 +89,7 @@
     "publish": [
       {
         "provider": "generic",
-        "url": "http://localhost:5500/up/"
+        "url": "http://47.107.59.12/upDateApp/"
       }
     ],
     "win": {
