@@ -6,6 +6,8 @@ import { AppService } from 'src/app/services/app.service';
 import { User } from 'src/app/models/user.models';
 import { LeftMenuComponent } from 'src/app/shared/left-menu/left-menu.component';
 import { nameRepetition } from 'src/app/Validator/async.validator';
+import { userInit } from 'src/app/models/userInit';
+import { copyAny } from 'src/app/models/baseInit';
 
 @Component({
   selector: 'app-user',
@@ -18,6 +20,7 @@ export class UserComponent implements OnInit {
   @ViewChild('leftMenu', null) leftMenu: LeftMenuComponent;
   formData: FormGroup;
   data: User = {
+    ...userInit,
     name: '用户',
     password: '123',
     jurisdiction: 0,
@@ -67,13 +70,13 @@ export class UserComponent implements OnInit {
   /**
    * *编辑
    */
-  edit(data) {
-    if (!data) {
+  edit(state: string) {
+    if (state === 'copy') {
       this.data.id = null;
-    } else {
-      this.data = data;
-      console.log(this.data, data);
+    } else if (state === 'add'){
+      this.data = copyAny(userInit);
     }
+    console.log('编辑', state, this.data);
     this.formInit();
     this.leftMenu.markForCheck();
   }

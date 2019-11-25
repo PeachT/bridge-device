@@ -37,9 +37,9 @@ export class GroutingRecordItemComponent implements OnInit, OnChanges {
 
   }
   ngOnChanges(changes: SimpleChanges) {
-    this.createForm(this.data).map(si => {
-      this.groutingInfoHoleFormArray.push(si);
-    })
+    // this.createForm(this.data).map(si => {
+    //   this.groutingInfoHoleFormArray.push(si);
+    // })
   }
   createForm(arrData: Array<GroutingHoleItem> = []): FormGroup[] {
     return arrData.map(d => {

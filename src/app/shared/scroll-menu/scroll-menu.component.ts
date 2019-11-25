@@ -279,6 +279,8 @@ export class ScrollMenuComponent implements OnInit, OnChanges {
   onCrd(ob) {
     const sub = ob.subscribe(r => {
       this.bridges = r;
+      console.log(r);
+
       this.cdr.markForCheck();
       sub.unsubscribe();
     })

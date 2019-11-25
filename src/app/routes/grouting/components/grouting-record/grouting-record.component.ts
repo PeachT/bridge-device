@@ -44,14 +44,14 @@ export class GroutingRecordComponent implements OnInit, OnChanges {
   ngOnInit() {
   }
   ngOnChanges(changes: SimpleChanges) {
-    console.log('压浆记录数据变更', changes, this.data.id, this.bid);
-    if (this.data.id !== this.bid) {
-      this.bid = this.data.id;
-      this.groupItem = null;
-    }
-    this.createForm(this.groutingInfo).map(si => {
-      this.groutingInfoFormArray.push(si);
-    })
+    // console.log('压浆记录数据变更', changes, this.data.id, this.bid);
+    // if (this.data.id !== this.bid) {
+    //   this.bid = this.data.id;
+    //   this.groupItem = null;
+    // }
+    // this.createForm(this.groutingInfo).map(si => {
+    //   this.groutingInfoFormArray.push(si);
+    // })
   }
   createForm(arrData: Array<GroutingInfo> = []): FormGroup[] {
     return arrData.map(d => {

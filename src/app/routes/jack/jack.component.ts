@@ -5,6 +5,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { AppService } from 'src/app/services/app.service';
 import { nameRepetition } from 'src/app/Validator/async.validator';
+import { copyAny } from 'src/app/models/baseInit';
+import { tensionDeviceInit } from 'src/app/models/jackInit';
 
 @Component({
   selector: 'app-jack',
@@ -16,60 +18,7 @@ export class JackComponent implements OnInit {
   @ViewChild('leftMenu', null) leftMenu: LeftMenuComponent;
 
   formData: FormGroup;
-  data: TensionDevice = {
-    name: '模拟',
-    equation: false,
-    jackModel: '240Q',
-    pumpModel: 'CZB2X3-500',
-    A1: {
-      /** 千斤顶编号 */
-      jackNo: '00A1',
-      /** 油泵编号 */
-      pumpNo: 'LQ0001',
-      /** 标定系数a */
-      a: 1,
-      /** 标定系数b */
-      b: 0,
-      /** 标定日期 */
-      date: new Date()
-    },
-    A2: {
-      /** 千斤顶编号 */
-      jackNo: '00A2',
-      /** 油泵编号 */
-      pumpNo: 'LQ0002',
-      /** 标定系数a */
-      a: 1,
-      /** 标定系数b */
-      b: 0,
-      /** 标定日期 */
-      date: new Date()
-    },
-    B1: {
-      /** 千斤顶编号 */
-      jackNo: '00B1',
-      /** 油泵编号 */
-      pumpNo: 'LQ0001',
-      /** 标定系数a */
-      a: 1,
-      /** 标定系数b */
-      b: 0,
-      /** 标定日期 */
-      date: new Date()
-    },
-    B2: {
-      /** 千斤顶编号 */
-      jackNo: '00B2',
-      /** 油泵编号 */
-      pumpNo: 'LQ0002',
-      /** 标定系数a */
-      a: 1,
-      /** 标定系数b */
-      b: 0,
-      /** 标定日期 */
-      date: new Date()
-    }
-  };
+  data: TensionDevice = copyAny(tensionDeviceInit);
   deleteShow = false;
 
   constructor(
@@ -117,14 +66,13 @@ export class JackComponent implements OnInit {
   /**
    * * 编辑
    */
-  edit(data) {
-    console.log(data);
-    if (!data) {
+  edit(state: string) {
+    if (state === 'copy') {
       this.data.id = null;
-    } else {
-      this.data = data;
-      console.log(this.data, data);
+    } else if (state === 'add') {
+      this.data = copyAny(tensionDeviceInit);
     }
+    console.log('编辑', state, this.data);
     this.formInit();
   }
   /**

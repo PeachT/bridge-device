@@ -52,7 +52,7 @@ export class ServiceAppUpdateComponent implements OnInit {
     });
     console.log('检测更新init');
 
-    this.e.ipcRenderer.send('update');
+
     // 监听主进程
     this.e.ipcRenderer.on('update-message', (event, message) => {
       if (this.appS.updateState) {

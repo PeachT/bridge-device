@@ -3,7 +3,6 @@ import { DbService } from 'src/app/services/db.service';
 import { GroutingTask, MixingInfo, GroutingHoleItem, GroutingInfo } from 'src/app/models/grouting';
 import { Subscription } from 'rxjs';
 import { PLC_D, PLC_M } from 'src/app/models/IPCChannel';
-import { copyAny } from 'src/app/models/base';
 import { ElectronService } from 'ngx-electron';
 import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
@@ -11,6 +10,8 @@ import { waterBinderRatio, getDatetimeS } from 'src/app/Function/unit';
 import { PLCService } from 'src/app/services/plc.service';
 import { FC } from 'src/app/models/socketTCP';
 import {sleep} from 'sleep-ts';
+import { copyAny } from 'src/app/models/baseInit';
+import { mixingInfoInit, groutingHoleItemInit, processDataInit } from 'src/app/models/groutingInit';
 
 const cmdarrs = [
   // 完成标志
@@ -30,49 +31,50 @@ const cmdarrs = [
   { request: FC.FC3, address: PLC_D(520), value: 6, outKey: 'out7' },
 ];
 
-const groutingHoleItemBase: GroutingHoleItem = {
-  /** 压浆方向 */
-  direction: null,
-  /** 设置压浆压力 */
-  setGroutingPressure: null,
-  /** 环境温度 */
-  envTemperature: null,
-  /** 浆液温度 */
-  slurryTemperature: null,
-  /** 开始时间 */
-  startDate: null,
-  /** 完成时间 */
-  endDate: null,
-  /** 进浆压力 */
-  intoPulpPressure: null,
-  /** 回浆压力 */
-  outPulpPressure: null,
-  /** 进浆量 (L) */
-  intoPulpvolume: null,
-  /** 回浆量 (L) */
-  outPulpvolume: null,
-  /** 真空泵压力 */
-  vacuumPumpPressure: null,
-  /** 稳压时间 */
-  steadyTime: null,
-  /** 通过情况 */
-  passMsg: null,
-  /** 冒浆情况 */
-  slurryEmittingMsg: null,
-  /** 其他说明 */
-  remarks: null,
-  /** 压浆过程数据 */
-  processDatas: {
-    hz: 1,
-    intoPulpPressure: [],
-    outPulpPressure: [],
-    intoPulpvolume: [],
-    outPulpvolume: [],
-  },
-  /** 真空过程数据 */
-  vacuumPumpProcessDatas: null,
-  /** 其他数据信息 */
-};
+const groutingHoleItemBase: GroutingHoleItem = {...copyAny(groutingHoleItemInit), processDatas: copyAny(processDataInit)};
+// {
+//   /** 压浆方向 */
+//   direction: null,
+//   /** 设置压浆压力 */
+//   setGroutingPressure: null,
+//   /** 环境温度 */
+//   envTemperature: null,
+//   /** 浆液温度 */
+//   slurryTemperature: null,
+//   /** 开始时间 */
+//   startDate: null,
+//   /** 完成时间 */
+//   endDate: null,
+//   /** 进浆压力 */
+//   intoPulpPressure: null,
+//   /** 回浆压力 */
+//   outPulpPressure: null,
+//   /** 进浆量 (L) */
+//   intoPulpvolume: null,
+//   /** 回浆量 (L) */
+//   outPulpvolume: null,
+//   /** 真空泵压力 */
+//   vacuumPumpPressure: null,
+//   /** 稳压时间 */
+//   steadyTime: null,
+//   /** 通过情况 */
+//   passMsg: null,
+//   /** 冒浆情况 */
+//   slurryEmittingMsg: null,
+//   /** 其他说明 */
+//   remarks: null,
+//   /** 压浆过程数据 */
+//   processDatas: {
+//     hz: 1,
+//     intoPulpPressure: [],
+//     outPulpPressure: [],
+//     intoPulpvolume: [],
+//     outPulpvolume: [],
+//   },
+//   /** 真空过程数据 */
+//   vacuumPumpProcessDatas: null,
+//   /** 其他数据信息 */
+// };
 @Component({
   selector: 'app-live-grouting',
   templateUrl: './live-grouting.component.html',
@@ -86,28 +88,29 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
   /** 模板数据 */
   templateData: GroutingTask = null;
   /** 搅拌数据 */
-  mixingData: MixingInfo = {
-    /** 用量 */
-    dosage: [0, 0, 0, 0, 0, 0, 0],
-    /** 开始时间 */
-    startDate: null,
-    /** 完成时间 */
-    endDate: null,
-    /** 搅拌时间 */
-    mixingTime: null,
-    /** 泌水率 */
-    bleedingRate: null,
-    /** 流动度 */
-    fluidity: null,
-    /** 黏稠度 */
-    viscosity: null,
-    /** 水胶比 */
-    waterBinderRatio: null,
-    /** 水温 */
-    waterTemperature: null,
-    /** 环境温度 */
-    envTemperature: null,
-  };
+  mixingData: MixingInfo = {...copyAny(mixingInfoInit), dosage: [0, 0, 0, 0, 0, 0, 0]};
+  // {
+  //   /** 用量 */
+  //   dosage: [0, 0, 0, 0, 0, 0, 0],
+  //   /** 开始时间 */
+  //   startDate: null,
+  //   /** 完成时间 */
+  //   endDate: null,
+  //   /** 搅拌时间 */
+  //   mixingTime: null,
+  //   /** 泌水率 */
+  //   bleedingRate: null,
+  //   /** 流动度 */
+  //   fluidity: null,
+  //   /** 黏稠度 */
+  //   viscosity: null,
+  //   /** 水胶比 */
+  //   waterBinderRatio: null,
+  //   /** 水温 */
+  //   waterTemperature: null,
+  //   /** 环境温度 */
+  //   envTemperature: null,
+  // };
   mixingDataNow = {
     state: false,
     time: 0,
@@ -289,6 +292,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
     if (this.mixingDataNow.state && data[6] === '0' && data[0] === '0') {
       if (this.mixingDataNow.save) {
         const mixing: MixingInfo = {
+          ...mixingInfoInit,
           /** 用量 */
           dosage: this.mixingData.dosage,
           /** 开始时间 */
@@ -297,18 +301,8 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
           endDate: new Date(),
           /** 搅拌时间 */
           mixingTime: this.mixingDataNow.time,
-          /** 泌水率 */
-          bleedingRate: null,
-          /** 流动度 */
-          fluidity: null,
-          /** 黏稠度 */
-          viscosity: null,
           /** 水胶比 */
           waterBinderRatio: this.mixingData.waterBinderRatio,
-          /** 水温 */
-          waterTemperature: null,
-          /** 环境温度 */
-          envTemperature: null,
         };
         this.save(mixing, null);
       } else {
@@ -323,72 +317,6 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
     this.now.dosage = dosage;
     this.now.waterBinderRatio = waterBinderRatio(dosage);
   };
-  /** 请求数据 */
-  async send(backData) {
-    console.log(backData);
-    try {
-      this.out9(backData.out9);
-      this.out8(backData.out8);
-      const dosage = backData.out7.float.map(m => Number(m.toFixed(2)));
-      this.now = {
-        name: backData.out0.str.replace(/\0/g, ''),
-        holeName: backData.out1.str.replace(/\0/g, ''),
-        dosage,
-        waterBinderRatio: waterBinderRatio(dosage)
-      };
-      this.mixingData.dosage = backData.out2.float.map(m => Number(m.toFixed(2)));
-      this.mixingData.waterBinderRatio = waterBinderRatio(this.mixingData.dosage);
-      this.mixingData.mixingTime = backData.out3.int16[0];
-      /** 搅拌开始 */
-      if (!this.mixingDataNow.state && backData.out6[0]) {
-        this.mixingDataNow.state = true;
-        this.mixingDataNow.date = new Date();
-      }
-      /** 上料完成 */
-      if (this.mixingDataNow.state && !this.mixingDataNow.save && backData.out6[6] && this.mixingData.mixingTime > 0) {
-        this.mixingDataNow.time = this.mixingData.mixingTime;
-        this.mixingDataNow.save = true;
-      }
-      /** 搅拌完成 */
-      if (this.mixingDataNow.state && !backData.out6[6] && !backData.out6[0]) {
-        if (this.mixingDataNow.save) {
-          const mixing: MixingInfo = {
-            /** 用量 */
-            dosage: this.mixingData.dosage,
-            /** 开始时间 */
-            startDate: this.mixingDataNow.date,
-            /** 完成时间 */
-            endDate: new Date(),
-            /** 搅拌时间 */
-            mixingTime: this.mixingDataNow.time,
-            /** 泌水率 */
-            bleedingRate: null,
-            /** 流动度 */
-            fluidity: null,
-            /** 黏稠度 */
-            viscosity: null,
-            /** 水胶比 */
-            waterBinderRatio: this.mixingData.waterBinderRatio,
-            /** 水温 */
-            waterTemperature: null,
-            /** 环境温度 */
-            envTemperature: null,
-          };
-          console.error('搅拌完成', mixing);
-          this.save(mixing, null);
-        }
-        this.mixingDataNow.state = false;
-        this.mixingDataNow.save = false;
-      }
-      this.groutingHoleItem.intoPulpPressure = (backData.out4.float[0]).toFixed(2);
-      this.groutingHoleItem.steadyTime = backData.out5.int16[0];
-    } catch (error) {
-      console.error('转换数据有误', backData);
-    } finally {
-      this.cdr.detectChanges();
-      this.liveData();
-    }
-  }
   /** 压浆完成 */
   out8(data) {
     if (!(data instanceof Array)) {
@@ -410,6 +338,7 @@ export class LiveGroutingComponent implements OnInit, OnDestroy {
     }
     if (data[0] === '1' && !this.monitoringMsg.start) {
       this.liveSvg();
+
       this.monitoringMsg.start = true;
     }
     if (data[0] === '0' && this.monitoringMsg.start) {

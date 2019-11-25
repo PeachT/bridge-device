@@ -5,6 +5,9 @@ import { AppService } from 'src/app/services/app.service';
 import { Comp } from 'src/app/models/component';
 import { LeftMenuComponent } from 'src/app/shared/left-menu/left-menu.component';
 import { nameRepetition } from 'src/app/Validator/async.validator';
+import { createFrom } from './createForm';
+import { compInit } from 'src/app/models/componentInit';
+import { copyAny } from 'src/app/models/baseInit';
 
 @Component({
   selector: 'app-component',
@@ -18,11 +21,13 @@ export class ComponentComponent implements OnInit {
 
   formData: FormGroup;
   data: Comp = {
+    ...compInit,
     name: '模拟',
     hole: [
       {
         name: '空号',
-        holes: ['N1', 'N2']
+        holes: ['N1', 'N2'],
+        imgBase64: null
       }
     ]
   };
@@ -39,17 +44,19 @@ export class ComponentComponent implements OnInit {
   }
   /** 初始化数据 */
   formInit() {
-    const data = this.data;
-    const fb = new FormBuilder();
-    this.formData = fb.group({
-      id: [data.id],
-      /** 名称 */
-      name: [data.name, [Validators.required]],
-      hole: fb.array([])
-    });
+    // const data = this.data;
+    // const fb = new FormBuilder();
+    // this.formData = fb.group({
+    //   id: [data.id],
+    //   /** 名称 */
+    //   name: [data.name, [Validators.required]],
+    //   hole: fb.array([])
+    // });
 
     // this.formData.setValue(data);
-    console.log('初始化数据', data, !data.id && data.name);
+    // console.log('初始化数据', data, !data.id && data.name);
+    this.formData = createFrom(this.data);
+
     this.formData.controls.name.setAsyncValidators([nameRepetition(this.db, this.dbName)]);
     setTimeout(() => this.formData.controls.name.updateValueAndValidity(), 1);
   }
@@ -67,14 +74,13 @@ export class ComponentComponent implements OnInit {
   /**
    * * 编辑
    */
-  edit(data) {
-    console.log(data);
-    if (!data) {
+  edit(state: string) {
+    if (state === 'copy') {
       this.data.id = null;
-    } else {
-      this.data = data;
-      console.log(this.data, data);
+    } else if (state === 'add'){
+      this.data = copyAny(compInit);
     }
+    console.log('编辑', state, this.data);
     this.formInit();
   }
   /**

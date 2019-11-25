@@ -10,6 +10,8 @@ import { AddOtherComponent } from 'src/app/shared/add-other/add-other.component'
 import { uploadingData } from 'src/app/Function/uploading';
 import { upFormData } from 'src/app/Function/uploadingOther';
 import { otherInfoForm } from 'src/app/shared/add-other/createFrom';
+import { projectInit } from 'src/app/models/projectInit';
+import { copyAny } from 'src/app/models/baseInit';
 
 
 @Component({
@@ -25,6 +27,7 @@ export class ProjectComponent implements OnInit, OnChanges {
 
   formData: FormGroup;
   data: Project = {
+    ...projectInit,
     id: null,
     name: '模拟数据',
     /** 监理 */
@@ -127,16 +130,16 @@ export class ProjectComponent implements OnInit, OnChanges {
   /**
    * *编辑
    */
-  edit(data) {
+  edit(state: string) {
     /** 复制一条数据 */
-    if (!data) {
+    if (state === 'copy') {
       this.data.id = null;
     /** 添加一条数据 */
-    } else {
-      this.data = data;
+    } else if (state === 'add') {
+      this.data = copyAny(projectInit);
     }
-    this.formInit(data);
-    console.log(this.data, data);
+    console.log('编辑', state, this.data);
+    this.formInit(this.data);
   }
   /**
    * *编辑完成

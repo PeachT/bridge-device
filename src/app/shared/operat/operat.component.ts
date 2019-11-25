@@ -4,7 +4,6 @@ import { Project } from 'src/app/models/project';
 import { NzMessageService, NzModalService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
 import { FormGroup } from '@angular/forms';
-import { getModelBase } from 'src/app/models/base';
 import { PLCService } from 'src/app/services/plc.service';
 
 @Component({
@@ -25,7 +24,7 @@ export class OperatComponent implements OnInit, OnChanges, DoCheck {
 
   @Output() outEditOk = new EventEmitter();
   @Output() outCancelEdit = new EventEmitter();
-  @Output() outEdit = new EventEmitter();
+  @Output() outEdit = new EventEmitter<string>();
   @Output() outModification = new EventEmitter();
   @Output() outDelete = new EventEmitter();
 
@@ -115,12 +114,12 @@ export class OperatComponent implements OnInit, OnChanges, DoCheck {
   /**
    * *true:添加 | false:复制
    */
-  edit(state: boolean) {
+  edit(state: string) {
     this.appS.edit = true;
     this.appS.editId = null;
     this.appS.leftMenu = null;
-    const data = state ? getModelBase(this.dbName) : null;
-    this.outEdit.emit(data);
+    // const data = state ? getModelBase(this.dbName) : null;
+    this.outEdit.emit(state);
     this.cdr.markForCheck();
   }
   /** 修改 */

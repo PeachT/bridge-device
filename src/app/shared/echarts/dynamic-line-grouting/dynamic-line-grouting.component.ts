@@ -33,7 +33,8 @@ const data: ProcessData = {
     80, 90, 66, 77, 88,
     92, 99, 80, 60, 50,
     45, 32, 30, 26, 10,
-  ]
+  ],
+  msg: []
 };
 @Component({
   // tslint:disable-next-line:component-selector

@@ -11,10 +11,11 @@ import { ElectronService } from 'ngx-electron';
 import { unit } from 'src/app/Function/unit';
 import { downloadFile } from 'src/app/Function/dowmloadFile';
 import { inHMIFile } from './inHMIFile';
-import { getModelBase, baseEnum } from 'src/app/models/base';
 import { format } from 'date-fns';
 import { utf8_to_b64 } from 'src/app/Function/stringToBase64';
 import { compress, decompress, compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
+import { groutingHoleItemInit } from 'src/app/models/groutingInit';
+import { copyAny } from 'src/app/models/baseInit';
 
 @Component({
   selector: 'app-data-in-out',
@@ -292,7 +293,7 @@ export class DataInOutComponent implements OnInit {
           uploading: false,
           groups: item.groups.map(hs => {
             return {
-              ...getModelBase(baseEnum.groutingHoleitem),
+              ...copyAny(groutingHoleItemInit),
               direction: tempdata.groutingInfo[0].groups[0].direction,
               setPulpvolume: tempdata.groutingInfo[0].groups[0].setPulpvolume,
               setVacuumPumpPressure: tempdata.groutingInfo[0].groups[0].setVacuumPumpPressure,

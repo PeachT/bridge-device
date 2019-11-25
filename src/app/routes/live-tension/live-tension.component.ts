@@ -19,7 +19,7 @@ import { TcpLive } from 'src/app/models/tensionLive';
 import { sleep } from 'sleep-ts';
 import { DbService, DbEnum } from 'src/app/services/db.service';
 import { nameRepetition } from 'src/app/Validator/async.validator';
-import { copyAny } from 'src/app/models/base';
+import { copyAny } from 'src/app/models/baseInit';
 
 enum JackModeEnum {
   '4顶两端' = 42,
@@ -114,7 +114,7 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
   /** 自动下载计数 */
   autoDownCount = 0;
   /** 启动延时 */
-  runPLCT: NodeJS.Timeout;
+  runPLCT: any;
   /** 梁张拉完成 */
   tensionSuccessAll = false;
   /** 复制新梁 */
@@ -735,6 +735,7 @@ export class LiveTensionComponent implements OnInit, OnDestroy {
       console.log(`${msg}失败😔`, r.msg);
     }
   }
+  /** 构建新数据 */
   createNewData() {
     this.tensionNot = [];
     this.newData = copyAny(this.data);

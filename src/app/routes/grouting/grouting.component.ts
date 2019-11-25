@@ -3,7 +3,6 @@ import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
-import { getModelBase, baseEnum } from 'src/app/models/base';
 import { Project } from 'src/app/models/project';
 import { HttpService } from 'src/app/services/http.service';
 import { uploadingData } from 'src/app/Function/uploading';
@@ -11,7 +10,9 @@ import { GroutingTask, GroutingHoleItem } from 'src/app/models/grouting';
 import { nameRepetition } from 'src/app/Validator/async.validator';
 import { upFormData } from 'src/app/Function/uploadingOther';
 import { ScrollMenuComponent } from 'src/app/shared/scroll-menu/scroll-menu.component';
-import { otherInfoForm } from 'src/app/shared/add-other/createFrom';
+import { createForm } from './createForm';
+import { mixingInfoInit, processDataInit, groutingHoleItemInit, groutingInfoInit, groutingTaskInit, getGroutingInfoInit } from 'src/app/models/groutingInit';
+import { copyAny } from 'src/app/models/baseInit';
 
 @Component({
   selector: 'app-grouting',
@@ -24,6 +25,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
   @ViewChild('menu', null) menuDom: ScrollMenuComponent;
 
   data: GroutingTask = {
+    ...groutingTaskInit,
     id: null,
     name: '测试base',
     createdDate: null,
@@ -67,42 +69,15 @@ export class GroutingComponent implements OnInit, OnDestroy {
     /** 压浆数据 */
     groutingInfo: [
       {
+        ...groutingInfoInit,
         /** 孔号 */
         name: 'N1',
         /** 压浆孔道采集数据 */
         groups: [
           {
-            /** 压浆方向 */
-            direction: null,
-            /** 设置压浆压力 */
-            setGroutingPressure: null,
-            /** 环境温度 */
-            envTemperature: null,
-            /** 浆液温度 */
-            slurryTemperature: null,
-            /** 开始时间 */
-            startDate: new Date(),
-            /** 完成时间 */
-            endDate: new Date(),
-            /** 进浆压力 */
-            intoPulpPressure: null,
-            /** 回浆压力 */
-            outPulpPressure: null,
-            /** 进浆量 (L) */
-            intoPulpvolume: null,
-            /** 回浆量 (L) */
-            outPulpvolume: null,
-            /** 真空泵压力 */
-            vacuumPumpPressure: null,
-            /** 稳压时间 */
-            steadyTime: null,
-            /** 通过情况 */
-            passMsg: null,
-            /** 冒浆情况 */
-            slurryEmittingMsg: null,
-            /** 其他说明 */
-            remarks: null,
+            ...groutingHoleItemInit,
             processDatas: {
+              ...processDataInit,
               hz: 1,
               intoPulpPressure: [
                 0, 0.2, 0.3, 0.28, 0.3,
@@ -141,44 +116,22 @@ export class GroutingComponent implements OnInit, OnDestroy {
         uploading: true,
         /** 压浆状态 */
         state: 2,
+        otherInfo: []
       },
       {
+        ...groutingInfoInit,
         /** 孔号 */
         name: 'N2',
         /** 压浆孔道采集数据 */
         groups: [
           {
-            /** 压浆方向 */
-            direction: null,
-            /** 设置压浆压力 */
-            setGroutingPressure: null,
-            /** 环境温度 */
-            envTemperature: null,
-            /** 浆液温度 */
-            slurryTemperature: null,
+            ...groutingHoleItemInit,
             /** 开始时间 */
             startDate: new Date(),
             /** 完成时间 */
             endDate: new Date(),
-            /** 进浆压力 */
-            intoPulpPressure: null,
-            /** 回浆压力 */
-            outPulpPressure: null,
-            /** 进浆量 (L) */
-            intoPulpvolume: null,
-            /** 回浆量 (L) */
-            outPulpvolume: null,
-            /** 真空泵压力 */
-            vacuumPumpPressure: null,
-            /** 稳压时间 */
-            steadyTime: null,
-            /** 通过情况 */
-            passMsg: null,
-            /** 冒浆情况 */
-            slurryEmittingMsg: null,
-            /** 其他说明 */
-            remarks: null,
             processDatas: {
+              ...processDataInit,
               hz: 1,
               intoPulpPressure: [
                 0, 0.2, 0.3, 0.28, 0.3,
@@ -207,37 +160,13 @@ export class GroutingComponent implements OnInit, OnDestroy {
             }
           },
           {
-            /** 压浆方向 */
-            direction: null,
-            /** 设置压浆压力 */
-            setGroutingPressure: null,
-            /** 环境温度 */
-            envTemperature: null,
-            /** 浆液温度 */
-            slurryTemperature: null,
+            ...groutingHoleItemInit,
             /** 开始时间 */
             startDate: new Date(),
             /** 完成时间 */
             endDate: new Date(),
-            /** 进浆压力 */
-            intoPulpPressure: null,
-            /** 回浆压力 */
-            outPulpPressure: null,
-            /** 进浆量 (L) */
-            intoPulpvolume: null,
-            /** 回浆量 (L) */
-            outPulpvolume: null,
-            /** 真空泵压力 */
-            vacuumPumpPressure: null,
-            /** 稳压时间 */
-            steadyTime: null,
-            /** 通过情况 */
-            passMsg: null,
-            /** 冒浆情况 */
-            slurryEmittingMsg: null,
-            /** 其他说明 */
-            remarks: null,
             processDatas: {
+              ...processDataInit,
               hz: 1,
               intoPulpPressure: [
                 0, 0.2, 0.3, 0.28, 0.3,
@@ -281,6 +210,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
     /** 搅拌数据 */
     mixingInfo: [
       {
+        ...mixingInfoInit,
         /** 用量 */
         dosage: [30, 100, 10],
         /** 开始时间 */
@@ -302,6 +232,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
         envTemperature: 35,
       },
       {
+        ...mixingInfoInit,
         /** 用量 */
         dosage: [300, 1000, 100],
         /** 开始时间 */
@@ -359,54 +290,17 @@ export class GroutingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    setTimeout(() => {
-      this.formInit(this.data);
-    }, 300);
+    this.formInit(this.data);
+    // setTimeout(() => {
+    // }, 300);
   }
   async getPorject(): Promise<Project> {
     return await this.odb.getOneAsync('project', (p: Project) => p.id === this.menuDom.projectId);
   }
   /** 初始化数据 */
   formInit(data: GroutingTask) {
-    const fb = new FormBuilder();
-    this.formData = fb.group({
-      id: [data.id],
-      project: [data.project],
-      /** 梁号 */
-      name: [data.name, [Validators.required]],
-      /** 构建 */
-      component: [data.component, [Validators.required]],
-      /** 梁长度 */
-      beamLength: [data.beamLength, [Validators.required]],
-      /** 张拉日期 */
-      tensionDate: [data.tensionDate, [Validators.required]],
-      /** 浇筑日期 */
-      castingDate: [data.castingDate, [Validators.required]],
-      /** 压浆顺序 */
-      sort: [data.sort],
-      /** 设备编号 */
-      deviceNo: [data.deviceNo],
-      /** 是否作为模板 */
-      template: [data.template],
-      /** 其他数据信息 */
-      otherInfo: otherInfoForm(data.otherInfo),
-      /** 施工员 */
-      operator: [data.operator],
-      /** 监理员 */
-      supervisors: [data.supervisors],
-      /** 自检员 */
-      qualityInspector: [data.qualityInspector],
-      /** 配比信息 */
-      proportionInfo: fb.group({
-        waterBinderRatio: [0.28],
-        proportions: fb.array([])
-      }),
-      /** 搅拌数据 */
-      mixingInfo: fb.array([]),
-      groutingInfo: fb.array([]),
-    });
-    // this.formData.setValue(data);
     console.log('初始化数据', data, !data.id && data.name);
+    this.formData = createForm(data);
     this.formData.controls.name.setAsyncValidators([nameRepetition(this.odb, this.dbName, this.updateFilterFun)]);
     setTimeout(() => {
       console.log('测试验证');
@@ -420,7 +314,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
     console.log(value);
     const groutingInfo = [];
     value.map(name => {
-      const g = { ...getModelBase(baseEnum.groutingInfo), name };
+      const g = { ...getGroutingInfoInit(), name };
       groutingInfo.push(g)
     });
     console.log(groutingInfo);
@@ -474,12 +368,12 @@ export class GroutingComponent implements OnInit, OnDestroy {
   /**
    * *编辑/添加
    */
-  async onEdit(data: GroutingTask, modification = false) {
+  async onEdit(state: string, modification = false) {
     const project = await this.getPorject();
     if (!modification) {
       /** 复制 */
-      if (!data) {
-        data = { ...this.data };
+      if (state === 'copy') {
+        const data = copyAny(this.data);
         data.id = null;
         data.tensionDate = null;
         data.castingDate = null;
@@ -490,7 +384,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
           const groups: Array<GroutingHoleItem> = [];
           for (const item of g.groups) {
             // tslint:disable-next-line:max-line-length
-            groups.push({ ...getModelBase(baseEnum.groutingHoleitem), direction: item.direction, setGroutingPressure: item.setGroutingPressure });
+            groups.push({ ...copyAny(groutingHoleItemInit), direction: item.direction, setGroutingPressure: item.setGroutingPressure });
           }
           g.groups = groups;
           console.log(g);
@@ -499,9 +393,8 @@ export class GroutingComponent implements OnInit, OnDestroy {
 
         this.data = data;
         /** 添加 */
-      } else {
-        this.data = getModelBase(baseEnum.groutingTask);
-        this.data.project = this.menuDom.projectId;
+      } else if (state === 'add') {
+        this.data = {...copyAny(groutingTaskInit), project: this.menuDom.projectId};
       }
       const other = this.projectAddOther(project);
       if (other) {
@@ -511,7 +404,7 @@ export class GroutingComponent implements OnInit, OnDestroy {
     } else {
       this.formData.controls.name.updateValueAndValidity();
     }
-    console.log('添加', this.data, project, this.otherUnDel);
+    console.log('编辑', state, this.data);
     this.formInit(this.data);
   }
   /** 处理项目其他数据添加 */
@@ -570,18 +463,20 @@ export class GroutingComponent implements OnInit, OnDestroy {
       case 'xalj':
         url = uploadingData.xalj(proj.uploadingLinkData);
         data = uploadingData.xaljData(this.data);
+        console.log(data);
+        // return;
         data.map(g => {
           this.http.post(url, { Data: g }).subscribe(r => {
           }, err => {
             const result: any = decodeURI(err.error.text);
             if (result.indexOf('压浆数据上传完成') !== -1) {
-              ups.push({success: true, name: g.holeNO});
+              ups.push({ success: true, name: g.holeNO });
               this.message.success(`${g.holeNO}上传成功`);
               if (data.length === ups.length) {
                 this.updataDB(ups);
               }
             } else {
-              ups.push({success: false, name: g.holeNO});
+              ups.push({ success: false, name: g.holeNO });
               this.message.error(`${g.holeNO}上传失败 \n错误：${result}`);
               if (data.length === ups.length) {
                 this.updataDB(ups);
@@ -602,17 +497,17 @@ export class GroutingComponent implements OnInit, OnDestroy {
             this.http.post1(urld).subscribe(r => {
               console.log(r);
               if ('CODE' in r && r.CODE !== 1) {
-                ups.push({success: true, name: g.STEELBEAMNO});
+                ups.push({ success: true, name: g.STEELBEAMNO });
                 this.message.success(`${g.STEELBEAMNO}上传成功`);
               } else {
-                ups.push({success: false, name: g.STEELBEAMNO});
+                ups.push({ success: false, name: g.STEELBEAMNO });
                 this.message.error(`${g.STEELBEAMNO}上传失败 \n错误：${JSON.stringify(r)}`);
               }
               if (data.length === ups.length) {
                 this.updataDB(ups);
               }
             }, err => {
-              ups.push({success: false, name: g.STEELBEAMNO});
+              ups.push({ success: false, name: g.STEELBEAMNO });
               this.message.error('上传错误！！！');
               if (data.length === ups.length) {
                 this.updataDB(ups);

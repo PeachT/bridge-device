@@ -2,7 +2,7 @@
   <div class="sider sider-menu">
     <app-left-menu [dbName]="dbName" (menuChange)="onMneu($event)" #leftMenu></app-left-menu>
   </div>
-  <div class="main scroll-y">
+  <div class="main scroll-y" *ngIf="formData">
       <app-operat
         [dbName]="dbName"
         [formData]="formData"
@@ -19,7 +19,7 @@
           <nz-autocomplete [nzDataSource]="bridgeOtherKeySelect()" #auto> </nz-autocomplete>
         </app-form-item>
         <div>
-          <component-birdge-model [formGroup]="formData" [data]="data.hole"></component-birdge-model>
+          <component-birdge-model [formGroup]="formData" [data]="data.hole" [edit]="appS.edit"></component-birdge-model>
         </div>
         <div class="edit" *ngIf="!appS.edit"></div>
       </form>

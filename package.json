@@ -11,7 +11,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json",
-    "build": "ng build",
+    "build": "ng build --prod --build-optimizer --aot",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
@@ -19,11 +19,11 @@
     "dev": "concurrently \"ng serve\" \"electron . --dev\"",
     "edev": "electron . --dev",
     "edev-9222": "electron . --remote-debugging-port=9222",
-    "win-ng-pack": "ng build --prod --build-optimizer && electron-builder -w",
+    "win-ng-pack": "ng build --prod --build-optimizer --aot && electron-builder -w",
     "win-pack": "electron-builder -w",
     "win-pack32": "electron-builder --ia32 --x64 -w",
     "linux-ng-pack": "ng build && electron-builder --linux",
-    "linux-ng-prod-pack": "ng build --prod --build-optimizer && electron-builder --linux",
+    "linux-ng-prod-pack": "ng build --prod --build-optimizer --aot && electron-builder --linux",
     "linux-pack": "electron-builder --linux",
     "all-pack": "electron-builder -mwl"
   },
@@ -89,11 +89,11 @@
     "publish": [
       {
         "provider": "generic",
-        "url": "http://47.107.59.12/upDateApp/"
+        "url": "http://47.107.59.12:8089/upDateApp/"
       }
     ],
     "win": {
-      "icon": "build/icons/lq/256x256.ico",
+      "icon": "build/icons/all/256x256.ico",
       "target": [
         {
           "target": "nsis",
@@ -113,7 +113,7 @@
       "target": [
         "deb"
       ],
-      "icon": "build/icons/lq"
+      "icon": "build/icons/all"
     }
   },
   "keywords": [

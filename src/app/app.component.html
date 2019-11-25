@@ -1,9 +1,9 @@
-<link-button></link-button>
+<link-button *ngIf="e.isElectronApp"></link-button>
 
 <div style="height: 100%; width: 100%;">
   <router-outlet></router-outlet>
 </div>
-<nz-modal [nzVisible]="appS.powerState" nzTitle="" [nzFooter]="null" [nzMaskClosable]="!appS.powerDelayT" nzClosable="false" (nzOnCancel)="appS.powerState = false">
+<nz-modal *ngIf="e.isElectronApp" [nzVisible]="appS.powerState" nzTitle="" [nzFooter]="null" [nzMaskClosable]="!appS.powerDelayT" nzClosable="false" (nzOnCancel)="appS.powerState = false">
   <div class="power-btn">
     <ng-container *ngIf="!appS.powerDelayT">
       <button class="login-out" (click)="loginOut()"> <i nz-icon nzType="logout" style="color:dodgerblue"></i> 登 出 </button>
@@ -19,4 +19,18 @@
   </div>
 </nz-modal>
 <!-- <app-fomr [formDynamin]="formDynamic"></app-fomr> -->
-<app-service-app-update></app-service-app-update>
+<app-service-app-update *ngIf="e.isElectronApp"></app-service-app-update>
+
+<nz-modal [nzVisible]="appS.codeState" nzTitle="注册码" [nzFooter]="null" nzClosable="false">
+  <div >
+    <h1>{{uuid}}</h1>
+    <nz-input-group nzSearch nzSize="large" [nzAddOnAfter]="suffixButton">
+      <input type="text" nz-input placeholder="注册码" [(ngModel)]="code" nzSize="large" />
+    </nz-input-group>
+  </div>
+</nz-modal>
+
+
+<ng-template #suffixButton>
+  <button nz-button nzType="primary" nzSize="large" (click)="codeFunc()" nzSearch>注 册</button>
+</ng-template>

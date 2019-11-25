@@ -75,7 +75,7 @@
             (outEditOk)="editOk($event)"
             (outDelete)="delete()"
             (outCancelEdit)="cancelEdit()"
-            (outModification)="onEdit(null, true)"
+            (outModification)="onEdit('modification')"
             >
             <button nz-button nzType="primary" (click)="upload()"
               [disabled]="!(data?.groutingInfo?.length > 0) || !uploading"><i nz-icon nzType="cloud-upload"

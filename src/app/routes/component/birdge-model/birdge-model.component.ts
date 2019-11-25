@@ -6,6 +6,7 @@ import { Hole } from 'src/app/models/component';
 import { DomSanitizer } from '@angular/platform-browser';
 import { onImg } from 'src/app/models/base64';
 import { NzMessageService } from 'ng-zorro-antd';
+import { bridgeControl } from '../createForm';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -19,6 +20,7 @@ export class BirdgeModelComponent implements OnInit, OnChanges {
   /** 候选的KEY */
   @Input() keys = [];
   @Input() data: Array<Hole> = [];
+  @Input() edit = false;
   /** 上传图片地址 */
   imgsrc: string;
   imgBase64: any;
@@ -39,9 +41,11 @@ export class BirdgeModelComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.createForm(this.data).map(si => {
-      this.forFormArr.push(si)
-    })
+    // console.log('数据更新');
+
+    // this.createForm(this.data).map(si => {
+    //   this.forFormArr.push(si)
+    // })
   }
 
   /** 其他信息 */
@@ -61,8 +65,7 @@ export class BirdgeModelComponent implements OnInit, OnChanges {
   }
   /** 添加其他数据 */
   add() {
-    const length = this.forFormArr.value.length;
-    this.forFormArr.push(this.createControl(length));
+    this.forFormArr.push(bridgeControl(this.forFormArr.value.length));
   }
   /** 删除其他数据 */
   remove(index: number) {

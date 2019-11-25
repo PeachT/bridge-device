@@ -114,7 +114,7 @@ function updateHandle() {
   const os = require('os');
   autoUpdater.autoDownload = false;
   // http://localhost:5500/up/ 更新文件所在服务器地址
-  autoUpdater.setFeedURL('http://47.107.59.12/upDateApp/');
+  autoUpdater.setFeedURL('http://47.107.59.12:8089/upDateApp/');
   autoUpdater.on('error', (info) => {
     sendUpdateMessage({msg: 'error', info});
   });

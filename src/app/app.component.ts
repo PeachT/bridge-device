@@ -1,22 +1,24 @@
-import { Component, OnInit, ChangeDetectorRef } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { ElectronService } from "ngx-electron";
 import { AppService } from "./services/app.service";
-import { DbService, DB } from "./services/db.service";
+import { DbService, DB, DbEnum } from "./services/db.service";
 import { NzMessageService } from "ng-zorro-antd";
 import { User } from "./models/user.models";
 import { Router, NavigationEnd } from "@angular/router";
-import { getModelBase } from "./models/base";
 import { Project } from "./models/project";
 import { PLCService } from './services/plc.service';
-import { interval, fromEvent, Observable } from 'rxjs';
-import { map, debounceTime } from 'rxjs/operators';
-import { format } from 'date-fns';
-import { trigger, transition, style, query, animateChild, animate, group } from '@angular/animations';
+import { fromEvent } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { trigger, transition, style, query, animate, group } from '@angular/animations';
 import { Store } from '@ngrx/store';
 import { NgrxState } from './ngrx/reducers';
 import { resetTcpLive } from './ngrx/actions/tcpLink.action';
-import { TcpLive } from './models/tensionLive';
 import { goRouter } from './ngrx/actions/router.action';
+import { userInit } from './models/userInit';
+import { copyAny } from './models/baseInit';
+import { projectInit } from './models/projectInit';
+import { uuid, unit } from './Function/unit';
+import { unitInfo } from './models/unitInit';
 
 @Component({
   selector: "app-root",
@@ -25,15 +27,19 @@ import { goRouter } from './ngrx/actions/router.action';
   animations: [
     trigger('routeAnimation', [
       transition('* => *', [
-        query(':enter', style({ opacity: 0}), { optional: true }),
+        query(':enter', style({ opacity: 0 }), { optional: true }),
         group([
-          query(':enter', animate('.3s ease-in-out', style({opacity: 1})), { optional: true }),
+          query(':enter', animate('.3s ease-in-out', style({ opacity: 1 })), { optional: true }),
         ])
       ]),
     ])
   ]
 })
 export class AppComponent implements OnInit {
+  /** 注册码 */
+  uuid = `${((new Date().getTime()).toString()).slice(-1)}${((new Date().getTime()).toString()).slice(-6, -1)}`;
+  code = null;
+  // codeState = false;
   time$ = null;
   // time$ = interval(1000).pipe(
   //   map(_ => format(new Date(), "H:mm:ss"))
@@ -46,6 +52,7 @@ export class AppComponent implements OnInit {
   // router跳转动画所需参数
   routerState = true;
   routerStateCode = 'active';
+  addFilterFun: (o1: any, o2: any) => boolean = (o1: any, o2: any) => o1.name === o2.name;
   constructor(
     public e: ElectronService,
     private odb: DbService,
@@ -55,7 +62,6 @@ export class AppComponent implements OnInit {
 
     public PLCS: PLCService,
     private store$: Store<NgrxState>,
-    private crd: ChangeDetectorRef,
   ) {
     console.log("平台", this.appS.platform);
     // 判断运行环境适合是 Electron
@@ -72,22 +78,30 @@ export class AppComponent implements OnInit {
         // 每次路由跳转改变状态动画切换
         this.routerState = !this.routerState;
         this.routerStateCode = this.routerState ? 'active' : 'inactive';
-        this.store$.dispatch(goRouter({routerInfo: {url: event.url, state: false }}))
+        this.store$.dispatch(goRouter({ routerInfo: { url: event.url, state: false } }))
       }
     });
   }
   async ngOnInit() {
+    const info = JSON.parse(localStorage.getItem('unitInfo'));
+    if (!info) {
+      this.appS.codeState = true;
+      // localStorage.setItem('unitInfo', JSON.stringify(this.info.unit));
+    } else {
+      this.appS.info.unit = info;
+    }
+
     this.store$.dispatch(resetTcpLive(null))
     const doby = document.getElementsByTagName('body')[0];
-    console.warn(doby.offsetWidth);
+    console.warn(doby.offsetWidth, this.e.isElectronApp);
     this.appS.bodyWidth = doby.offsetWidth;
     // 页面监听
     fromEvent(window, 'resize').pipe(
       debounceTime(300) // 以免频繁处理
-      ).subscribe((event) => {
-        // 这里处理页面变化时的操作
-        this.appS.bodySize.next(doby.offsetWidth);
-        this.appS.bodyWidth = doby.offsetWidth;
+    ).subscribe(() => {
+      // 这里处理页面变化时的操作
+      this.appS.bodySize.next(doby.offsetWidth);
+      this.appS.bodyWidth = doby.offsetWidth;
     });
     /** 添加管理员 */
     await this.db.users
@@ -96,57 +110,39 @@ export class AppComponent implements OnInit {
         console.log("获取用户数量", data);
         if (data === 0) {
           const user: User = {
+            ...userInit,
             name: "Administrator",
             password: "admin",
             jurisdiction: 9,
             operation: [],
-            createdDate: new Date().getTime(),
-            modificationDate: new Date().getTime(),
+            createdDate: new Date(),
+            modificationDate: new Date(),
             user: "sys"
           };
-          this.db.users
-            .add(user)
-            .then(() => {
-              // // this.message.success("添加成功🙂");
-            })
-            .catch(() => {
-              this.message.error("添加失败😔");
-            });
+          await this.odb.addAsync(DbEnum.users, user, (o: any) => this.addFilterFun(o, user));
           const user2: User = {
+            ...userInit,
             name: "技术员",
             password: "123456",
             jurisdiction: 1,
             operation: [],
-            createdDate: new Date().getTime(),
-            modificationDate: new Date().getTime(),
+            createdDate: new Date(),
+            modificationDate: new Date(),
             user: "sys"
           };
-          this.db.users
-            .add(user2)
-            .then(() => {
-              // // this.message.success("添加成功🙂");
-            })
-            .catch(() => {
-              this.message.error("添加失败😔");
-            });
+          await this.odb.addAsync(DbEnum.users, user2, (o: any) => this.addFilterFun(o, user2));
           for (let index = 0; index < 10; index++) {
-            const user1: User = {
+            const user3: User = {
+              ...userInit,
               name: `admin${index}`,
               password: "admin",
               jurisdiction: 8,
               operation: [],
-              createdDate: new Date().getTime(),
-              modificationDate: new Date().getTime(),
+              createdDate: new Date(),
+              modificationDate: new Date(),
               user: "sys"
             };
-            this.db.users
-              .add(user1)
-              .then(() => {
-                // this.message.success("添加成功🙂");
-              })
-              .catch(() => {
-                this.message.error("添加失败😔");
-              });
+            await this.odb.addAsync(DbEnum.users, user3, (o: any) => this.addFilterFun(o, user3));
           }
         }
       })
@@ -156,44 +152,36 @@ export class AppComponent implements OnInit {
     /** 添加测试项目 */
     await this.db.project
       .count()
-      .then(data => {
+      .then(async data => {
         console.log("获取项目数量", data);
         if (data === 0) {
-          const project: Project = getModelBase("project");
+          const project: Project = copyAny(projectInit);
           project.name = "测试项目";
           project.jurisdiction = 8;
-          delete project.id;
-          this.db.project
-            .add(project)
-            .then(() => {
-              this.message.success('数据初始化完成');
-              this.router.navigate(["/help"]);
-            })
-            .catch(err => {
-              console.log(err);
-              this.message.error("项目添加失败😔");
-            });
+          await this.odb.addAsync(DbEnum.project, project, (o: any) => this.addFilterFun(o, project));
+          this.message.success('数据初始化完成');
+          this.router.navigate(["/login"]);
         }
       })
       .catch(error => {
         console.log("数据库错误！！", error);
       });
-    let keyboard = JSON.parse(localStorage.getItem("keyboard"));
-    if (!keyboard) {
-      console.log("没有数据");
-      keyboard = {
-        number: {
-          w: 240,
-          h: 320
-        },
-        text: {
-          w: 660,
-          h: 320
-        }
-      };
-      localStorage.setItem("keyboard", JSON.stringify(keyboard));
-    }
-    if (this.appS.Environment) {
+    if (this.e.isElectronApp) {
+      let keyboard = JSON.parse(localStorage.getItem("keyboard"));
+      if (!keyboard) {
+        console.log("没有数据");
+        keyboard = {
+          number: {
+            w: 240,
+            h: 320
+          },
+          text: {
+            w: 660,
+            h: 320
+          }
+        };
+        localStorage.setItem("keyboard", JSON.stringify(keyboard));
+      }
       console.log("在 Electron 中运行");
       // 监听主进程
       this.e.ipcRenderer.on("message", (event, message) => {
@@ -332,5 +320,34 @@ export class AppComponent implements OnInit {
     console.log("取消");
     clearTimeout(this.appS.powerDelayT);
     this.appS.powerDelayT = null;
+  }
+  /**  */
+  codeFunc() {
+    console.log(this.code);
+    const uuidArr = Array.from(this.uuid).map(m => Number(m));
+    let m1 = uuidArr.reduce((ia, ic) => ia + ic);
+    m1 = m1 < 10 ? m1 * 10 : m1;
+
+    // const su = Number(`${m1 + 1}${new Date().getFullYear()}`);
+    // // // tslint:disable-next-line:no-bitwise
+    // const su1 = Number(this.uuid) + Number(su);
+
+    // console.log(su1, su);
+    // console.log(su1 - su);
+    // console.log(su1 - Number(this.uuid));
+    // console.log((su1 - Number(this.uuid)).toString().slice(0, 2), m1);
+
+    if (this.code) {
+      const c1 = Number((Number(this.code) - Number(this.uuid)).toString().slice(0, 2)) - m1;
+      const u = unitInfo[c1];
+      console.log(c1, u);
+      if (u) {
+        this.appS.codeState = false;
+        localStorage.setItem('unitInfo', JSON.stringify(u));
+        this.appS.info.unit = u;
+      } else {
+        this.message.error('输入验证码错误！！')
+      }
+    }
   }
 }

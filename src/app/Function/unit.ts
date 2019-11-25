@@ -43,7 +43,7 @@ export function getJSDate(date: Date | string | number = null): Date {
 /** UUID */
 export function uuid() {
   const s = [];
-  const hexDigits = "0123456789abcdef";
+  const hexDigits = "0123456789abcdefghijklmnopqrstuvwsyz";
   for (let i = 0; i < 36; i++) {
       s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
   }

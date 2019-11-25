@@ -9,15 +9,15 @@ import { ElectronService } from 'ngx-electron';
 
 const menus = [
   { platform: 'tension,windows', jurisdiction: 0, url: '/tension', icon: 'icon-renwuguanli', name: '张拉' , uid: null},
-  { platform: 'tension,windows', jurisdiction: 1, url: '/tension-setting', icon: 'icon-settings-1', name: '张拉设置' , uid: null},
+  { platform: 'tension,windows,electron', jurisdiction: 1, url: '/tension-setting', icon: 'icon-settings-1', name: '张拉设置' , uid: null},
   { platform: 'tension,windows', jurisdiction: 1, url: '/jack', icon: 'icon-yeyaxitong', name: '千斤顶' , uid: null},
   { platform: 'tension,windows', jurisdiction: 0, url: '/live-tension', icon: 'icon-jiankong', name: '张拉监控', uid: 'tensionLink' },
   { platform: 'grouting,windows', jurisdiction: 0, url: '/grouting', icon: 'icon-renwufenpei', name: '压浆' , uid: null},
-  { platform: 'grouting,windows', jurisdiction: 1, url: '/grouting-setting', icon: 'icon-185096settingsstreamline', name: '压浆设置' , uid: null},
+  { platform: 'grouting,windows,electron', jurisdiction: 1, url: '/grouting-setting', icon: 'icon-185096settingsstreamline', name: '压浆设置' , uid: null},
   { platform: 'grouting,windows', jurisdiction: 0, url: '/live-grouting', icon: 'icon-shishishipinjiankong', name: '压浆监控', uid: 'groutingLink' },
   { platform: 'all', jurisdiction: 1, url: '/project', icon: 'icon-xiangmu', name: '项目' , uid: null},
   { platform: 'all', jurisdiction: 1, url: '/component', icon: 'icon-bridge', name: '构建' , uid: null},
-  { platform: 'all', jurisdiction: 1, url: '/user', icon: 'icon-yonghu', name: '用户' },
+  { platform: 'all,electron', jurisdiction: 1, url: '/user', icon: 'icon-yonghu', name: '用户' },
   { platform: 'all', jurisdiction: 0, url: '/help', icon: 'icon-icon', name: '帮助', uid: null},
 ];
 @Component({
@@ -106,6 +106,11 @@ export class LoginComponent implements OnInit {
           // this.message.success('登录成功🙂');
           /** 菜单过滤 */
           this.appS.menus = menus.filter(menu => {
+            if (!this.e.isElectronApp) {
+              if (menu.platform.indexOf('electron') > -1) {
+                return;
+              }
+            }
             if (this.appS.platform === 'debug' || menu.platform.indexOf(this.appS.platform) > -1 || menu.platform === 'all') {
               return menu.jurisdiction <= user.jurisdiction;
             }
@@ -121,6 +126,7 @@ export class LoginComponent implements OnInit {
           }
           console.warn(url, goUrl)
           this.router.navigate([goUrl]);
+          this.e.ipcRenderer.send('update');
           // if (stateTension) {
           //   this.router.navigate(['/auto']);
           // } else if (this.appS.platform === 'tension') {

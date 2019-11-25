@@ -11,9 +11,9 @@
         </label>
       </nz-radio-group>
     </nz-form-item>
-  <form nz-form [formGroup]="formData" *ngIf="groupIndex !== null" @showAnimations >
+  <form nz-form [formGroup]="formData" >
     <div formArrayName="tensionHoleInfos">
-      <div [formArrayName]="groupIndex">
+      <div [formArrayName]="groupIndex" *ngIf="groupIndex !== null" @showAnimations >
         <div style="display: flow-root;" >
           <app-form-item label="孔号">
             <input type="text" readonly nz-input placeholder="请输入孔号" formControlName="name">
@@ -36,9 +36,8 @@
         </div>
       </div>
       <!-- <ng-container *ngFor="let item of tensionHoleInfosFormArray.controls; index as i" [formArrayName]="i">
-        <div class="hole-group" [ngClass]="{'active': item.value.name === groupItem?.name}" [hidden]=" !(item.value.name === groupItem?.name)">
+        <div class="hole-group" [hidden]="!(item.value.name === groupItem?.name)">
           <div>
-            {{item.value.name}}=={{groupItem?.name}}
             <app-form-item label="孔号">
               <input type="text" readonly nz-input placeholder="请输入孔号" formControlName="name">
             </app-form-item>
@@ -57,7 +56,7 @@
             </app-add-other>
           </div>
           <div>
-            <tension-hole-task [formData]="item" [data]="tensionHoleInfos[i]" [index]="i"></tension-hole-task>
+            <tension-hole-task [formData]="item" [data]="tensionHoleInfos[i]"></tension-hole-task>
           </div>
         </div>
       </ng-container> -->

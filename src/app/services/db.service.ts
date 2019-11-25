@@ -56,17 +56,19 @@ export class DbService {
       return { success: false, msg: '已存在' };
     }
     try {
+      console.log(this.appS.userInfo);
+      const user = this.appS.userInfo ? this.appS.userInfo.name : 'system'
       delete data.id;
       // tslint:disable-next-line:radix
       data.createdDate = new Date();
       data.modificationDate = new Date();
       data.uuid = uuid();
-      data.user = this.appS.userInfo.name || 'sys';
+      data.user =  user;
       const r = await this.db[tName].add(data);
       console.log('保存结果', r);
       return { success: true, id: r };
     } catch (error) {
-      console.log('错误', error);
+      console.error('错误', error);
       return { success: false, msg: error };
     }
   }

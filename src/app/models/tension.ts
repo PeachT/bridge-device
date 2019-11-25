@@ -3,23 +3,6 @@ import { JackItem, TensionDevice } from './jack';
 import { OtherInfo } from './common';
 
 export interface TensionTask extends TaskBase {
-  //   /** Id */
-  //   id?: any;
-  //   /** 名称 */
-  //   name: string;
-  //   /** 创建日期 */
-  //   createdDate?: any;
-  //   /** 修改日期 */
-  //   modificationDate?: any;
-  //   /** 创建用户 */
-  //   user?: any;
-  //   project: number;
-  //   component: any;
-  //   /** 开始时间 */
-  //   startDate: any;
-  //   /** 结束时间 */
-  //   endDate: any;
-  //   otherInfo?: Array<OtherInfo>;
   /** 梁长度 */
   beamLength: number;
   /** 张拉日期 */
@@ -27,9 +10,9 @@ export interface TensionTask extends TaskBase {
   /** 浇筑日期 */
   castingDate: Date;
   /** 张拉顺序 */
-  sort?: Array<string>;
+  sort: Array<string>;
   /** 设备编号 */
-  deviceNo?: number;
+  deviceNo: number;
   /** 是否作为模板 */
   template: boolean;
   /** 施工员 */
@@ -39,7 +22,7 @@ export interface TensionTask extends TaskBase {
   /** 自检员 */
   qualityInspector: string;
   /** 张拉孔数据 */
-  tensionHoleInfos?: Array<TensionHoleInfo>;
+  tensionHoleInfos: Array<TensionHoleInfo>;
 }
 export interface TensionHoleInfo {
   /** 孔号 */
@@ -53,9 +36,9 @@ export interface TensionHoleInfo {
   /** 张拉状态   =0 未张拉    =1一次张拉完成   =2 已张拉 */
   state: number;
   /** 上传状态 */
-  uploading?: boolean;
+  uploading: boolean;
   /** 其它数据 */
-  otherInfo?: Array<OtherInfo>;
+  otherInfo: Array<OtherInfo>;
   /** task */
   tasks: Array<TensionHoleTask>;
 }
@@ -76,9 +59,9 @@ export interface TensionHoleTask {
   /** 张拉模式  =42为4顶两端 =41为4顶单端  =21为2顶A1A2单端 =22为2顶A1B1单端 =23为2顶A1A2两端  =24为2顶B1B2两端 =25为2顶A1B1两端  =11为1顶A1单端  =12为1顶B1单端 =13为A1A2B1单端 */
   mode: number;
   /** 其它数据 */
-  otherInfo?: Array<OtherInfo>;
+  otherInfo: Array<OtherInfo>;
   /** 张拉记录 */
-  record?: TensionRecord;
+  record: TensionRecord;
 }
 /** 张拉阶段 */
 export interface TensionStage {
@@ -92,10 +75,10 @@ export interface TensionStage {
   uploadPercentage: number;
   /** 卸荷延时 */
   uploadDelay: number;
-  A1?: CalculateInfo;
-  A2?: CalculateInfo;
-  B1?: CalculateInfo;
-  B2?: CalculateInfo;
+  A1: CalculateInfo;
+  A2: CalculateInfo;
+  B1: CalculateInfo;
+  B2: CalculateInfo;
 }
 
 /** 计算数据 */
@@ -153,19 +136,19 @@ export interface TensionRecordStage {
 export interface Process {
   /** 采集频率 */
   hz: number;
-  A1?: JackProcess;
-  A2?: JackProcess;
-  B1?: JackProcess;
-  B2?: JackProcess;
+  A1: JackProcess;
+  A2: JackProcess;
+  B1: JackProcess;
+  B2: JackProcess;
   /** 说明 */
-  msg?: Array<Make>;
+  msg: Array<Make>;
 }
 /** 过程信息记录 */
 export interface Make {
   /** 说明 */
-  msg?: any;
+  msg: any;
   /** 过程index */
-  index?: number;
+  index: number;
 }
 /** 顶过程记录 */
 export interface JackProcess {
@@ -181,23 +164,23 @@ export const TensionTaskIndex = '++id, name, component, project';
 
 /** 张拉记录结果计算 */
 export interface RecordCompute {
-  stage?: Array<{
-    A1?: {
+  stage: Array<{
+    A1: {
       LZ: number;
       DR: number;
       Sn: number;
     },
-    A2?: {
+    A2: {
       LZ: number;
       DR: number;
       Sn: number;
     },
-    B1?: {
+    B1: {
       LZ: number;
       DR: number;
       Sn: number;
     },
-    B2?: {
+    B2: {
       LZ: number;
       DR: number;
       Sn: number;

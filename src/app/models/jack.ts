@@ -2,16 +2,6 @@ import { IBase } from './base';
 
 
 export interface TensionDevice extends IBase {
-  // /** Id */
-  // id?: any;
-  // /** 名称 */
-  // name: string;
-  // /** 创建日期 */
-  // createdDate?: any;
-  // /** 修改日期 */
-  // modificationDate?: any;
-  // /** 创建用户 */
-  // user?: any;
   /** 方程类型 */
   equation: boolean;
   /** 千斤顶型号 */
@@ -36,7 +26,7 @@ export interface JackItem {
   /** 标定系数b */
   b: number;
   /** 标定日期 */
-  date: Date | string | number;
+  date: Date;
 }
 
 /** 用户索引 */

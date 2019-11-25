@@ -9,6 +9,7 @@ import { MenuItem } from '../models/app';
 
 @Injectable({ providedIn: 'root' })
 export class AppService {
+  codeState = false;
   bodyWidth = 0;
   /** ID */
   ID = null;
@@ -25,12 +26,8 @@ export class AppService {
   uploadingData = JSON.parse(localStorage.getItem('uploadingData'));
   /** 软件信息 */
   public info = {
-    version: '6.3.22',
-    unit: {
-      name: '凌桥',
-      tel: '联系技术员',
-      logo: 'assets/img/lq/logo.png'
-    }
+    version: '6.3.24',
+    unit: null
   };
   /** 运行环境是否是Electron */
   public Environment: boolean;
@@ -92,12 +89,7 @@ export class AppService {
       this.setPlatFormName();
     }
     this.refresh = Number(localStorage.getItem('refresh')) || 50;
-    const info = JSON.parse(localStorage.getItem('unitInfo'));
-    if (!info) {
-      localStorage.setItem('unitInfo', JSON.stringify(this.info.unit));
-    } else {
-      this.info.unit = info;
-    }
+
     this.ID = localStorage.getItem('ID');
     if (!this.ID) {
       localStorage.setItem('ID', new Date().getTime().toString());

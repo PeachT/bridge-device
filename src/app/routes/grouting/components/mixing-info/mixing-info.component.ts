@@ -28,10 +28,10 @@ export class MixingInfoComponent implements OnInit, OnChanges {
     console.log('搅拌数据', this.data, this.formData);
   }
   ngOnChanges(changes: SimpleChanges) {
-    console.log('配比数据更新', changes, this.data);
-    this.createForm(this.data.mixingInfo).map(si => {
-      this.mixingInfoForm.push(si);
-    })
+    // console.log('配比数据更新', changes, this.data);
+    // this.createForm(this.data.mixingInfo).map(si => {
+    //   this.mixingInfoForm.push(si);
+    // })
   }
   createForm(mixingInfos: Array<MixingInfo> = []): FormGroup[] {
     return mixingInfos.map(d => {

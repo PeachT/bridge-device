@@ -4,6 +4,7 @@ import { AppService } from 'src/app/services/app.service';
 import { arrayValidator } from 'src/app/Validator/repetition.validator';
 import { ProportionItem, ProportionInfo } from 'src/app/models/grouting';
 import { waterBinderRatio } from 'src/app/Function/unit';
+import { proportionControl } from '../../createForm';
 
 @Component({
   // tslint:disable-next-line: component-selector
@@ -40,10 +41,10 @@ export class ProportionComponent implements OnInit, OnChanges {
   }
   ngOnChanges(changes: SimpleChanges) {
     console.log('配比数据更新', changes, this.data);
-    this.piFormGroup.controls.waterBinderRatio.setValue(this.data.waterBinderRatio);
-    this.createForm(this.data.proportions).map(si => {
-      this.proportionrFormArr.push(si)
-    })
+    // this.piFormGroup.controls.waterBinderRatio.setValue(this.data.waterBinderRatio);
+    // this.createForm(this.data.proportions).map(si => {
+    //   this.proportionrFormArr.push(si)
+    // })
   }
   /** 初始化Form */
   createForm(data: Array<ProportionItem>) {
@@ -63,7 +64,7 @@ export class ProportionComponent implements OnInit, OnChanges {
   /** 添加其他数据 */
   add() {
     const length = this.proportionrFormArr.value.length;
-    this.proportionrFormArr.push(this.proportionControl(length, { name: `外加剂${length - 2}`, type: 'xx外加剂', value: 0 }));
+    this.proportionrFormArr.push(proportionControl(length, { name: `外加剂${length - 2}`, type: 'xx外加剂', value: 0 }));
   }
   /** 删除其他数据 */
   del(index) {

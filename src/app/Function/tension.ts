@@ -334,6 +334,7 @@ export function HMIstage(data: TensionTask, index: number) {
   return {percentage: stageP, time: stageTime, ...jn, reboundWord, d2082};
 }
 
+/** 张拉组状态 */
 export function createGroupsName(data: TensionTask): Array<GroupsName> {
   console.log(data.tensionHoleInfos);
 

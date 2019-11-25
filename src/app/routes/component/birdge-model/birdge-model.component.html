@@ -2,7 +2,7 @@
   <div formArrayName="hole">
     <nz-form-item>
       <nz-divider style="min-width: auto;" nzText="梁型" nzOrientation="left"></nz-divider>
-      <button nz-button nzType="primary" nzSearch (click)="add()" type="button" *ngIf="appS.edit">添 加</button>
+      <button nz-button nzType="primary" nzSearch (click)="add()" type="button" *ngIf="edit">添 加</button>
     </nz-form-item>
     <div class="content" nz-row>
       <ng-container *ngFor="let item of forFormArr.controls; index as i" [formGroupName]="i">
@@ -13,7 +13,6 @@
                 <img height="100px" width="100%" [src]="item.value.imgBase64 || onImg">
                 <input type="file" (change)="fileChange($event, item)" class="file-input" [ngClass]="{'show': imgsrc}"
                 accept="image/png, image/jpeg, image/jpg" >
->
                 <!-- <input type="text" nz-input placeholder="图片" formControlName="imgBase64" hidden> -->
                 <!-- <button nz-button nzType="dashed" *ngIf="imgsrc">选择图片</button> -->
               </div>

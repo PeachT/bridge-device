@@ -4,10 +4,12 @@ import { format } from 'date-fns';
 import { Process } from 'src/app/models/tension';
 import { Subscription } from 'rxjs';
 import { AppService } from 'src/app/services/app.service';
+import { processInit } from 'src/app/models/tensionBase';
 // 引入 ECharts 主模块
 const echarts = require('echarts');
 
 const data: Process = {
+  ...processInit,
   hz: 1,
   A1: {
     mpa: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5],

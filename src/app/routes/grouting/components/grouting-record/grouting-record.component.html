@@ -5,7 +5,6 @@
       <label nz-radio-button [nzValue]="item" *ngFor="let item of groutingInfo; index as i" (click)="switchHole(item)"
         [ngClass]="{'hole-active': item.name === groupItem?.name}" [class]="'hole' + item.state"
         class="hole">
-        <!-- <i nz-icon nzType="cloud" nzTheme="outline" style="color: #00E676" *ngIf="!item.uploading"></i> -->
         <div *ngIf="item.uploading" class="template">
         </div>
         {{item.name}}</label>
@@ -38,6 +37,5 @@
         </div>
       </ng-container>
     </div>
-
   </form>
 </div>

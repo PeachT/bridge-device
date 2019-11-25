@@ -1,29 +1,24 @@
 import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { TensionTask, ManualGroup, TensionHoleInfo, GroupsName } from 'src/app/models/tension';
-import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
+import { FormGroup, FormArray } from '@angular/forms';
 import { DbService } from 'src/app/services/db.service';
 import { NzMessageService } from 'ng-zorro-antd';
 import { AppService } from 'src/app/services/app.service';
-import { HttpService } from 'src/app/services/http.service';
 import { nameRepetition } from 'src/app/Validator/async.validator';
-import { getModelBase, baseEnum } from 'src/app/models/base';
 import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Comp } from 'src/app/models/component';
 import { TensionDevice } from 'src/app/models/jack';
 import { TensionHolesComponent } from './tension-holes/tension-holes.component';
-import { getModeStr, holeNameShow, HMIstage, kn2Mpa } from 'src/app/Function/tension';
+import { getModeStr } from 'src/app/Function/tension';
 import { ScrollMenuComponent } from 'src/app/shared/scroll-menu/scroll-menu.component';
 import { PLCService } from 'src/app/services/plc.service';
-import { stringUnicode2Int16 } from 'src/app/Function/convertData';
-import { FC } from 'src/app/models/socketTCP';
-import { PLC_D, PLC_M } from 'src/app/models/IPCChannel';
 import { Router } from '@angular/router';
-import { tensionBase } from 'src/app/models/tensionBase';
-import { createForm, holeGroupForm_item, holeForm_item } from './CreateFormGroup.worker';
+import { tensionBase, tensionTaskInit, tensionHoleInfoInit, tensionHoleTaskInit, tensionStageInit } from 'src/app/models/tensionBase';
+import { createForm, holeForm_item } from './CreateFormGroup.worker';
 import { sleep } from 'sleep-ts';
 import { ifHMIData } from 'src/app/Function/tensionHMI';
-import { MenuItem } from 'src/app/models/app';
+import { copyAny } from 'src/app/models/baseInit';
 
 @Component({
   selector: 'app-tension',
@@ -71,12 +66,14 @@ export class TensionComponent implements OnInit, OnDestroy {
   menuStateFunc = (g: TensionTask) => {
     // console.log(g);
     return g.tensionHoleInfos.map(item => {
-      return item.state
+      const length = item.tasks.length - 1;
+      // console.log(item);
+      if (item.tasks.length > 0 && item.tasks[length].record) {
+        return item.tasks[length].record.state
+      }
+      return 0
     })
   }
-
-
-
 
   constructor(
     public db: DbService,
@@ -179,32 +176,29 @@ export class TensionComponent implements OnInit, OnDestroy {
   /**
    * *编辑/添加
    */
-  onEdit(data: TensionTask, modification = false) {
-    if (!modification) {
-      /** 复制 */
-      if (!data) {
-        data = { ...this.data };
-        data.id = null;
-        data.tensionDate = null;
-        data.castingDate = null;
-        data.template = false;
-        for (const g of data.tensionHoleInfos) {
-          g.state = 0;
-          g.uploading = false;
-          g.tasks.map(t => {
-            t.record = null;
-          })
-          console.log(g);
-        }
-        console.log(data);
-        this.data = data;
-        /** 添加 */
-      } else {
-        this.data = getModelBase(baseEnum.tension);
-        this.data.project = this.menuDom.projectId;
+  onEdit(state: string) {
+    /** 复制 */
+    if (state === 'copy') {
+      const data = copyAny(this.data);
+      data.id = null;
+      data.tensionDate = null;
+      data.castingDate = null;
+      data.template = false;
+      for (const g of data.tensionHoleInfos) {
+        g.state = 0;
+        g.uploading = false;
+        g.tasks.map(t => {
+          t.record = null;
+        })
+        console.log(g);
       }
-      console.log('添加', this.data);
+      console.log(data);
+      this.data = data;
+      /** 添加 */
+    } else if (state === 'add') {
+      this.data = {...copyAny(tensionTaskInit), project: this.menuDom.projectId}; // getModelBase(baseEnum.tension);
     }
+    console.log('编辑', state, this.data);
     this.formInit();
   }
   /**
@@ -365,58 +359,68 @@ export class TensionComponent implements OnInit, OnDestroy {
       getModeStr(g.mode).map(key => {
         jacks[key] = { reboundMm: 3.5, wordMm: 5, theoryMm: 0 };
       });
+      // const tensionHoleInfo: TensionHoleInfo = {
+      //   /** 孔号 */
+      //   name: holeName,
+      //   // tslint:disable-next-line:max-line-length
+      //   /** 张拉工艺(先张，后张，分级张拉第一级，分级张拉第二级等) */
+      //   stretchDrawProcess: '后张',
+      //   /** 张拉长度 */
+      //   length: null,
+      //   /** 钢绞线数量 */
+      //   steelStrandNum: null,
+      //   /** 张拉状态   =0 未张拉    =1一次张拉完成   =2 已张拉 */
+      //   state: 0,
+      //   /** 上传状态 */
+      //   uploading: false,
+      //   otherInfo: [],
+      //   /** task */
+      //   tasks: [
+      //     {
+      //       /** 二次张拉 */
+      //       twice: false,
+      //       /** 超张拉 */
+      //       super: false,
+      //       /** 补张拉 */
+      //       mend: false,
+      //       /** 设置张拉应力 */
+      //       tensionKn: 0,
+      //       /** 张拉设备 */
+      //       device,
+      //       // tslint:disable-next-line:max-line-length
+      //       /** 张拉模式  =42为4顶两端 =41为4顶单端  =21为2顶A1A2单端 =22为2顶A1B1单端 =23为2顶A1A2两端  =24为2顶B1B2两端 =25为2顶A1B1两端  =11为1顶A1单端  =12为1顶B1单端 =13为A1A2B1单端 */
+      //       mode: g.mode,
+      //       otherInfo: [],
+      //       /** 张拉阶段 */
+      //       stage: {
+      //         /** 张拉阶段应力百分比 */
+      //         knPercentage: [10, 20, 50, 100],
+      //         /** 阶段说明（初张拉 阶段一 超张拉 补张拉...） */
+      //         msg: ['初张拉', '阶段一', '阶段二', '终张拉'],
+      //         /** 阶段保压时间 */
+      //         time: [30, 30, 30, 300],
+      //         /** 卸荷比例 */
+      //         uploadPercentage: 10,
+      //         /** 卸荷延时 */
+      //         uploadDelay: 10,
+      //         /** 顶计算数据 */
+      //         ...jacks
+      //       },
+      //       /** 张拉记录 */
+      //       record: {
+      //         state: 0,
+      //         groups: []
+      //       },
+      //     }
+      //   ]
+      // };
       const tensionHoleInfo: TensionHoleInfo = {
-        /** 孔号 */
-        name: holeName,
-        // tslint:disable-next-line:max-line-length
-        /** 张拉工艺(先张，后张，分级张拉第一级，分级张拉第二级等) */
-        stretchDrawProcess: '后张',
-        /** 张拉长度 */
-        length: null,
-        /** 钢绞线数量 */
-        steelStrandNum: null,
-        /** 张拉状态   =0 未张拉    =1一次张拉完成   =2 已张拉 */
-        state: 0,
-        /** 上传状态 */
-        uploading: false,
-        otherInfo: [],
-        /** task */
+        ...tensionHoleInfoInit, name: holeName,
         tasks: [
           {
-            /** 二次张拉 */
-            twice: false,
-            /** 超张拉 */
-            super: false,
-            /** 补张拉 */
-            mend: false,
-            /** 设置张拉应力 */
-            tensionKn: 0,
-            /** 张拉设备 */
-            device,
-            // tslint:disable-next-line:max-line-length
-            /** 张拉模式  =42为4顶两端 =41为4顶单端  =21为2顶A1A2单端 =22为2顶A1B1单端 =23为2顶A1A2两端  =24为2顶B1B2两端 =25为2顶A1B1两端  =11为1顶A1单端  =12为1顶B1单端 =13为A1A2B1单端 */
+            ...tensionHoleTaskInit, device,
             mode: g.mode,
-            otherInfo: [],
-            /** 张拉阶段 */
-            stage: {
-              /** 张拉阶段应力百分比 */
-              knPercentage: [10, 20, 50, 100],
-              /** 阶段说明（初张拉 阶段一 超张拉 补张拉...） */
-              msg: ['初张拉', '阶段一', '阶段二', '终张拉'],
-              /** 阶段保压时间 */
-              time: [30, 30, 30, 300],
-              /** 卸荷比例 */
-              uploadPercentage: 10,
-              /** 卸荷延时 */
-              uploadDelay: 10,
-              /** 顶计算数据 */
-              ...jacks
-            },
-            /** 张拉记录 */
-            record: {
-              state: 0,
-              groups: []
-            },
+            stage: {...tensionStageInit, ...jacks}
           }
         ]
       };
@@ -440,7 +444,7 @@ export class TensionComponent implements OnInit, OnDestroy {
   switchGorup(data) {
     this.holeIndex = data.index;
     this.gourpItem = data.item;
-    console.log(data);
-
+    // console.log(data);
+    // this.cdr.detectChanges();
   }
 }

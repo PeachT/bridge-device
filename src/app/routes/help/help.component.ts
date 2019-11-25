@@ -250,6 +250,8 @@ export class HelpComponent implements OnInit {
     this.appS.setPlatFormName();
     this.router.navigate(['/login']);
   }
-
+  selectUnit() {
+    this.appS.codeState= true;
+  }
 
 }

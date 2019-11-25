@@ -80,7 +80,4 @@ export class GroutingMianComponent implements OnInit, OnChanges {
     console.log(value, this.componentHoles);
     this.outSelectComponent.emit(this.componentHoles.filter(f => f.value === value)[0].holes);
   }
-
-
-
 }

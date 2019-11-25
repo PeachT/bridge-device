@@ -11,7 +11,7 @@ export interface GroutingTask extends TaskBase {
   // /** 结束时间 */
   // endDate: any;
   // /** 其他数据信息 */
-  // otherInfo?: Array<OtherInfo>;
+  // otherInfo: Array<OtherInfo>;
   /** 梁长度 */
   beamLength: number;
   /** 张拉日期 */
@@ -33,9 +33,9 @@ export interface GroutingTask extends TaskBase {
   /** 配比信息 */
   proportionInfo: ProportionInfo;
   /** 压浆数据 */
-  groutingInfo?: Array<GroutingInfo>;
+  groutingInfo: Array<GroutingInfo>;
   /** 搅拌数据 */
-  mixingInfo?: Array<MixingInfo>;
+  mixingInfo: Array<MixingInfo>;
 }
 
 /** 压浆孔数据 */
@@ -54,16 +54,16 @@ export interface GroutingInfo {
   uploading: boolean;
   /** 压浆状态 */
   state: number;
-  otherInfo?: Array<OtherInfo>;
+  otherInfo: Array<OtherInfo>;
 }
 /** 压浆孔道采集数据 */
 export interface GroutingHoleItem {
   /** 压浆方向 */
   direction: string;
   /** 环境温度 */
-  envTemperature?: number;
+  envTemperature: number;
   /** 浆液温度 */
-  slurryTemperature?: number;
+  slurryTemperature: number;
   /** 开始时间 */
   startDate: Date;
   /** 完成时间 */
@@ -71,35 +71,35 @@ export interface GroutingHoleItem {
   /** 设置压浆压力 */
   setGroutingPressure: number;
   /** 进浆压力 */
-  intoPulpPressure?: number;
+  intoPulpPressure: number;
   /** 回浆压力 */
-  outPulpPressure?: number;
+  outPulpPressure: number;
   /** 稳压时间 */
   steadyTime: number;
   /** 设计浆量 */
-  setPulpvolume?:number;
+  setPulpvolume:number;
   /** 进浆量 (L) */
-  intoPulpvolume?: number;
+  intoPulpvolume: number;
   /** 回浆量 (L) */
-  outPulpvolume?: number;
+  outPulpvolume: number;
   /** 设置真空压力 */
-  setVacuumPumpPressure?: number;
+  setVacuumPumpPressure: number;
   /** 真空压力 */
-  vacuumPumpPressure?: number;
+  vacuumPumpPressure: number;
   /** 真空循环时间 */
-  cycletime?: number;
+  cycletime: number;
   /** 通过情况 */
-  passMsg?: string;
+  passMsg: string;
   /** 冒浆情况 */
-  slurryEmittingMsg?: string;
+  slurryEmittingMsg: string;
   /** 其他说明 */
-  remarks?: string;
+  remarks: string;
   /** 压浆过程数据 */
-  processDatas?: ProcessData;
+  processDatas: ProcessData;
   /** 真空过程数据 */
-  vacuumPumpProcessDatas?: Array<VacuumPumpProcessDatas>;
+  vacuumPumpProcessDatas: Array<VacuumPumpProcessDatas>;
   /** 其他数据信息 */
-  otherInfo?: Array<OtherInfo>;
+  otherInfo: Array<OtherInfo>;
 }
 
 /** 压浆过程数据 */
@@ -117,8 +117,11 @@ export interface ProcessData {
   /** 回浆量(L) */
   outPulpvolume: Array<number>;
   /** 说明 */
-  msg?: string;
-
+  msg: Array<ProcessDataMsg>;
+}
+export interface ProcessDataMsg {
+  length: number,
+  info: string
 }
 /** 压浆过程数据 */
 export interface VacuumPumpProcessDatas {
@@ -127,8 +130,7 @@ export interface VacuumPumpProcessDatas {
   /** 真空压力 */
   vacuumPumpPressure: number;
   /** 说明 */
-  msg: string;
-
+  msg: Array<ProcessDataMsg>;
 }
 
 /** 配比数据 */
@@ -164,7 +166,7 @@ export interface MixingInfo {
   /** 泌水率 */
   fluidity: number;
   /** 初始流动度 */
-  initFluidity?: number;
+  initFluidity: number;
   /** 黏稠度 */
   viscosity: number;
   /** 水胶比 */

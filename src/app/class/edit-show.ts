@@ -1,4 +1,4 @@
-import { copyAny } from '../models/base';
+import { copyAny } from '../models/baseInit';
 
 export class EditShow<T> {
   private data: T;

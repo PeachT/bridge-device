@@ -3,7 +3,6 @@ import { FormGroup, FormArray, FormBuilder, AbstractControl, ValidatorFn, Valida
 import { TensionStage, TensionHoleTask } from 'src/app/models/tension';
 import { Subscription } from 'rxjs';
 import { holeNameShow, getModeStr, createHoleTask } from 'src/app/Function/tension';
-import { copyAny } from 'src/app/models/base';
 import { AppService } from 'src/app/services/app.service';
 import { TensionDevice } from 'src/app/models/jack';
 import { DbService } from 'src/app/services/db.service';
@@ -233,8 +232,6 @@ export class TensionHoleTaskStageComponent implements OnInit, OnChanges {
   }
   /** 切换张拉模式 */
   async selectMode(mode: number) {
-    // const value = copyAny(this.stageGroup.value)
-    // const device: TensionDevice = await this.db.db.jack.filter(f => f.id === g.deviceId).first();
     const value = createHoleTask(mode);
     console.log(mode, value);
     this.knPercentageFormArray.clear();

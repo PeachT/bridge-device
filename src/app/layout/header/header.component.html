@@ -2,7 +2,8 @@
   <header>
     <div class="left" (click)="power()" style="cursor: pointer">
       <div class="logo">
-        <nz-avatar [nzSize]="56" nzShape="square" [nzSrc]="'./' + appS.info.unit.logo"></nz-avatar>
+        <!-- <nz-avatar [nzSize]="56" nzShape="square" [nzSrc]="'./' + appS.info.unit.logo"></nz-avatar> -->
+        <img style="width: 56px; height: 56px; border: 0;" [src]="'./' + appS.info.unit.logo || 'assets/img/all/logo.png'" >
       </div>
       <div class="user">
         <p>
